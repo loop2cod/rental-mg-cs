@@ -53,7 +53,7 @@ export function NavUser({
               <Avatar className="h-8 w-8 rounded-xl">
                 <AvatarImage src={user.avatar} alt={user.name} />
                 <AvatarFallback className="rounded-xl">AD</AvatarFallback>
-              </Avatar> 
+              </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{user.name}</span>
                 <span className="truncate text-xs">{user.email}</span>
