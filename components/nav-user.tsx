@@ -34,33 +34,41 @@ import { useTheme } from "@/hooks/useTheme"
 import { Switch } from "@/components/ui/switch"
 import { useState } from "react"
 import { Button } from "./ui/button"
+import { ColorTheme } from "@/context/ThemeContext"
 
 export function NavUser({
   user,
 }: {
   user: {
-    name: string
-    email?: string
-    avatar?: string
-  }
+    name: string;
+    email?: string;
+    avatar?: string;
+  };
 }) {
-  const { isMobile } = useSidebar()
-  const { theme, toggleTheme } = useTheme()
-  const [selectedColor, setSelectedColor] = useState("Zinc");
-  const colorOptions = [
-    { name: "Zinc", color: "bg-zinc-600" },
-    { name: "Red", color: "bg-red-600" },
-    { name: "Rose", color: "bg-rose-600" },
-    { name: "Orange", color: "bg-orange-600" },
-    { name: "Green", color: "bg-green-600" },
-    { name: "Blue", color: "bg-blue-600" },
-    { name: "Yellow", color: "bg-yellow-600" },
-    { name: "Violet", color: "bg-violet-600" },
-  ];
+  const { isMobile } = useSidebar();
+  const { theme, toggleTheme, colorTheme, toggleColorTheme } = useTheme();
+  const [selectedColor, setSelectedColor] = useState(colorTheme);
+
   const handleThemeToggle = () => {
-    const nextTheme = theme === "light" ? "dark" : "light"
-    toggleTheme(nextTheme)
-  }
+    const nextTheme = theme === "light" ? "dark" : "light";
+    toggleTheme(nextTheme);
+  };
+
+  const handleColorChange = (color: ColorTheme) => {
+    setSelectedColor(color);
+    toggleColorTheme(color);
+  };
+
+  const colorOptions = [
+    { name: "Zinc", value: "zinc", color: "bg-zinc-600" },
+    { name: "Red", value: "red", color: "bg-red-600" },
+    { name: "Rose", value: "rose", color: "bg-rose-600" },
+    { name: "Orange", value: "orange", color: "bg-orange-600" },
+    { name: "Green", value: "green", color: "bg-green-600" },
+    { name: "Blue", value: "blue", color: "bg-blue-600" },
+    { name: "Yellow", value: "yellow", color: "bg-yellow-600" },
+    { name: "Violet", value: "violet", color: "bg-violet-600" },
+  ];
 
   return (
     <SidebarMenu>
@@ -83,7 +91,7 @@ export function NavUser({
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg bg-primary-foreground"
             side={isMobile ? "bottom" : "right"}
             align="end"
             sideOffset={4}
@@ -119,28 +127,23 @@ export function NavUser({
                 </div>
               </DropdownMenuItem>
               <div className="grid grid-cols-2 gap-1">
-      {colorOptions.map((option) => (
-        <Button
-          key={option.name}
-          variant={selectedColor === option.name ? "default" : "outline"}
-          className={`flex items-center  p-0.5 rounded-xl text-xs hover:bg-primary/10 ${
-            selectedColor === option.name ? "border border-primary bg-secondary text-secondary-foreground" : ""
-          }`}
-          onClick={() => setSelectedColor(option.name)}
-        >
-          {/* Color Circle */}
-          <span
-            className={`w-4 h-4 rounded-full ${option.color}`}
-          ></span>
-          {/* Label */}
-          <span>{option.name}</span>
-          {/* Checkmark if selected */}
-          {selectedColor === option.name && (
-            <Check className="w-5 h-5 text-secondary-foreground" />
-          )}
-        </Button>
-      ))}
-    </div>
+                {colorOptions.map((option) => (
+                  <Button
+                    key={option.value}
+                    variant={selectedColor === option.value ? "default" : "outline"}
+                    className={`flex items-center p-0.5 rounded-xl text-xs hover:bg-primary/10 ${
+                      selectedColor === option.value ? "border border-primary bg-secondary text-secondary-foreground" : ""
+                    }`}
+                    onClick={() => handleColorChange(option.value as ColorTheme)}
+                  >
+                    <span className={`w-4 h-4 rounded-full ${option.color}`}></span>
+                    <span>{option.name}</span>
+                    {selectedColor === option.value && (
+                      <Check className="w-5 h-5 text-secondary-foreground" />
+                    )}
+                  </Button>
+                ))}
+              </div>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
@@ -151,5 +154,5 @@ export function NavUser({
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import ThemeContextProvider from "@/context/ThemeContext";
+import ThemeContextProvider, { ColorTheme, Theme } from "@/context/ThemeContext";
 import { cookies } from "next/headers";
 
 const geistSans = Geist({
@@ -25,19 +25,20 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const cookieStore = await cookies();
-  const initialTheme = (cookieStore.get("theme")?.value as "light" | "dark" | "system") || "light";
+  const initialTheme = (cookieStore.get("theme")?.value as Theme) || "light";
+  const initialColorTheme = (cookieStore.get("colorTheme")?.value as ColorTheme) || "zinc";
 
   const isDarkMode =
     initialTheme === "dark" ||
-    (initialTheme === "system" &&
-      false);
+    (initialTheme === "system" && false); // Update this to use system preference
 
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased ${isDarkMode ? "dark" : ""}`}
+        data-color-theme={initialColorTheme}
       >
-        <ThemeContextProvider initialTheme={initialTheme}>
+        <ThemeContextProvider initialTheme={initialTheme} initialColorTheme={initialColorTheme}>
           {children}
         </ThemeContextProvider>
       </body>
