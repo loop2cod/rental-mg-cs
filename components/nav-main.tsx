@@ -1,7 +1,7 @@
 "use client"
 
 import { ChevronRight, type LucideIcon } from "lucide-react"
-import { usePathname } from "next/navigation" // Import usePathname hook
+import { usePathname } from "next/navigation"
 import {
   Collapsible,
   CollapsibleContent,
@@ -38,20 +38,27 @@ export function NavMain({
     <SidebarGroup>
       <SidebarMenu>
         {items.map((item) => {
-          const isActive = item.url ? pathname === item.url : false
+          // Check if the parent URL matches the current pathname
+          const isParentActive = item.url ? pathname === item.url : false
+          // Check if any sub-item URL matches the current pathname
+          const isChildActive = item.items
+            ? item.items.some((subItem) => pathname === subItem.url)
+            : false
+          // Set isActive to true if either the parent or any child is active
+          const isActive = isParentActive || isChildActive
 
           return (
             <Collapsible
               key={item.title}
               asChild
-              defaultOpen={item.isActive}
+              defaultOpen={isActive} // Open the collapsible if the parent or any child is active
               className="group/collapsible"
             >
               <SidebarMenuItem>
-                <CollapsibleTrigger asChild>
+                <CollapsibleTrigger asChild className="mx-auto">
                   <SidebarMenuButton
                     tooltip={item.title}
-                    className={`flex items-center w-full p-2 rounded-md transition-colors text-secondary-foreground hover:bg-secondary-foreground/10`}
+                    className={`flex items-center w-full p-2 rounded-md transition-colors text-secondary-foreground hover:bg-secondary-foreground/10 mb-2`}
                   >
                     {item.icon && <item.icon className="mr-2" />}
                     <span>{item.title}</span>

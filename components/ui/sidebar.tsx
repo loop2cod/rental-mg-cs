@@ -163,7 +163,14 @@ function Sidebar({
   variant?: "sidebar" | "floating" | "inset"
   collapsible?: "offcanvas" | "icon" | "none"
 }) {
-  const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+  const { isMobile, state, openMobile, setOpenMobile, toggleSidebar } = useSidebar()
+
+  // Handle click on the collapsed sidebar to expand it
+  const handleCollapsedClick = () => {
+    if (state === "collapsed" && collapsible === "icon") {
+      toggleSidebar()
+    }
+  }
 
   if (collapsible === "none") {
     return (
@@ -237,6 +244,7 @@ function Sidebar({
             : "group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l",
           className
         )}
+        onClick={handleCollapsedClick} // Add click handler for collapsed state
         {...props}
       >
         <div

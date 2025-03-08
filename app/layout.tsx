@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import ThemeContextProvider from "@/context/ThemeContext";
+import { cookies } from "next/headers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,17 +19,27 @@ export const metadata: Metadata = {
   description: "Rental management for software",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const initialTheme = (cookieStore.get("theme")?.value as "light" | "dark" | "system") || "light";
+
+  const isDarkMode =
+    initialTheme === "dark" ||
+    (initialTheme === "system" &&
+      false);
+
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased ${isDarkMode ? "dark" : ""}`}
       >
-        {children}
+        <ThemeContextProvider initialTheme={initialTheme}>
+          {children}
+        </ThemeContextProvider>
       </body>
     </html>
   );
