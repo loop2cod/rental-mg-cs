@@ -35,6 +35,7 @@ import { Switch } from "@/components/ui/switch"
 import { useState } from "react"
 import { Button } from "./ui/button"
 import { ColorTheme } from "@/context/ThemeContext"
+import { cn } from "@/lib/utils"
 
 export function NavUser({
   user,
@@ -71,88 +72,94 @@ export function NavUser({
   ];
 
   return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <Avatar className="h-8 w-8 rounded-xl">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-xl">AD</AvatarFallback>
-              </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+<SidebarMenu>
+  <SidebarMenuItem>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <SidebarMenuButton
+          size="lg"
+          className={cn(
+            "data-[state=open]:bg-accent data-[state=open]:text-accent-foreground"
+          )}
+        >
+          <Avatar className="h-8 w-8 rounded-xl">
+            <AvatarImage src={user.avatar} alt={user.name} />
+            <AvatarFallback className="rounded-xl">AD</AvatarFallback>
+          </Avatar>
+          <div className="grid flex-1 text-left text-sm leading-tight">
+            <span className="truncate font-semibold">{user.name}</span>
+            <span className="truncate text-xs text-muted-foreground">{user.email}</span>
+          </div>
+          <ChevronsUpDown className="ml-auto size-4" />
+        </SidebarMenuButton>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        className={cn(
+          "w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg bg-popover"
+        )}
+        side={isMobile ? "bottom" : "right"}
+        align="end"
+        sideOffset={4}
+      >
+        <DropdownMenuLabel className="p-0 font-normal">
+          <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+            <Avatar className="h-8 w-8 rounded-xl">
+              <AvatarImage src={user.avatar} alt={user.name} />
+              <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+            </Avatar>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-semibold">{user.name}</span>
+              <span className="truncate text-xs text-muted-foreground">{user.email}</span>
+            </div>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem>
+            <Bell className="mr-2 size-4" />
+            Notifications
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center gap-2">
+                <Sparkles className="mr-2 size-4" />
+                Dark Theme
               </div>
-              <ChevronsUpDown className="ml-auto size-4" />
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg bg-primary-foreground"
-            side={isMobile ? "bottom" : "right"}
-            align="end"
-            sideOffset={4}
-          >
-            <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-xl">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-                </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
-                </div>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <div className="flex items-center justify-between w-full">
-                  <div className="flex items-center gap-2">
-                    <Sparkles />
-                    Dark Theme
-                  </div>
-                  <Switch
-                    checked={theme === "dark"}
-                    onCheckedChange={handleThemeToggle}
-                  />
-                </div>
-              </DropdownMenuItem>
-              <div className="grid grid-cols-2 gap-1">
-                {colorOptions.map((option) => (
-                  <Button
-                    key={option.value}
-                    variant={selectedColor === option.value ? "default" : "outline"}
-                    className={`flex items-center p-0.5 rounded-xl text-xs hover:bg-primary/10 ${
-                      selectedColor === option.value ? "border border-primary bg-secondary text-secondary-foreground" : ""
-                    }`}
-                    onClick={() => handleColorChange(option.value as ColorTheme)}
-                  >
-                    <span className={`w-4 h-4 rounded-full ${option.color}`}></span>
-                    <span>{option.name}</span>
-                    {selectedColor === option.value && (
-                      <Check className="w-5 h-5 text-secondary-foreground" />
-                    )}
-                  </Button>
-                ))}
-              </div>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOut />
-              Log out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
+              <Switch
+                checked={theme === "dark"}
+                onCheckedChange={handleThemeToggle}
+              />
+            </div>
+          </DropdownMenuItem>
+          <div className="grid grid-cols-2 gap-1">
+            {colorOptions.map((option) => (
+              <Button
+                key={option.value}
+                variant={selectedColor === option.value ? "default" : "outline"}
+                className={cn(
+                  "flex items-center p-0.5 rounded-xl text-xs hover:bg-accent/10",
+                  selectedColor === option.value &&
+                    "border border-primary bg-secondary text-secondary-foreground"
+                )}
+                onClick={() => handleColorChange(option.value as ColorTheme)}
+              >
+                <span className={`w-4 h-4 rounded-full ${option.color}`}></span>
+                <span>{option.name}</span>
+                {selectedColor === option.value && (
+                  <Check className="w-5 h-5 text-secondary-foreground" />
+                )}
+              </Button>
+            ))}
+          </div>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>
+          <LogOut className="mr-2 size-4" />
+          Log out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  </SidebarMenuItem>
+</SidebarMenu>
   );
 }

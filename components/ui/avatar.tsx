@@ -18,7 +18,7 @@ function Avatar({
       )}
       {...props}
     />
-  )
+  );
 }
 
 function AvatarImage({
@@ -31,7 +31,7 @@ function AvatarImage({
       className={cn("aspect-square size-full", className)}
       {...props}
     />
-  )
+  );
 }
 
 function AvatarFallback({
@@ -47,7 +47,7 @@ function AvatarFallback({
       )}
       {...props}
     />
-  )
+  );
 }
 
 export { Avatar, AvatarImage, AvatarFallback }
