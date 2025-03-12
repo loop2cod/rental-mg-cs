@@ -45,7 +45,6 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-
 :root {
   --background: #f4f4f5;           /* oklch(0, 0%, 95%) - Very light neutral gray */
   --foreground: #27272a;           /* oklch(0, 0%, 15%) - Dark gray for text */
@@ -66,12 +65,12 @@
   --border: #d4d4d8;               /* oklch(0, 0%, 85%) - Light gray for borders */
   --input: #e4e4e7;                /* oklch(0, 0%, 90%) - Light gray for inputs */
   --ring: #3f3f46;                 /* oklch(0, 0%, 25%) - Medium-dark gray for focus */
-  --radius: 0.5rem;                /* Slightly larger radius for shadcn-like softness */
+  --radius: 0.3rem;                /* Slightly larger radius for shadcn-like softness */
   --chart-1: #71717a;              /* oklch(0, 0%, 45%) - Mid gray */
   --chart-2: #a1a1aa;              /* oklch(0, 0%, 65%) - Lighter gray */
   --chart-3: #3f3f46;              /* oklch(0, 0%, 25%) - Darker gray */
   --chart-4: #d4d4d8;              /* oklch(0, 0%, 85%) - Light gray */
-  --chart-5: #52525b;             /* oklch(27, 87, 67%) - Amber */
+  --chart-5: #52525b;             /* oklch(27, 87, 67%) - Amber */             --sidebar: hsl(0 0% 98%);             --sidebar-foreground: hsl(240 5.3% 26.1%);             --sidebar-primary: hsl(240 5.9% 10%);             --sidebar-primary-foreground: hsl(0 0% 98%);             --sidebar-accent: hsl(240 4.8% 95.9%);             --sidebar-accent-foreground: hsl(240 5.9% 10%);             --sidebar-border: hsl(220 13% 91%);             --sidebar-ring: hsl(217.2 91.2% 59.8%);
 }
 
 .dark {
@@ -98,7 +97,7 @@
   --chart-2: #71717a;              /* oklch(0, 0%, 45%) - Mid gray */
   --chart-3: #d4d4d8;              /* oklch(0, 0%, 85%) - Light gray */
   --chart-4: #3f3f46;              /* oklch(0, 0%, 25%) - Darker gray */
-  --chart-5: #52525b;               /* oklch(340, 75, 55%) - Pink */
+  --chart-5: #52525b;               /* oklch(340, 75, 55%) - Pink */               --sidebar: hsl(240 5.9% 10%);               --sidebar-foreground: hsl(240 4.8% 95.9%);               --sidebar-primary: hsl(224.3 76.3% 48%);               --sidebar-primary-foreground: hsl(0 0% 100%);               --sidebar-accent: hsl(240 3.7% 15.9%);               --sidebar-accent-foreground: hsl(240 4.8% 95.9%);               --sidebar-border: hsl(240 3.7% 15.9%);               --sidebar-ring: hsl(217.2 91.2% 59.8%);
 }
 
 /* zinc Theme */
@@ -122,7 +121,7 @@
   --border: #d4d4d8;               /* oklch(0, 0%, 85%) - Light gray for borders */
   --input: #e4e4e7;                /* oklch(0, 0%, 90%) - Light gray for inputs */
   --ring: #3f3f46;                 /* oklch(0, 0%, 25%) - Medium-dark gray for focus */
-  --radius: 0.5rem;                /* Slightly larger radius for shadcn-like softness */
+  --radius: 0.3rem;                /* Slightly larger radius for shadcn-like softness */
   --chart-1: #71717a;              /* oklch(0, 0%, 45%) - Mid gray */
   --chart-2: #a1a1aa;              /* oklch(0, 0%, 65%) - Lighter gray */
   --chart-3: #3f3f46;              /* oklch(0, 0%, 25%) - Darker gray */
@@ -157,7 +156,6 @@
   --chart-5: #52525b;              /* oklch(0, 0%, 35%) - Medium gray */
 }
 
-
 /* Red Theme */
 [data-color-theme="red"] {
   --background: #ffffff;
@@ -181,7 +179,7 @@
   --ring: #dc2626;
   --radius: 0.3rem;
   --chart-1: #f87171;
-  --chart-2: #0d9488;
+  --chart-2: #dc2626;
   --chart-3: #1e3a8a;
   --chart-4: #facc15;
   --chart-5: #fb923c;
@@ -207,14 +205,12 @@
   --border: #262626;
   --input: #262626;
   --ring: #dc2626;
-  --chart-1: #3b82f6;
-  --chart-2: #10b981;
+  --chart-1: #f87171;
+  --chart-2: #dc2626;
   --chart-3: #f59e0b;
   --chart-4: #a855f7;
   --chart-5: #ec4899;
 }
-
-
 
 /* Rose Theme */
 [data-color-theme="rose"] {
@@ -238,8 +234,8 @@
   --input: #e5e5e5;
   --ring: #e11d48;
   --radius: 0.3rem;
-  --chart-1: #f87171;
-  --chart-2: #0d9488;
+  --chart-1: rgb(239, 148, 148);
+  --chart-2: #e11d48;
   --chart-3: #1e3a8a;
   --chart-4: #facc15;
   --chart-5: #fb923c;
@@ -265,8 +261,8 @@
   --border: #262626;
   --input: #262626;
   --ring: #e11d48;
-  --chart-1: #3b82f6;
-  --chart-2: #10b981;
+  --chart-1: rgb(239, 148, 148);
+  --chart-2: #e11d48;
   --chart-3: #f59e0b;
   --chart-4: #a855f7;
   --chart-5: #ec4899;
@@ -294,8 +290,8 @@
   --input: #e5e5e5;
   --ring: #f97316;
   --radius: 0.3rem;
-  --chart-1: #f87171;
-  --chart-2: #0d9488;
+  --chart-1: #f59e0b;
+  --chart-2: #f97316;
   --chart-3: #1e3a8a;
   --chart-4: #facc15;
   --chart-5: #fb923c;
@@ -321,8 +317,8 @@
   --border: #262626;
   --input: #262626;
   --ring: #ea580c;
-  --chart-1: #3b82f6;
-  --chart-2: #10b981;
+  --chart-1: #f59e0b;
+  --chart-2: #f97316;
   --chart-3: #f59e0b;
   --chart-4: #a855f7;
   --chart-5: #ec4899;
@@ -350,8 +346,8 @@
   --input: #e5e5e5;
   --ring: #16a34a;
   --radius: 0.3rem;
-  --chart-1: #f87171;
-  --chart-2: #0d9488;
+  --chart-1: #43db7b;
+  --chart-2: #16a34a;
   --chart-3: #1e3a8a;
   --chart-4: #facc15;
   --chart-5: #fb923c;
@@ -377,13 +373,12 @@
   --border: #262626;
   --input: #262626;
   --ring: #22c55e;
-  --chart-1: #3b82f6;
-  --chart-2: #10b981;
+  --chart-1: #43db7b;
+  --chart-2: #16a34a;
   --chart-3: #f59e0b;
   --chart-4: #a855f7;
   --chart-5: #ec4899;
 }
-
 
 /* Blue Theme */
 [data-color-theme="blue"] {
@@ -407,8 +402,8 @@
   --input: #cbd5e1;
   --ring: #3b82f6;
   --radius: 0.3rem;
-  --chart-1: #d65a31;
-  --chart-2: #28a745;
+  --chart-1: #7faffc;
+  --chart-2: #3b82f6;
   --chart-3: #145374;
   --chart-4: #f4a261;
   --chart-5: #f4b400;  
@@ -434,8 +429,8 @@
   --border: #1e293b;
   --input: #1e293b;
   --ring: #2563eb;
-  --chart-1: #007bff;
-  --chart-2: #28c76f;
+  --chart-1: #7faffc;
+  --chart-2: #3b82f6;
   --chart-3: #ffa500;
   --chart-4: #8b5cf6;
   --chart-5: #ff007f;  
@@ -463,8 +458,8 @@
   --input: #e5e5e5;
   --ring: #1a1a1a;
   --radius: 0.3rem;
-  --chart-1: #f87171;
-  --chart-2: #0d9488;
+  --chart-1: #f9e198d4;
+  --chart-2: #eab308;
   --chart-3: #1e3a8a;
   --chart-4: #facc15;
   --chart-5: #fb923c;
@@ -490,8 +485,8 @@
   --border: #262626;
   --input: #262626;
   --ring: #ca8a04;
-  --chart-1: #3b82f6;
-  --chart-2: #10b981;
+  --chart-1: #f9e198d4;
+  --chart-2: #eab308;
   --chart-3: #f59e0b;
   --chart-4: #a855f7;
   --chart-5: #ec4899;
