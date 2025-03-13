@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ThemeContextProvider, { ColorTheme, Theme } from "@/context/ThemeContext";
 import { cookies } from "next/headers";
+import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,6 +40,7 @@ export default async function RootLayout({
         data-color-theme={initialColorTheme}
       >
         <ThemeContextProvider initialTheme={initialTheme} initialColorTheme={initialColorTheme}>
+        <Toaster />
           {children}
         </ThemeContextProvider>
       </body>

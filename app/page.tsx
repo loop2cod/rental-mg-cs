@@ -1,3 +1,4 @@
+'use client'
 import { AppSidebar } from "@/components/app-sidebar"
 import {
   Breadcrumb,
@@ -14,13 +15,17 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent} from "@/components/ui/tabs"
 import {  CheckCircle, Clock, IndianRupee, Package} from "lucide-react"
 import Section2 from "@/components/Dashboard/Section2"
 import Section1 from "@/components/Dashboard/Section1"
+import { useEffect } from "react"
+import Cookies from "js-cookie"
+import { withAuth } from "@/components/Middleware/withAuth"
 
 
-export default function Home() {
+
+function Home() {
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -42,9 +47,6 @@ export default function Home() {
         <div className="flex flex-1 flex-col gap-4 p-2 pt-0">
         <div className="flex-col md:flex">
   <Tabs defaultValue="overview" className="space-y-4">
-    <TabsList>
-      <TabsTrigger value="overview">Overview</TabsTrigger>
-    </TabsList>
     <TabsContent value="overview" className="space-y-4">
       {/* Grid layout for cards */}
       <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -114,3 +116,5 @@ export default function Home() {
     </SidebarProvider>
   );
 }
+
+export default withAuth(Home);
