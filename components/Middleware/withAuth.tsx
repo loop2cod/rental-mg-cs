@@ -26,7 +26,7 @@ export function withAuth<T extends object>(Component: React.ComponentType<T>) {
     useEffect(() => {
       const checkAuth = async () => {
         try {
-          const response = await post<AuthResponse>(API_ENDPOINTS.AUTH.VERIFY);
+          const response = await post<AuthResponse>(API_ENDPOINTS.AUTH.VERIFY,{},{ withCredentials: true });
 
           if (response.success) {
             setIsAuthenticated(true);

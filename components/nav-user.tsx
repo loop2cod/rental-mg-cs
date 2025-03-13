@@ -36,6 +36,18 @@ import { useState } from "react"
 import { Button } from "./ui/button"
 import { ColorTheme } from "@/context/ThemeContext"
 import { cn } from "@/lib/utils"
+import { useRouter } from "next/navigation"
+import { post } from "@/utilities/AxiosInterceptor"
+import { API_ENDPOINTS } from "@/lib/apiEndpoints"
+import { toast } from "./ui/use-toast"
+
+
+interface AuthResponse {
+  success: boolean;
+  data?: any;
+  message?: string;
+  sessionOut?: boolean;
+}
 
 export function NavUser({
   user,
@@ -70,6 +82,24 @@ export function NavUser({
     { name: "Yellow", value: "yellow", color: "bg-yellow-600" },
     { name: "Violet", value: "violet", color: "bg-violet-600" },
   ];
+
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      const response = await post<AuthResponse>(API_ENDPOINTS.AUTH.LOGOUT, {}, { withCredentials: true });
+
+      if (response.success) {
+        router.push('/auth');
+      }
+    } catch (error:any) {
+      toast({
+          title: 'Error',
+          description: error.response?.data?.message || error.message || 'Failed to verify authentication',
+          variant: 'destructive',
+      })
+    }
+  };
 
   return (
 <SidebarMenu>
@@ -153,7 +183,7 @@ export function NavUser({
           </div>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleLogout}>
           <LogOut className="mr-2 size-4" />
           Log out
         </DropdownMenuItem>

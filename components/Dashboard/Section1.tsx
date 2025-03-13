@@ -27,7 +27,7 @@ const Section1 = () => {
                 <div className='mx-4 border-b-3'>
                     <h4 className='font-semibold text-lg'>Quick menu</h4>
                 </div>
-                <div className="grid grid-cols-2 lg:grid-cols-2 gap-4 w-full px-3 pt-3">
+                <div className="grid grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4 w-full px-3 pt-3">
                     {[
                         { icon: PlusCircle, label: "New Booking" },
                         { icon: CheckCircle, label: "Orders" },
@@ -41,7 +41,7 @@ const Section1 = () => {
                             className="bg-primary hover:bg-primary/90 text-primary-foreground h-auto py-3 flex flex-col items-center gap-2 text-sm sm:text-base cursor-pointer border rounded"
                         >
                             <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
-                            <span>{label}</span>
+                            <span className='text-xs md:text-sm lg:text-xs xl:text-base'>{label}</span>
                         </Button>
                     ))}
                 </div>
@@ -55,7 +55,7 @@ const Section1 = () => {
                         <CardDescription className="text-sm text-muted-foreground">Latest bookings and their status.</CardDescription>
                     </CardHeader>
                     <CardContent className="overflow-x-auto">
-                        <ScrollArea className='h-[230px]'>
+                        <ScrollArea className='h-[220px] lg:h-[400px] xl:h-[220px]'>
                             <Table>
                                 <TableHeader>
                                     <TableRow>

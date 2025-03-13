@@ -36,7 +36,7 @@ const chartConfig = {
 
 const Section2 = () => {
     return (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-5 lg:grid-cols-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-6">
             {/* Chart Section */}
             <div className="w-full col-span-3">
                 <Card className="shadow-md rounded-xl border border-muted">
@@ -62,7 +62,7 @@ const Section2 = () => {
                 <Card className="h-full bg-card text-card-foreground shadow-sm">
                     <CardTitle className="text-lg sm:text-xl font-semibold px-4">Notifications</CardTitle>
                     <CardContent>
-                        <ScrollArea className="h-[325px] pr-4">
+                        <ScrollArea className="xl:h-[325px] pr-4">
                             <div className="space-y-4">
                                 {[
                                     { message: "New booking received", time: "5 minutes ago" },

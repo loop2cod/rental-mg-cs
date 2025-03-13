@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from "@/lib/apiEndpoints";
 import axios, { AxiosRequestConfig } from "axios";
 
 // Apply base URL for axios
@@ -10,9 +11,8 @@ const axiosApi = axios.create({
 
 // Function to refresh the token
 const refreshTokenApi = async () => {
-  const refreshUrl = `api/v1/auth/refresh`;
   try {
-    const response = await axiosApi.post(refreshUrl, {}, { withCredentials: true });
+    const response = await axiosApi.post(API_ENDPOINTS.AUTH.REFRESH, {}, { withCredentials: true });
     if (response?.data?.success) {
       return true;
     } else {
