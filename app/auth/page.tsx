@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,6 +12,7 @@ import Authorised from '@/components/Middleware/Authorised';
 import { API_ENDPOINTS } from '@/lib/apiEndpoints';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { post } from '@/utilities/AxiosInterceptor';
+import Spinner from '@/components/Spinner';
 
 interface AuthResponse {
   success: boolean;
@@ -33,21 +34,29 @@ const Page = () => {
   const checkAuth = async () => {
     try {
       const response = await post<AuthResponse>(API_ENDPOINTS.AUTH.VERIFY, {}, { withCredentials: true });
-
       if (response.success) {
         setOk(true);
-      } else if (!response.success && response.sessionOut) {
+      } else {
         setOk(false);
       }
-    } catch (error) {
-      console.error('Error during token verification:', error);
-      setOk(false);
+    } catch (error: any) {
+      if (error.response?.status === 400 && error.response?.data?.sessionOut === true) {
+        setOk(false);
+      } else {
+        toast({
+          title: 'Error',
+          description: error.response?.data?.message || error.message || 'Failed to verify authentication',
+          variant: 'destructive',
+        });
+        setOk(false);
+      }
     }
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     checkAuth();
   }, []);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,6 +89,7 @@ const Page = () => {
       );
 
       if (response.success) {
+        console.log('done')
         const redirectTo = redirect ? decodeURIComponent(redirect) : '/';
         router.push(redirectTo);
       } else {
@@ -115,6 +125,7 @@ const Page = () => {
   }, [toast]);
 
   if (ok) return <Authorised />;
+  if (ok === null) return <Spinner/>;
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center bg-secondary/40 p-6 md:p-10">
@@ -135,7 +146,7 @@ const Page = () => {
                         className="border border-primary"
                         id="mobile"
                         type="tel"
-                        placeholder="+91 9876543123"
+                        placeholder="Mobile with 91"
                         value={mobile}
                         onChange={(e) => setMobile(e.target.value)}
                         required
@@ -155,6 +166,7 @@ const Page = () => {
                         className="border border-primary"
                         id="password"
                         type="password"
+                        placeholder='password'
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
@@ -170,7 +182,7 @@ const Page = () => {
                 <img
                   src="/loginbf.jpg"
                   alt="Login Background"
-                  className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+                  className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.8]"
                 />
               </div>
             </CardContent>
