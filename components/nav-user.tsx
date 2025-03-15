@@ -40,6 +40,7 @@ import { useRouter } from "next/navigation"
 import { post } from "@/utilities/AxiosInterceptor"
 import { API_ENDPOINTS } from "@/lib/apiEndpoints"
 import { toast } from "./ui/use-toast"
+import Spinner from "./Spinner"
 
 
 interface AuthResponse {
@@ -61,6 +62,8 @@ export function NavUser({
   const { isMobile } = useSidebar();
   const { theme, toggleTheme, colorTheme, toggleColorTheme } = useTheme();
   const [selectedColor, setSelectedColor] = useState(colorTheme);
+  const router = useRouter();
+  const [loading, setloading] = useState(false);
 
   const handleThemeToggle = () => {
     const nextTheme = theme === "light" ? "dark" : "light";
@@ -83,9 +86,8 @@ export function NavUser({
     { name: "Violet", value: "violet", color: "bg-violet-600" },
   ];
 
-  const router = useRouter();
-
   const handleLogout = async () => {
+    setloading(true);
     try {
       const response = await post<AuthResponse>(API_ENDPOINTS.AUTH.LOGOUT, {}, { withCredentials: true });
 
@@ -98,8 +100,11 @@ export function NavUser({
           description: error.response?.data?.message || error.message || 'Failed to verify authentication',
           variant: 'destructive',
       })
+    }finally{
+      setloading(false);
     }
   };
+  if(loading){<Spinner/>}
 
   return (
 <SidebarMenu>

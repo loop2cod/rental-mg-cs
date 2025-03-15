@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -13,6 +12,7 @@ import { API_ENDPOINTS } from '@/lib/apiEndpoints';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { post } from '@/utilities/AxiosInterceptor';
 import Spinner from '@/components/Spinner';
+import axios from 'axios';
 
 interface AuthResponse {
   success: boolean;
@@ -22,6 +22,7 @@ interface AuthResponse {
 }
 
 const Page = () => {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -33,8 +34,8 @@ const Page = () => {
 
   const checkAuth = async () => {
     try {
-      const response = await post<AuthResponse>(API_ENDPOINTS.AUTH.VERIFY, {}, { withCredentials: true });
-      if (response.success) {
+      const response = await axios.post(`${apiUrl}${API_ENDPOINTS.AUTH.VERIFY}`, {}, { withCredentials: true });
+      if (response?.data?.success) {
         setOk(true);
       } else {
         setOk(false);
