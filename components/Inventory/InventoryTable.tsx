@@ -38,24 +38,29 @@ export function InventoryTable({ inventory, onEdit, onDelete }: InventoryTablePr
       accessorKey: "product_id.name",
       sortable: true,
       searchable: true,
+      cell: (item: any) => (
+        <span className="underline decoration-secondary-foreground decoration-2 underline-offset-4 cursor-pointer">
+          {item.product_id.name}
+        </span>
+      ),
     },
     {
-        id: "features",
-        header: "Features",
-        accessorKey: "product_id.features", // Add accessorKey to access nested features
-        cell: (item) => (
-          <div className="flex flex-wrap gap-1">
-            {item.product_id.features &&
-              Object.entries(item.product_id.features).map(([key, value]: any) => (
-                <Badge key={key} variant="outline" className="capitalize">
-                  {key}: {value}
-                </Badge>
-              ))}
-          </div>
-        ),
-        sortable: false,
-        searchable: false,
-      },
+      id: "features",
+      header: "Features",
+      accessorKey: "product_id.features",
+      cell: (item) => (
+        <div className="flex flex-wrap gap-1">
+          {item.product_id.features &&
+            Object.entries(item.product_id.features).map(([key, value]: any) => (
+              <Badge key={key} variant="outline" className="capitalize">
+                {key}: {value}
+              </Badge>
+            ))}
+        </div>
+      ),
+      sortable: false,
+      searchable: false,
+    },
     {
       id: "price",
       header: "Price",
@@ -110,7 +115,7 @@ export function InventoryTable({ inventory, onEdit, onDelete }: InventoryTablePr
       <DataTable
         data={inventory}
         columns={columns}
-        // serialNumber={true}
+        serialNumber={true}
         showSearchBar={true}
         showPdfExport={true}
         showExcelExport={true}

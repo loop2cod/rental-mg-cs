@@ -16,10 +16,14 @@ function convertToCSV<T>(data: T[], columns: ColumnDef<T>[]): string {
   
     // Create data rows
     const rows = data
-      .map((item) => {
+      .map((item, index) => {
         return columns
           .filter((col) => col.id !== "actions" && col.id !== "image") // Exclude action and image columns
           .map((col) => {
+            if (col.id === "serialNumber") {
+              // Handle SI No. column
+              return index + 1
+            }
             if (col.accessorKey) {
               const value = getNestedValue(item, col.accessorKey)
               if (col.id === "features" && typeof value === "object") {
@@ -92,11 +96,15 @@ export function exportToPdf<T>(data: T[], columns: ColumnDef<T>[], fileName: str
           <tbody>
             ${data
               .map(
-                (item) => `
+                (item, index) => `
               <tr>
                 ${columns
                   .filter((col) => col.id !== "actions" && col.id !== "image")
                   .map((col) => {
+                    if (col.id === "serialNumber") {
+                      // Handle SI No. column
+                      return `<td>${index + 1}</td>`
+                    }
                     if (col.accessorKey) {
                       const value = getNestedValue(item, col.accessorKey)
                       if (col.id === "features" && typeof value === "object") {

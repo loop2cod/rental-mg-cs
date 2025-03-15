@@ -46,6 +46,7 @@ interface DataTableProps<T> {
   totalCount?: number
   onPageChange?: (page: number) => void
   onPageSizeChange?: (size: number) => void
+  serialNumber?: boolean // New prop to enable/disable SI No. column
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -66,6 +67,7 @@ export function DataTable<T extends Record<string, any>>({
   totalCount: externalTotalCount,
   onPageChange,
   onPageSizeChange,
+  serialNumber = true, // Default to true
 }: DataTableProps<T>) {
   const [searchTerm, setSearchTerm] = useState("")
   const [sortField, setSortField] = useState<string | null>(null)
@@ -76,6 +78,22 @@ export function DataTable<T extends Record<string, any>>({
   const currentPage = externalCurrentPage ?? internalCurrentPage
   const totalPages = externalTotalPages ?? Math.ceil(data.length / itemsPerPage)
   const totalCount = externalTotalCount ?? data.length
+
+  // Add SI No. column if serialNumber is true
+  const finalColumns:any = useMemo(() => {
+    if (!serialNumber) return columns
+
+    return [
+      {
+        id: "serialNumber",
+        header: "SI No.",
+        cell: (_:any, index: number) => (currentPage - 1) * itemsPerPage + index + 1,
+        sortable: false,
+        searchable: false,
+      },
+      ...columns,
+    ]
+  }, [columns, serialNumber, currentPage, itemsPerPage])
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -96,7 +114,7 @@ export function DataTable<T extends Record<string, any>>({
     if (!searchTerm.trim()) return data
 
     return data.filter((item) => {
-      return columns.some((column) => {
+      return finalColumns.some((column:any) => {
         if (!column.searchable) return false
 
         const value = column.accessorKey ? getNestedValue(item, column.accessorKey) : null
@@ -106,14 +124,14 @@ export function DataTable<T extends Record<string, any>>({
         return String(value).toLowerCase().includes(searchTerm.toLowerCase())
       })
     })
-  }, [data, searchTerm, columns])
+  }, [data, searchTerm, finalColumns])
 
   // Sort data
   const sortedData = useMemo(() => {
     if (!sortField) return filteredData
 
     return [...filteredData].sort((a, b) => {
-      const column = columns.find((col) => col.id === sortField)
+      const column:any = finalColumns.find((col:any) => col.id === sortField)
       if (!column || !column.accessorKey) return 0
 
       const valueA = getNestedValue(a, column.accessorKey)
@@ -130,7 +148,7 @@ export function DataTable<T extends Record<string, any>>({
       if (valueA > valueB) return sortDirection === "asc" ? 1 : -1
       return 0
     })
-  }, [filteredData, sortField, sortDirection, columns])
+  }, [filteredData, sortField, sortDirection, finalColumns])
 
   // Paginate data
   const paginatedData = useMemo(() => {
@@ -146,11 +164,11 @@ export function DataTable<T extends Record<string, any>>({
   }
 
   const handleExportExcel = () => {
-    exportToExcel(sortedData, columns, tableName)
+    exportToExcel(sortedData, finalColumns, tableName)
   }
 
   const handleExportPdf = () => {
-    exportToPdf(sortedData, columns, tableName)
+    exportToPdf(sortedData, finalColumns, tableName)
   }
 
   const handlePageChange = (page: number) => {
@@ -211,7 +229,7 @@ export function DataTable<T extends Record<string, any>>({
         <Table>
           <TableHeader>
             <TableRow>
-              {columns.map((column) => (
+              {finalColumns.map((column:any) => (
                 <TableHead
                   key={column.id}
                   className={column.sortable ? "cursor-pointer" : ""}
@@ -227,7 +245,7 @@ export function DataTable<T extends Record<string, any>>({
           <TableBody>
             {paginatedData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={columns.length} className="text-center py-8">
+                <TableCell colSpan={finalColumns.length} className="text-center py-8">
                   No data found
                 </TableCell>
               </TableRow>
@@ -238,10 +256,10 @@ export function DataTable<T extends Record<string, any>>({
                   className={onRowClick ? "cursor-pointer hover:bg-muted/50" : ""}
                   onClick={() => onRowClick && onRowClick(item)}
                 >
-                  {columns.map((column) => (
+                  {finalColumns.map((column:any) => (
                     <TableCell key={column.id}>
                       {column.cell
-                        ? column.cell(item)
+                        ? column.cell(item, index) // Pass index to cell function for SI No.
                         : column.accessorKey
                           ? getNestedValue(item, column.accessorKey)
                           : null}
@@ -253,8 +271,6 @@ export function DataTable<T extends Record<string, any>>({
           </TableBody>
         </Table>
       </div>
-
-
 
       {/* Pagination controls */}
       {showPagination && (

@@ -2,6 +2,7 @@
 import { AppSidebar } from "@/components/app-sidebar"
 import AddProductForm from "@/components/Inventory/AddProductForm"
 import CategoryManagement from "@/components/Inventory/CategoryManagement"
+import { withAuth } from "@/components/Middleware/withAuth";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -102,4 +103,4 @@ const Page = () => {
   )
 }
 
-export default Page
+export default withAuth(Page)

@@ -1,6 +1,7 @@
 'use client'
 import { AppSidebar } from "@/components/app-sidebar"
 import { InventoryTable } from "@/components/Inventory/InventoryTable"
+import { withAuth } from "@/components/Middleware/withAuth"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -146,4 +147,4 @@ const page = () => {
   )
 }
 
-export default page
+export default withAuth(page)
