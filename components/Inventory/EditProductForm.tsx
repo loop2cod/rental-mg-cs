@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef, useEffect } from "react"
+import React, { useState, useRef, useEffect, useLayoutEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Trash2, Plus, X, ImageIcon } from "lucide-react"
@@ -39,6 +39,7 @@ export default function EditProductForm({ categories, productId }: { categories:
     const [images, setImages] = useState<string[]>([])
     const [features, setFeatures] = useState<{ key: string; value: string }[]>([{ key: "", value: "" }])
     const [loading, setLoading] = useState(false) // Loading state
+    const [productCategoryName, setProductCategoryName] = useState<string>("") // Store product's category name
 
     // Initialize the form using useForm with Zod resolver
     const form = useForm({
@@ -53,7 +54,7 @@ export default function EditProductForm({ categories, productId }: { categories:
     })
 
     // Fetch product data and populate the form
-    useEffect(() => {
+    useLayoutEffect(() => {
         const fetchProduct = async () => {
             try {
                 const response = await get<ResponseType>(
@@ -65,6 +66,9 @@ export default function EditProductForm({ categories, productId }: { categories:
 
                     // Ensure category_id exists and has an _id property
                     const categoryId = product.category_id?._id || "";
+
+                    // Set the product's category name
+                    setProductCategoryName(product.category_id?.name || "");
 
                     // Set default values for the form
                     form.reset({
@@ -268,6 +272,7 @@ export default function EditProductForm({ categories, productId }: { categories:
                                                 <SelectTrigger className="w-full">
                                                     <SelectValue
                                                         placeholder={
+                                                            productCategoryName ||
                                                             categories.find((category: any) => category._id === field.value)?.name ||
                                                             "Select a category"
                                                         }

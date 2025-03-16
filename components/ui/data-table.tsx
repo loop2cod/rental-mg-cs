@@ -18,6 +18,7 @@ import {
 } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { exportToExcel, exportToPdf } from "@/lib/export-utils"
+import { Skeleton } from "./skeleton"
 
 export type ColumnDef<T> = {
   id: string
@@ -48,6 +49,7 @@ interface DataTableProps<T> {
   onPageSizeChange?: (size: number) => void
   serialNumber?: boolean
   onSearch?: (term: string) => void
+  isLoading?: boolean
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -69,8 +71,8 @@ export function DataTable<T extends Record<string, any>>({
   onPageSizeChange,
   serialNumber = true,
   onSearch,
+  isLoading = false,
 }: DataTableProps<T>) {
-  console.log(data)
   const [searchTerm, setSearchTerm] = useState("")
   const [sortField, setSortField] = useState<string | null>(null)
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
@@ -80,7 +82,6 @@ export function DataTable<T extends Record<string, any>>({
   const currentPage = externalCurrentPage ?? internalCurrentPage
   const totalPages = externalTotalPages ?? Math.ceil(data.length / itemsPerPage)
   const totalCount = externalTotalCount ?? data.length
-
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -96,99 +97,74 @@ export function DataTable<T extends Record<string, any>>({
     return sortDirection === "asc" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
   }
 
-  const finalColumns:any = useMemo(() => {
+  const finalColumns: any = useMemo(() => {
     if (!serialNumber) return columns
 
     return [
       {
         id: "serialNumber",
         header: "SI No.",
-        cell: (_:any, index: number) => (
-        <span className="ps-3 font-bold font-sans">{(currentPage - 1) * itemsPerPage + index + 1}</span>
+        cell: (_: any, index: number) => (
+          <span className="ps-3 font-bold font-sans">{(currentPage - 1) * itemsPerPage + index + 1}</span>
         ),
         sortable: false,
         searchable: false,
       },
       ...columns,
     ]
-  }, [columns, serialNumber, currentPage, itemsPerPage,data])
-  
-  // Filter data based on search term
+  }, [columns, serialNumber, currentPage, itemsPerPage])
+
   const filteredData = useMemo(() => {
     if (!searchTerm.trim()) return data
 
     return data.filter((item) => {
-      return finalColumns.some((column:any) => {
+      return finalColumns.some((column: any) => {
         if (!column.searchable) return false
-
         const value = column.accessorKey ? getNestedValue(item, column.accessorKey) : null
-
-        if (value === null || value === undefined) return false
-
-        return String(value).toLowerCase().includes(searchTerm.toLowerCase())
+        return value !== null && value !== undefined && String(value).toLowerCase().includes(searchTerm.toLowerCase())
       })
     })
   }, [data, searchTerm, finalColumns])
 
-  // Sort data
   const sortedData = useMemo(() => {
     if (!sortField) return filteredData
-
     return [...filteredData].sort((a, b) => {
-      const column:any = finalColumns.find((col:any) => col.id === sortField)
-      if (!column || !column.accessorKey) return 0
+      const column: any = finalColumns.find((col: any) => col.id === sortField)
+      if (!column?.accessorKey) return 0
 
       const valueA = getNestedValue(a, column.accessorKey)
       const valueB = getNestedValue(b, column.accessorKey)
 
       if (valueA === valueB) return 0
-
-      // Handle different types of values
       if (typeof valueA === "string" && typeof valueB === "string") {
         return sortDirection === "asc" ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA)
       }
-
-      if (valueA < valueB) return sortDirection === "asc" ? -1 : 1
-      if (valueA > valueB) return sortDirection === "asc" ? 1 : -1
-      return 0
+      return sortDirection === "asc" ? (valueA < valueB ? -1 : 1) : valueA > valueB ? -1 : 1
     })
-  }, [filteredData, sortField, sortDirection, finalColumns,data])
+  }, [filteredData, sortField, sortDirection, finalColumns])
 
-  // Paginate data
   const paginatedData = useMemo(() => {
+    if (onPageChange) return data
     const startIndex = (currentPage - 1) * itemsPerPage
     return sortedData.slice(startIndex, startIndex + itemsPerPage)
-  }, [sortedData, currentPage, itemsPerPage,data])
+  }, [sortedData, currentPage, itemsPerPage, onPageChange, data])
 
-  // Helper function to get nested values using dot notation
   function getNestedValue(obj: any, path: string): any {
-    return path.split(".").reduce((prev, curr) => {
-      return prev ? prev[curr] : null
-    }, obj)
+    return path.split(".").reduce((prev, curr) => (prev ? prev[curr] : null), obj)
   }
 
-  const handleExportExcel = () => {
-    exportToExcel(sortedData, finalColumns, tableName)
-  }
-
-  const handleExportPdf = () => {
-    exportToPdf(sortedData, finalColumns, tableName)
-  }
+  const handleExportExcel = () => exportToExcel(sortedData, finalColumns, tableName)
+  const handleExportPdf = () => exportToPdf(sortedData, finalColumns, tableName)
 
   const handlePageChange = (page: number) => {
-    if (onPageChange) {
-      onPageChange(page)
-    } else {
-      setInternalCurrentPage(page)
-    }
+    if (page < 1 || page > totalPages) return
+    onPageChange ? onPageChange(page) : setInternalCurrentPage(page)
   }
 
   const handlePageSizeChange = (size: number) => {
     setItemsPerPage(size)
-    if (onPageSizeChange) {
-      onPageSizeChange(size)
-    }
-    handlePageChange(1) // Reset to first page when changing page size
+    onPageSizeChange?.(size)
+    handlePageChange(1)
   }
 
   return (
@@ -211,16 +187,30 @@ export function DataTable<T extends Record<string, any>>({
             </div>
           )}
           <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-            <div className="text-sm text-muted-foreground">Showing {totalCount} items</div>
+            <div className="text-sm text-muted-foreground">
+              {isLoading ? "Loading..." : `Showing ${totalCount} items`}
+            </div>
             <div className="flex gap-2">
               {showExcelExport && (
-                <Button variant="outline" size="sm" onClick={handleExportExcel} title="Export to Excel">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportExcel}
+                  title="Export to Excel"
+                  disabled={isLoading}
+                >
                   <FileSpreadsheet className="h-4 w-4 mr-2" />
                   <span className="hidden sm:inline">Excel</span>
                 </Button>
               )}
               {showPdfExport && (
-                <Button variant="outline" size="sm" onClick={handleExportPdf} title="Export to PDF">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportPdf}
+                  title="Export to PDF"
+                  disabled={isLoading}
+                >
                   <FileText className="h-4 w-4 mr-2" />
                   <span className="hidden sm:inline">PDF</span>
                 </Button>
@@ -230,15 +220,15 @@ export function DataTable<T extends Record<string, any>>({
         </div>
       )}
 
-      <div className="block border rounded-lg">
+      <div className="block border rounded-lg relative">
         <Table>
           <TableHeader>
             <TableRow>
-              {finalColumns.map((column:any) => (
+              {finalColumns.map((column: any) => (
                 <TableHead
                   key={column.id}
                   className={column.sortable ? "cursor-pointer" : ""}
-                  onClick={() => column.sortable && handleSort(column.id)}
+                  onClick={() => column.sortable && !isLoading && handleSort(column.id)}
                 >
                   <div className="flex items-center gap-1">
                     {column.header} {column.sortable && getSortIcon(column.id)}
@@ -248,7 +238,19 @@ export function DataTable<T extends Record<string, any>>({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedData.length === 0 ? (
+            {isLoading ? (
+          <>
+           {[...Array(itemsPerPage || 5)].map((_, i) => (
+      <TableRow key={i}>
+        {finalColumns.map((column: any) => (
+          <TableCell key={column.id}>
+            <Skeleton className="h-4 w-full" />
+          </TableCell>
+        ))}
+      </TableRow>
+    ))}
+    </>
+            ) : paginatedData.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={finalColumns.length} className="text-center py-8">
                   No data found
@@ -259,12 +261,12 @@ export function DataTable<T extends Record<string, any>>({
                 <TableRow
                   key={index}
                   className={onRowClick ? "cursor-pointer hover:bg-muted/50" : ""}
-                  onClick={() => onRowClick && onRowClick(item)}
+                  onClick={() => !isLoading && onRowClick?.(item)}
                 >
-                  {finalColumns.map((column:any) => (
+                  {finalColumns.map((column: any) => (
                     <TableCell key={column.id}>
                       {column.cell
-                        ? column.cell(item, index) // Pass index to cell function for SI No.
+                        ? column.cell(item, index)
                         : column.accessorKey
                           ? getNestedValue(item, column.accessorKey)
                           : null}
@@ -277,16 +279,16 @@ export function DataTable<T extends Record<string, any>>({
         </Table>
       </div>
 
-      {/* Pagination controls */}
       {showPagination && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Select
               value={itemsPerPage.toString()}
               onValueChange={(value) => handlePageSizeChange(Number(value))}
+              disabled={isLoading}
             >
-              <SelectTrigger className="h-5 text-xs  md:h-8 w-[75px]">
-                <SelectValue placeholder={defaultItemsPerPage.toString()} />
+              <SelectTrigger className="h-8 w-[75px]">
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {itemsPerPageOptions.map((option) => (
@@ -296,7 +298,7 @@ export function DataTable<T extends Record<string, any>>({
                 ))}
               </SelectContent>
             </Select>
-            <span className="text-xs text-muted-foreground">per page</span>
+            <span className="text-sm text-muted-foreground">per page</span>
           </div>
 
           <div className="flex items-center gap-1">
@@ -304,21 +306,19 @@ export function DataTable<T extends Record<string, any>>({
               variant="outline"
               size="icon"
               onClick={() => handlePageChange(1)}
-              disabled={currentPage === 1}
+              disabled={currentPage === 1 || isLoading}
               className="hidden md:flex h-8 w-8"
             >
               <ChevronsLeft className="h-4 w-4" />
-              <span className="sr-only">First page</span>
             </Button>
             <Button
               variant="outline"
               size="icon"
               onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
+              disabled={currentPage === 1 || isLoading}
               className="h-8 w-8"
             >
               <ChevronLeft className="h-4 w-4" />
-              <span className="sr-only">Previous page</span>
             </Button>
             <span className="text-sm mx-2">
               Page {currentPage} of {totalPages || 1}
@@ -327,21 +327,19 @@ export function DataTable<T extends Record<string, any>>({
               variant="outline"
               size="icon"
               onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages || totalPages === 0}
+              disabled={currentPage === totalPages || totalPages === 0 || isLoading}
               className="h-8 w-8"
             >
               <ChevronRight className="h-4 w-4" />
-              <span className="sr-only">Next page</span>
             </Button>
             <Button
               variant="outline"
               size="icon"
               onClick={() => handlePageChange(totalPages)}
-              disabled={currentPage === totalPages || totalPages === 0}
+              disabled={currentPage === totalPages || totalPages === 0 || isLoading}
               className="hidden md:flex h-8 w-8"
             >
               <ChevronsRight className="h-4 w-4" />
-              <span className="sr-only">Last page</span>
             </Button>
           </div>
         </div>

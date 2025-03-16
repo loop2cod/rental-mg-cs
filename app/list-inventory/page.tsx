@@ -37,8 +37,10 @@ const page = () => {
   const [totalCount, setTotalCount] = useState(0)
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchInventory = async (page: number = 1, limit: number = 10, search: string = "") => {
+    setIsLoading(true);
     try {
       const response = await get<ResponseType>(API_ENDPOINTS.INVENTORY.GET_ALL, {
         params: { page, limit, search },
@@ -61,6 +63,8 @@ const page = () => {
         description: error.response?.data?.message || error.message || "Failed to fetch Inventory",
         variant: "destructive",
       });
+    }finally{
+      setIsLoading(false);
     }
   };
 
@@ -117,6 +121,7 @@ const page = () => {
         <div>
           <InventoryTable
             onSearch={handleSearch}
+            isLoading={isLoading}
             inventory={inventory}
             onEdit={openEditDialog}
             onDelete={handleDeleteProduct}

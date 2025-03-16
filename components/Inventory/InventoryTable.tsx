@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation"
 
 interface InventoryTableProps {
   onSearch?: (term: string) => void
+  isLoading: boolean
   inventory: any
   onEdit: (item: any) => void
   onDelete: (id: string) => void
@@ -23,6 +24,7 @@ interface InventoryTableProps {
 
 export function InventoryTable({
   onSearch,
+  isLoading,
   inventory,
   onEdit,
   onDelete,
@@ -144,6 +146,7 @@ export function InventoryTable({
     <div className="px-2 md:px-2 lg:px-4">
       <DataTable
         itemsPerPageOptions={[2, 5, 10, 20, 50, 100]}
+        isLoading={isLoading}
         data={inventory}
         columns={columns}
         serialNumber={true}
