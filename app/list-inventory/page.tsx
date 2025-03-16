@@ -45,7 +45,6 @@ const page = () => {
         withCredentials: true,
       });
       if (response.success) {
-        console.log("Successfully fetched Inventory:", response.data);
         setInventory(response.data.products);
         setTotalPages(response.data?.pagination?.totalPages);
         setTotalCount(response.data?.pagination?.totalItems);

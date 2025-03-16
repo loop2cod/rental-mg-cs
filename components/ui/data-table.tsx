@@ -57,7 +57,6 @@ export function DataTable<T extends Record<string, any>>({
   itemsPerPageOptions = [10, 25, 50, 100],
   defaultItemsPerPage = 10,
   tableName = "Data",
-  renderMobileCard,
   onRowClick,
   showSearchBar = true,
   showPdfExport = true,
@@ -71,6 +70,7 @@ export function DataTable<T extends Record<string, any>>({
   serialNumber = true,
   onSearch,
 }: DataTableProps<T>) {
+  console.log(data)
   const [searchTerm, setSearchTerm] = useState("")
   const [sortField, setSortField] = useState<string | null>(null)
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
@@ -81,23 +81,6 @@ export function DataTable<T extends Record<string, any>>({
   const totalPages = externalTotalPages ?? Math.ceil(data.length / itemsPerPage)
   const totalCount = externalTotalCount ?? data.length
 
-  // Add SI No. column if serialNumber is true
-  const finalColumns:any = useMemo(() => {
-    if (!serialNumber) return columns
-
-    return [
-      {
-        id: "serialNumber",
-        header: "SI No.",
-        cell: (_:any, index: number) => (
-        <span className="ps-3 font-bold font-sans">{(currentPage - 1) * itemsPerPage + index + 1}</span>
-        ),
-        sortable: false,
-        searchable: false,
-      },
-      ...columns,
-    ]
-  }, [columns, serialNumber, currentPage, itemsPerPage])
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -113,6 +96,23 @@ export function DataTable<T extends Record<string, any>>({
     return sortDirection === "asc" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
   }
 
+  const finalColumns:any = useMemo(() => {
+    if (!serialNumber) return columns
+
+    return [
+      {
+        id: "serialNumber",
+        header: "SI No.",
+        cell: (_:any, index: number) => (
+        <span className="ps-3 font-bold font-sans">{(currentPage - 1) * itemsPerPage + index + 1}</span>
+        ),
+        sortable: false,
+        searchable: false,
+      },
+      ...columns,
+    ]
+  }, [columns, serialNumber, currentPage, itemsPerPage,data])
+  
   // Filter data based on search term
   const filteredData = useMemo(() => {
     if (!searchTerm.trim()) return data
@@ -152,13 +152,13 @@ export function DataTable<T extends Record<string, any>>({
       if (valueA > valueB) return sortDirection === "asc" ? 1 : -1
       return 0
     })
-  }, [filteredData, sortField, sortDirection, finalColumns])
+  }, [filteredData, sortField, sortDirection, finalColumns,data])
 
   // Paginate data
   const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage
     return sortedData.slice(startIndex, startIndex + itemsPerPage)
-  }, [sortedData, currentPage, itemsPerPage])
+  }, [sortedData, currentPage, itemsPerPage,data])
 
   // Helper function to get nested values using dot notation
   function getNestedValue(obj: any, path: string): any {

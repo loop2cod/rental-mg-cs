@@ -1,3 +1,4 @@
+
 "use client"
 
 import Image from "next/image"
@@ -6,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { DataTable, type ColumnDef } from "@/components/ui/data-table"
 import { Badge } from "../ui/badge"
 import { useMemo } from "react"
+import { useRouter } from "next/navigation"
 
 interface InventoryTableProps {
   onSearch?: (term: string) => void
@@ -30,6 +32,8 @@ export function InventoryTable({
   onPageChange,
   onPageSizeChange,
 }: InventoryTableProps) {
+  const router = useRouter()
+
   // Define columns for the data table using useMemo
   const columns: ColumnDef<any>[] = useMemo(() => [
     {
@@ -54,7 +58,11 @@ export function InventoryTable({
       sortable: true,
       searchable: true,
       cell: (item: any) => (
-        <span className="underline decoration-secondary-foreground decoration-2 underline-offset-4 cursor-pointer">
+        <span
+        onClick={
+          () => router.push(`/list-inventory/details/${item?._id}`)
+        }
+         className="underline decoration-secondary-foreground decoration-2 underline-offset-4 cursor-pointer">
           {item?.name}
         </span>
       ),
