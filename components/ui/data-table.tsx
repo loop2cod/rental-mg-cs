@@ -46,7 +46,8 @@ interface DataTableProps<T> {
   totalCount?: number
   onPageChange?: (page: number) => void
   onPageSizeChange?: (size: number) => void
-  serialNumber?: boolean // New prop to enable/disable SI No. column
+  serialNumber?: boolean
+  onSearch?: (term: string) => void
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -67,7 +68,8 @@ export function DataTable<T extends Record<string, any>>({
   totalCount: externalTotalCount,
   onPageChange,
   onPageSizeChange,
-  serialNumber = true, // Default to true
+  serialNumber = true,
+  onSearch,
 }: DataTableProps<T>) {
   const [searchTerm, setSearchTerm] = useState("")
   const [sortField, setSortField] = useState<string | null>(null)
@@ -87,7 +89,9 @@ export function DataTable<T extends Record<string, any>>({
       {
         id: "serialNumber",
         header: "SI No.",
-        cell: (_:any, index: number) => (currentPage - 1) * itemsPerPage + index + 1,
+        cell: (_:any, index: number) => (
+        <span className="ps-3 font-bold font-sans">{(currentPage - 1) * itemsPerPage + index + 1}</span>
+        ),
         sortable: false,
         searchable: false,
       },
@@ -200,7 +204,8 @@ export function DataTable<T extends Record<string, any>>({
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value)
-                  handlePageChange(1) // Reset to first page on search
+                  handlePageChange(1)
+                  onSearch?.(e.target.value)
                 }}
               />
             </div>
@@ -280,7 +285,7 @@ export function DataTable<T extends Record<string, any>>({
               value={itemsPerPage.toString()}
               onValueChange={(value) => handlePageSizeChange(Number(value))}
             >
-              <SelectTrigger className="h-8 w-[70px]">
+              <SelectTrigger className="h-5 text-xs  md:h-8 w-[75px]">
                 <SelectValue placeholder={defaultItemsPerPage.toString()} />
               </SelectTrigger>
               <SelectContent>
@@ -291,7 +296,7 @@ export function DataTable<T extends Record<string, any>>({
                 ))}
               </SelectContent>
             </Select>
-            <span className="text-sm text-muted-foreground">per page</span>
+            <span className="text-xs text-muted-foreground">per page</span>
           </div>
 
           <div className="flex items-center gap-1">
@@ -300,7 +305,7 @@ export function DataTable<T extends Record<string, any>>({
               size="icon"
               onClick={() => handlePageChange(1)}
               disabled={currentPage === 1}
-              className="h-8 w-8"
+              className="hidden md:flex h-8 w-8"
             >
               <ChevronsLeft className="h-4 w-4" />
               <span className="sr-only">First page</span>
@@ -333,7 +338,7 @@ export function DataTable<T extends Record<string, any>>({
               size="icon"
               onClick={() => handlePageChange(totalPages)}
               disabled={currentPage === totalPages || totalPages === 0}
-              className="h-8 w-8"
+              className="hidden md:flex h-8 w-8"
             >
               <ChevronsRight className="h-4 w-4" />
               <span className="sr-only">Last page</span>

@@ -85,8 +85,7 @@ const Page = () => {
     try {
       const response = await post<AuthResponse>(
         API_ENDPOINTS.AUTH.LOGIN,
-        { mobile, password },
-        { withCredentials: true }
+        { mobile, password }
       );
 
       if (response.success) {

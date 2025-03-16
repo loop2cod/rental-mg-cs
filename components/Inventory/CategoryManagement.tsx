@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Edit, Trash2, Plus, Check, X } from "lucide-react"
+import { Edit, Trash2, Plus, Check, X, Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { toast } from "../ui/use-toast"
 import { API_ENDPOINTS } from "@/lib/apiEndpoints"
-import { post, put } from "@/utilities/AxiosInterceptor"
+import { del, post, put } from "@/utilities/AxiosInterceptor"
 
 interface Category {
   _id: string
@@ -29,11 +29,12 @@ interface CategoryManagementProps {
   categories: Category[]
   fetchCategories: any
 }
+
 interface ResponseType {
-    success: boolean;
-    data?: any;
-    message?: string;
-  }
+  success: boolean
+  data?: any
+  message?: string
+}
 
 export default function CategoryManagement({ categories: initialCategories, fetchCategories }: CategoryManagementProps) {
   const [categories, setCategories] = useState<Category[]>(initialCategories)
@@ -41,17 +42,20 @@ export default function CategoryManagement({ categories: initialCategories, fetc
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false) // Loading state
 
   useEffect(() => {
     setCategories(initialCategories)
   }, [initialCategories])
 
   const handleAddCategory = async () => {
-    if (newCategory.trim()) {
+    if (newCategory.trim() && !loading) {
+      setLoading(true) // Start loading
       try {
-        const response = await post<ResponseType>(API_ENDPOINTS.CATEGORY.CREATE, 
-            { name: newCategory  },
-            { withCredentials: true }
+        const response = await post<ResponseType>(
+          API_ENDPOINTS.CATEGORY.CREATE,
+          { name: newCategory },
+          { withCredentials: true }
         )
 
         if (response.success) {
@@ -60,19 +64,22 @@ export default function CategoryManagement({ categories: initialCategories, fetc
             title: "Category added",
             description: `${newCategory} has been added to your categories.`,
           })
+          fetchCategories()
         } else {
-            toast({
-                title: 'Error',
-                description: response.message || 'Something went wrong',
-                variant: 'destructive',
-              });
+          toast({
+            title: "Error",
+            description: response.message || "Something went wrong",
+            variant: "destructive",
+          })
         }
-      } catch (error:any) {
+      } catch (error: any) {
         toast({
           title: "Error",
-          description: error.response?.data?.message || error.message ||"Failed to add category.",
+          description: error.response?.data?.message || error.message || "Failed to add category.",
           variant: "destructive",
         })
+      } finally {
+        setLoading(false) // End loading
       }
     }
   }
@@ -86,33 +93,33 @@ export default function CategoryManagement({ categories: initialCategories, fetc
   }
 
   const saveEditing = async () => {
-    if (editingCategory) {
+    if (editingCategory && !loading) {
+      setLoading(true) // Start loading
       try {
-        // const response = await put(API_ENDPOINTS.CATEGORY.UPDATE.replace(":id", editingCategory.id), {
-        //   method: "PUT",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //   },
-        //   body: JSON.stringify({ name: editingCategory.name }),
-        // })
+        const response = await put<ResponseType>(
+          API_ENDPOINTS.CATEGORY.UPDATE.replace(":id", editingCategory._id),
+          { name: editingCategory.name, description: "" },
+          { withCredentials: true }
+        )
 
-        // if (response.ok) {
-        //   const updatedCategory = await response.json()
-        //   setCategories(categories.map((c) => (c.id === updatedCategory.id ? updatedCategory : c)))
-        //   setEditingCategory(null)
-        //   toast({
-        //     title: "Category updated",
-        //     description: `Category has been updated successfully.`,
-        //   })
-        // } else {
-        //   throw new Error("Failed to update category")
-        // }
+        if (response.success) {
+          fetchCategories()
+          setEditingCategory(null)
+          toast({
+            title: "Category updated",
+            description: `Category has been updated successfully.`,
+          })
+        } else {
+          throw new Error("Failed to update category")
+        }
       } catch (error) {
         toast({
           title: "Error",
           description: "Failed to update category.",
           variant: "destructive",
         })
+      } finally {
+        setLoading(false) // End loading
       }
     }
   }
@@ -123,31 +130,38 @@ export default function CategoryManagement({ categories: initialCategories, fetc
   }
 
   const handleDelete = async () => {
-    if (categoryToDelete) {
+    if (categoryToDelete && !loading) {
+      setLoading(true) // Start loading
       try {
-        const response = await fetch(API_ENDPOINTS.CATEGORY.DELETE.replace(":id", categoryToDelete), {
-          method: "DELETE",
-        })
+        const response = await del<ResponseType>(
+          API_ENDPOINTS.CATEGORY.DELETE.replace(":id", categoryToDelete),
+          { withCredentials: true }
+        )
 
-        if (response.ok) {
-          const categoryName = categories.find((c) => c._id === categoryToDelete)?.name
-          setCategories(categories.filter((c) => c._id !== categoryToDelete))
+        if (response.success) {
+          fetchCategories()
           setCategoryToDelete(null)
           setDeleteDialogOpen(false)
           toast({
             title: "Category deleted",
-            description: `${categoryName} has been removed from your categories.`,
+            description: `Category has been removed from your categories.`,
             variant: "destructive",
           })
         } else {
-          throw new Error("Failed to delete category")
+          toast({
+            title: "Error",
+            description: response.message || "Failed to delete category",
+            variant: "destructive",
+          })
         }
-      } catch (error) {
+      } catch (error: any) {
         toast({
           title: "Error",
-          description: "Failed to delete category.",
+          description: error.response?.data?.message || error.message || "Failed to delete category",
           variant: "destructive",
         })
+      } finally {
+        setLoading(false) // End loading
       }
     }
   }
@@ -165,9 +179,10 @@ export default function CategoryManagement({ categories: initialCategories, fetc
                 placeholder="New category name"
                 value={newCategory}
                 onChange={(e) => setNewCategory(e.target.value)}
+                disabled={loading} // Disable input during loading
               />
-              <Button onClick={handleAddCategory} size="icon">
-                <Plus className="h-4 w-4" />
+              <Button onClick={handleAddCategory} size="icon" disabled={loading}>
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
               </Button>
             </div>
 
@@ -183,11 +198,12 @@ export default function CategoryManagement({ categories: initialCategories, fetc
                           value={editingCategory?.name}
                           onChange={(e) => setEditingCategory({ ...editingCategory, name: e.target.value })}
                           className="flex-1"
+                          disabled={loading} // Disable input during loading
                         />
-                        <Button onClick={saveEditing} size="icon" variant="ghost">
-                          <Check className="h-4 w-4" />
+                        <Button onClick={saveEditing} size="icon" variant="ghost" disabled={loading}>
+                          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                         </Button>
-                        <Button onClick={cancelEditing} size="icon" variant="ghost">
+                        <Button onClick={cancelEditing} size="icon" variant="ghost" disabled={loading}>
                           <X className="h-4 w-4" />
                         </Button>
                       </div>
@@ -195,10 +211,10 @@ export default function CategoryManagement({ categories: initialCategories, fetc
                       <>
                         <span className="flex-1">{category.name}</span>
                         <div className="flex space-x-1">
-                          <Button onClick={() => startEditing(category)} size="icon" variant="ghost">
+                          <Button onClick={() => startEditing(category)} size="icon" variant="ghost" disabled={loading}>
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button onClick={() => confirmDelete(category._id)} size="icon" variant="ghost">
+                          <Button onClick={() => confirmDelete(category._id)} size="icon" variant="ghost" disabled={loading}>
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -221,9 +237,13 @@ export default function CategoryManagement({ categories: initialCategories, fetc
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-              Delete
+            <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground"
+              disabled={loading}
+            >
+              {loading ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -4,7 +4,9 @@ import React, { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Trash2, Plus, X, ImageIcon } from "lucide-react"
-import { useForm, UseFormReturn, FieldValues } from "react-hook-form"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -13,37 +15,113 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "../ui/use-toast"
+import { API_ENDPOINTS } from "@/lib/apiEndpoints"
+import { post } from "@/utilities/AxiosInterceptor"
+
+// Define validation schema using Zod
+const formSchema = z.object({
+  name: z.string().min(1, "Product name is required"),
+  unit_cost: z.string().min(1, "Unit cost is required").regex(/^\d+(\.\d{1,2})?$/, "Invalid unit cost"),
+  quantity: z.string().min(1, "Quantity is required").regex(/^\d+$/, "Invalid quantity"),
+  category: z.string().min(1, "Category is required"),
+  description: z.string().min(1, "Description is required"),
+})
+
+
+
+interface ResponseType {
+  success: boolean;
+  data?: any;
+  message?: string;
+}
 
 export default function AddProductForm({ categories }: any) {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [images, setImages] = useState<string[]>([])
   const [features, setFeatures] = useState<{ key: string; value: string }[]>([{ key: "", value: "" }])
+  const [loading, setLoading] = useState(false) // Loading state
 
-  // Initialize the form using useForm
+  // Initialize the form using useForm with Zod resolver
   const form = useForm({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       unit_cost: "",
-      quantity: "", // Add quantity to default values
+      quantity: "",
       category: "",
       description: "",
-      features: [{ key: "", value: "" }],
     },
   })
 
-  const handleSubmit = (data: any) => {
-    // In a real app, you would submit to your API here
-    console.log({ ...data, images })
+  const handleSubmit = async (data: z.infer<typeof formSchema>) => {
+    if (loading) return; // Prevent multiple submissions
+    setLoading(true); // Start loading
 
-    toast({
-      title: "Product created",
-      description: `${data.name} has been added to your inventory.`,
-    })
+    try {
+      // Prepare form data for submission
+      const formData = new FormData();
 
-    // Optionally redirect to products list
-    // router.push("/products")
-  }
+      // Append basic fields
+      formData.append("name", data.name);
+      formData.append("unit_cost", data.unit_cost);
+      formData.append("quantity", data.quantity);
+      formData.append("category_id", data.category);
+      formData.append("description", data.description);
+
+      // Append features as JSON
+      const validFeatures = features
+        .filter((f) => f.key && f.value)
+        .reduce((acc, f) => {
+          acc[f.key] = f.value; 
+          return acc;
+        }, {} as Record<string, string>); 
+
+      formData.append("features", JSON.stringify(validFeatures));
+
+      // Append images as files
+      if (fileInputRef.current?.files) {
+        for (let i = 0; i < fileInputRef.current.files.length; i++) {
+          formData.append("images", fileInputRef.current.files[i]);
+        }
+      }
+
+      // Send the request
+      const response = await post<ResponseType>(
+        API_ENDPOINTS.INVENTORY.CREATE,
+        formData,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.success) {
+        toast({
+          title: "Product created",
+          description: `${data.name} has been added to your inventory.`,
+        });
+        router.push("/list-inventory");
+      } else {
+        toast({
+          title: "Error",
+          description: response.message || "Failed to create product",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description:
+          error.response?.data?.message || error.message || "Failed to create product",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false); // End loading
+    }
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -89,7 +167,7 @@ export default function AddProductForm({ categories }: any) {
                   <FormItem>
                     <FormLabel>Product Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter product name" {...field} />
+                      <Input placeholder="Enter product name" {...field} disabled={loading} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -103,51 +181,53 @@ export default function AddProductForm({ categories }: any) {
                   <FormItem>
                     <FormLabel>Unit Cost</FormLabel>
                     <FormControl>
-                      <Input placeholder="0.00" type="number" step="0.01" min="0" {...field} />
+                      <Input placeholder="0.00" type="number" step="0.01" min="0" {...field} disabled={loading} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormField
+              <FormField
                 name="quantity"
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Quantity</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter quantity" type="number" min="0" {...field} />
+                      <Input placeholder="Enter quantity" type="number" min="0" {...field} disabled={loading} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            <FormField
-              name="category"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Category</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a category" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {categories?.map((category: any) => (
-                        <SelectItem key={category._id} value={category._id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
+              <FormField
+                name="category"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading}>
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {categories?.map((category: any) => (
+                          <SelectItem key={category._id} value={category._id}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             <FormField
@@ -157,7 +237,7 @@ export default function AddProductForm({ categories }: any) {
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Enter product description" className="resize-none" {...field} />
+                    <Textarea placeholder="Enter product description" className="resize-none" {...field} disabled={loading} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -175,19 +255,34 @@ export default function AddProductForm({ categories }: any) {
                       value={feature.key}
                       onChange={(e) => updateFeatureField(index, "key", e.target.value)}
                       className="flex-1"
+                      disabled={loading}
                     />
                     <Input
                       placeholder="Feature value"
                       value={feature.value}
                       onChange={(e) => updateFeatureField(index, "value", e.target.value)}
                       className="flex-1"
+                      disabled={loading}
                     />
-                    <Button type="button" variant="outline" size="icon" onClick={() => removeFeatureField(index)}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => removeFeatureField(index)}
+                      disabled={loading}
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 ))}
-                <Button type="button" variant="outline" size="sm" onClick={addFeatureField} className="mt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addFeatureField}
+                  className="mt-2"
+                  disabled={loading}
+                >
                   <Plus className="h-4 w-4 mr-2" />
                   Add Feature
                 </Button>
@@ -197,12 +292,11 @@ export default function AddProductForm({ categories }: any) {
             <div>
               <FormLabel>Product Images</FormLabel>
               <FormDescription>Upload images of your product (max 5 images)</FormDescription>
-
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-3">
                 {images.map((image, index) => (
                   <div key={index} className="relative aspect-square rounded-md overflow-hidden border">
                     <Image
-                      src={image || "/placeholder.svg"}
+                      src={image || "/placeHolder.jpg"}
                       alt={`Product image ${index + 1}`}
                       fill
                       className="object-cover"
@@ -213,6 +307,7 @@ export default function AddProductForm({ categories }: any) {
                       size="icon"
                       className="absolute top-1 right-1 h-6 w-6"
                       onClick={() => removeImage(index)}
+                      disabled={loading}
                     >
                       <X className="h-3 w-3" />
                     </Button>
@@ -233,6 +328,7 @@ export default function AddProductForm({ categories }: any) {
                       accept="image/*"
                       multiple
                       className="hidden"
+                      disabled={loading}
                     />
                   </div>
                 )}
@@ -240,7 +336,9 @@ export default function AddProductForm({ categories }: any) {
             </div>
 
             <div className="flex justify-end">
-              <Button type="submit">Create Product</Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? "Creating..." : "Create Product"}
+              </Button>
             </div>
           </form>
         </Form>

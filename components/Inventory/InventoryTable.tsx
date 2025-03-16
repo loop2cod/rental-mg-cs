@@ -8,12 +8,28 @@ import { Badge } from "../ui/badge"
 import { useMemo } from "react"
 
 interface InventoryTableProps {
+  onSearch?: (term: string) => void
   inventory: any
   onEdit: (item: any) => void
   onDelete: (id: string) => void
+  currentPage?: number
+  totalPages?: number
+  totalCount?: number
+  onPageChange?: (page: number) => void
+  onPageSizeChange?: (size: number) => void
 }
 
-export function InventoryTable({ inventory, onEdit, onDelete }: InventoryTableProps) {
+export function InventoryTable({
+  onSearch,
+  inventory,
+  onEdit,
+  onDelete,
+  currentPage,
+  totalPages,
+  totalCount,
+  onPageChange,
+  onPageSizeChange,
+}: InventoryTableProps) {
   // Define columns for the data table using useMemo
   const columns: ColumnDef<any>[] = useMemo(() => [
     {
@@ -21,10 +37,9 @@ export function InventoryTable({ inventory, onEdit, onDelete }: InventoryTablePr
       header: "Image",
       cell: (item: any) => (
         <div className="h-12 w-12 relative rounded-md overflow-hidden">
-          <Image
-            src={item.product_id.image1 || "/placeholder.svg?height=48&width=48"}
-            alt={item.product_id.name}
-            fill
+          <img
+            src={item?.images?.[0] || "/placeHolder.jpg"}
+            alt={item?.name}
             className="object-cover"
           />
         </div>
@@ -35,23 +50,30 @@ export function InventoryTable({ inventory, onEdit, onDelete }: InventoryTablePr
     {
       id: "name",
       header: "Product",
-      accessorKey: "product_id.name",
+      accessorKey: "name",
       sortable: true,
       searchable: true,
       cell: (item: any) => (
         <span className="underline decoration-secondary-foreground decoration-2 underline-offset-4 cursor-pointer">
-          {item.product_id.name}
+          {item?.name}
         </span>
       ),
     },
     {
+      id: "categoryName",
+      header: "Category",
+      accessorKey: "categoryName",
+      sortable: true,
+      searchable: true,
+    },
+    {
       id: "features",
       header: "Features",
-      accessorKey: "product_id.features",
+      accessorKey: "features",
       cell: (item) => (
         <div className="flex flex-wrap gap-1">
-          {item.product_id.features &&
-            Object.entries(item.product_id.features).map(([key, value]: any) => (
+          {item?.features &&
+            Object.entries(item?.features).map(([key, value]: any) => (
               <Badge key={key} variant="outline" className="capitalize">
                 {key}: {value}
               </Badge>
@@ -64,15 +86,15 @@ export function InventoryTable({ inventory, onEdit, onDelete }: InventoryTablePr
     {
       id: "price",
       header: "Price",
-      accessorKey: "product_id.unit_cost",
-      cell: (item: any) => `$${item.product_id.unit_cost.toFixed(2)}`,
+      accessorKey: "unit_cost",
+      cell: (item: any) => `₹${item?.unit_cost.toFixed(2)}`,
       sortable: true,
       searchable: false,
     },
     {
       id: "quantity",
       header: "Quantity",
-      accessorKey: "quantity",
+      accessorKey: "inventoryQuantity",
       sortable: true,
       searchable: false,
     },
@@ -113,6 +135,7 @@ export function InventoryTable({ inventory, onEdit, onDelete }: InventoryTablePr
   return (
     <div className="px-2 md:px-2 lg:px-4">
       <DataTable
+        itemsPerPageOptions={[2, 5, 10, 20, 50, 100]}
         data={inventory}
         columns={columns}
         serialNumber={true}
@@ -120,6 +143,12 @@ export function InventoryTable({ inventory, onEdit, onDelete }: InventoryTablePr
         showPdfExport={true}
         showExcelExport={true}
         showPagination={true}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalCount={totalCount}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+        onSearch={onSearch}
       />
     </div>
   )
