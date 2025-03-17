@@ -1,4 +1,6 @@
+'use client'
 import { AppSidebar } from "@/components/app-sidebar"
+import CreatePreBooking from "@/components/PreBooking/CreatePreBooking"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,8 +15,50 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { toast } from "@/components/ui/use-toast"
+import { API_ENDPOINTS } from "@/lib/apiEndpoints"
+import { get } from "@/utilities/AxiosInterceptor"
+import { useLayoutEffect, useState } from "react"
 
+
+type ResponseType = {
+  success: boolean;
+  data?: any;
+  message?: string;
+}
 const page = () => {
+const [loading, setLoading] = useState(true)
+  const [products, setProducts] = useState<any[]>([])
+
+  // Fetch categories from the API
+  const fetchProducts = async () => {
+    try {
+      setLoading(true) // Start loading
+      const response = await get<ResponseType>(API_ENDPOINTS.INVENTORY.GET_ALL_WITHOUT_PAGINATION,{withCredentials: true})
+      if (response.success) {
+        setProducts(response.data)
+      } else {
+        toast({
+          title: "Error",
+          description: response.message || "Failed to fetch Products",
+          variant: "destructive",
+        })
+    }
+  }catch (error:any) {
+        toast({
+          title: "Error",
+          description: error.response?.data?.message || error.message || "Failed to fetch Products",
+          variant: "destructive",
+        })
+    }finally{
+      setLoading(false); // End loading
+    }
+  }
+
+  useLayoutEffect(() => {
+    fetchProducts()
+    }, [])
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -38,9 +82,9 @@ const page = () => {
             </Breadcrumb>
           </div>
         </header>
-    <div>
-
-    </div>
+<div>
+<CreatePreBooking products={products} fetchProducts={fetchProducts} loading={loading}/>
+</div>
       </SidebarInset>
     </SidebarProvider>
   )

@@ -8,6 +8,7 @@ export const API_ENDPOINTS = {
   },
   INVENTORY: {
     GET_ALL: `/api/v1/inventory/all-products`,
+    GET_ALL_WITHOUT_PAGINATION: `/api/v1/inventory/list-all-products`,
     CREATE: `/api/v1/inventory/add-product`,
     UPDATE: `/api/v1/inventory/update-product/:id`,
     DELETE: `/api/v1/inventory/delete-product/:id`,
