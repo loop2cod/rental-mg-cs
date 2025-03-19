@@ -18,7 +18,7 @@ import {
 import { toast } from "@/components/ui/use-toast"
 import { API_ENDPOINTS } from "@/lib/apiEndpoints"
 import { get } from "@/utilities/AxiosInterceptor"
-import { useLayoutEffect, useState } from "react"
+import { useEffect, useLayoutEffect, useState } from "react"
 
 
 type ResponseType = {
@@ -45,6 +45,7 @@ const [loading, setLoading] = useState(true)
         })
     }
   }catch (error:any) {
+    console.log(error)
         toast({
           title: "Error",
           description: error.response?.data?.message || error.message || "Failed to fetch Products",
@@ -55,7 +56,7 @@ const [loading, setLoading] = useState(true)
     }
   }
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     fetchProducts()
     }, [])
 
