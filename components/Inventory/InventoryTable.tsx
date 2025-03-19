@@ -145,7 +145,7 @@ export function InventoryTable({
   return (
     <div className="px-2 md:px-2 lg:px-4">
       <DataTable
-        itemsPerPageOptions={[2, 5, 10, 20, 50, 100]}
+        itemsPerPageOptions={[5, 10, 20, 50, 100]}
         isLoading={isLoading}
         data={inventory}
         columns={columns}

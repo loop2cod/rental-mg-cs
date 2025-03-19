@@ -15,7 +15,7 @@ const DroppableBookingItems = ({ onDrop, children }: any) => {
   return (
     <div ref={drop as any} className={`rounded-md border ${isOver ? "border-primary bg-primary/5" : ""}`}>
       {isOver && (
-        <div className="absolute inset-0 flex items-center justify-center bg-primary/10 rounded-md z-10 pointer-events-none">
+        <div className="absolute inset-0 flex items-center justify-center bg-primary/10 rounded-lg z-10 pointer-events-none">
           <Badge variant="outline" className="bg-background">
             Drop to add item
           </Badge>

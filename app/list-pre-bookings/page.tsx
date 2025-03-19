@@ -1,4 +1,7 @@
+'use client'
 import { AppSidebar } from "@/components/app-sidebar"
+import { withAuth } from "@/components/Middleware/withAuth"
+import ListPreBookings from "@/components/PreBooking/ListPreBookings"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,8 +16,77 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { toast } from "@/components/ui/use-toast"
+import { API_ENDPOINTS } from "@/lib/apiEndpoints"
+import { get } from "@/utilities/AxiosInterceptor"
+import { useEffect, useState } from "react"
+
+
+interface ResponseType {
+  success: boolean;
+  data?: any;
+  message?: string;
+}
 
 const page = () => {
+    const [preBookings, setPreBookings] = useState([])
+    const [currentPage, setCurrentPage] = useState(1)
+    const [totalPages, setTotalPages] = useState(1)
+    const [totalCount, setTotalCount] = useState(0)
+    const [itemsPerPage, setItemsPerPage] = useState(10)
+    const [searchTerm, setSearchTerm] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Fetch pre-bookings
+    const fetchPreBookings = async (page: number = 1, limit: number = 10, search: string = "") => {
+        setIsLoading(true);
+        try {
+            const response = await get<ResponseType>(API_ENDPOINTS.BOOKING.GET_ALL, {
+                params: { page, limit, search },
+                withCredentials: true,
+            });
+            if (response.success) {
+                setPreBookings(response.data.bookings);
+                setTotalPages(response.data?.pagination?.totalPages);
+                setTotalCount(response.data?.pagination?.totalItems);
+            } else {
+                toast({
+                    title: "Error",
+                    description: response.message || "Failed to fetch Pre-Bookings",
+                    variant: "destructive",
+                });
+            }
+            } catch (error: any) {
+              console.log(error)
+                toast({
+                    title: "Error",
+                    description: error.response?.data?.message || error.message || "Failed to fetch Pre-Bookings",
+                    variant: "destructive",
+                });
+            }finally{
+                setIsLoading(false);
+            }
+        }
+
+        useEffect(() => {
+            fetchPreBookings(currentPage, itemsPerPage, searchTerm);
+        }, [currentPage, itemsPerPage, searchTerm]);
+
+        // Handle search input change
+        const handleSearch = (term: string) => {
+            setSearchTerm(term);
+            setCurrentPage(1);
+        };
+
+        const handlePageChange = (page: number) => {
+          setCurrentPage(page)
+        }
+      
+        const handlePageSizeChange = (size: number) => {
+          setItemsPerPage(size)
+          setCurrentPage(1) // Reset to first page when changing page size
+        }
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -39,10 +111,20 @@ const page = () => {
           </div>
         </header>
     <div>
+<ListPreBookings
+        preBookings={preBookings}
+        onSearch={handleSearch}
+        isLoading={isLoading}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalCount={totalCount}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+        />
     </div>
       </SidebarInset>
     </SidebarProvider>
   )
 }
 
-export default page
+export default withAuth(page)

@@ -73,6 +73,7 @@ export function DataTable<T extends Record<string, any>>({
   onSearch,
   isLoading = false,
 }: DataTableProps<T>) {
+  console.log(data)
   const [searchTerm, setSearchTerm] = useState("")
   const [sortField, setSortField] = useState<string | null>(null)
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
@@ -80,8 +81,8 @@ export function DataTable<T extends Record<string, any>>({
   const [itemsPerPage, setItemsPerPage] = useState(defaultItemsPerPage)
 
   const currentPage = externalCurrentPage ?? internalCurrentPage
-  const totalPages = externalTotalPages ?? Math.ceil(data.length / itemsPerPage)
-  const totalCount = externalTotalCount ?? data.length
+  const totalPages = externalTotalPages ?? Math.ceil(data?.length / itemsPerPage)
+  const totalCount = externalTotalCount ?? data?.length
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -250,14 +251,14 @@ export function DataTable<T extends Record<string, any>>({
       </TableRow>
     ))}
     </>
-            ) : paginatedData.length === 0 ? (
+            ) : paginatedData?.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={finalColumns.length} className="text-center py-8">
                   No data found
                 </TableCell>
               </TableRow>
             ) : (
-              paginatedData.map((item, index) => (
+              paginatedData?.map((item, index) => (
                 <TableRow
                   key={index}
                   className={onRowClick ? "cursor-pointer hover:bg-muted/50" : ""}

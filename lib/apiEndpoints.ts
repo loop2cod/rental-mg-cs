@@ -19,6 +19,13 @@ export const API_ENDPOINTS = {
     CREATE: `/api/v1/category/add`,
     UPDATE: `/api/v1/category/update/:id`,
     DELETE: `/api/v1/category/delete/:id`,
+  },
+  BOOKING:{
+    GET_ALL: `/api/v1/booking/list`,
+    CREATE: `/api/v1/booking/add`,
+    UPDATE: `/api/v1/booking/update/:id`,
+    CANCEL: `/api/v1/booking/delete/:id`,
+    GET_BY_ID: `/api/v1/booking/get-booking-details/:id`,
   }
 } as const;
 
