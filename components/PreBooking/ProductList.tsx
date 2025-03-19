@@ -1,10 +1,9 @@
 // ProductList.tsx
 "use client"
-
-import DraggableProduct from "./CreatePreBooking" // Import the DraggableProduct component
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "../ui/skeleton"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
+import DraggableProduct from "./DraggableProduct"
 
 interface Product {
   _id: string

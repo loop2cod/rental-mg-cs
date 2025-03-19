@@ -1,11 +1,9 @@
-// CreatePreBooking.tsx
 "use client"
 
 import type React from "react"
 import { useState } from "react"
 import { DndProvider } from "react-dnd"
 import { HTML5Backend } from "react-dnd-html5-backend"
-import { TouchBackend } from "react-dnd-touch-backend"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -91,6 +89,7 @@ const CreatePreBooking = ({
   fetchProducts,
   loading,
 }: any) => {
+  console.log(products)
   const [formData, setFormData] = useState(initialData)
   const [fromDate, setFromDate] = useState<Date | undefined>(new Date(initialData.from_date))
   const [toDate, setToDate] = useState<Date | undefined>(new Date(initialData.to_date))
@@ -203,7 +202,6 @@ const CreatePreBooking = ({
   const dndBackend = HTML5Backend
 
   return (
-    <form onSubmit={handleSubmit}>
       <DndProvider backend={dndBackend}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 px-2 md:px-4">
           <div className="lg:col-span-2">
@@ -457,7 +455,6 @@ const CreatePreBooking = ({
           </div>
         </div>
       </DndProvider>
-    </form>
   )
 }
 

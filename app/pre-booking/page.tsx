@@ -1,5 +1,6 @@
 'use client'
 import { AppSidebar } from "@/components/app-sidebar"
+import { withAuth } from "@/components/Middleware/withAuth"
 import CreatePreBooking from "@/components/PreBooking/CreatePreBooking"
 import {
   Breadcrumb,
@@ -33,7 +34,7 @@ const [loading, setLoading] = useState(true)
   // Fetch categories from the API
   const fetchProducts = async () => {
     try {
-      setLoading(true) // Start loading
+      // setLoading(true) // Start loading
       const response = await get<ResponseType>(API_ENDPOINTS.INVENTORY.GET_ALL_WITHOUT_PAGINATION,{withCredentials: true})
       if (response.success) {
         setProducts(response.data)
@@ -91,4 +92,4 @@ const [loading, setLoading] = useState(true)
   )
 }
 
-export default page
+export default withAuth(page)

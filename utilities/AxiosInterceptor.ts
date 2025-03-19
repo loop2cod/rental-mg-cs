@@ -1,7 +1,7 @@
 import { API_ENDPOINTS } from "@/lib/apiEndpoints";
 import axios, { AxiosRequestConfig } from "axios";
+import Cookies from "js-cookie";
 
-// Apply base URL for axios
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const axiosApi = axios.create({
@@ -13,6 +13,23 @@ const axiosApi = axios.create({
 const refreshTokenApi = async () => {
   try {
     const response = await axiosApi.post(API_ENDPOINTS.AUTH.REFRESH, {}, { withCredentials: true });
+
+    if (response?.data?.sessionOut) {
+      await axiosApi.post(API_ENDPOINTS.AUTH.LOGOUT, {}, { withCredentials: true });
+
+      Cookies.set(
+        "toastMessage",
+        JSON.stringify({
+          message: "Your session has expired.",
+          description: "Please try again.",
+        }),
+        { expires: 1 }
+      );
+
+      window.location.href = '/auth'
+      throw new Error("Session expired, logging out.");
+    }
+
     if (response?.data?.success) {
       return true;
     } else {
@@ -32,7 +49,8 @@ axiosApi.interceptors.response.use(
     if (
       error.response &&
       error.response.status === 401 &&
-      !originalRequest._retry
+      !originalRequest._retry &&
+      !error.response.sessionOut
     ) {
       originalRequest._retry = true;
 
@@ -52,6 +70,8 @@ axiosApi.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+
 
 // Helper functions for HTTP methods
 export async function get<T>(url: string, config: AxiosRequestConfig = {}): Promise<T> {
