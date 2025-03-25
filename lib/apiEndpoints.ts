@@ -26,6 +26,17 @@ export const API_ENDPOINTS = {
     UPDATE: `/api/v1/booking/update/:id`,
     CANCEL: `/api/v1/booking/delete/:id`,
     GET_BY_ID: `/api/v1/booking/get-booking-details/:id`,
+  },
+  SUPPLIERS:{
+    GET_ALL: `/api/v1/supplier/list-all`,
+    CREATE: `/api/v1/supplier/add`,
+    UPDATE: `/api/v1/supplier/update/`,
+    LIST_WITH_PAGINATION: `/api/v1/supplier/list`,
+  },
+  OUTSOURCED_PRODUCTS:{
+    GET_ALL: `/api/v1/inventory/list-all-outsourced`,
+    CREATE: `/api/v1/inventory/add-outsourced-product`,
+    GET_BY_SUPPLIER: `/api/v1/inventory/list-outsourced`
   }
 } as const;
 

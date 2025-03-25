@@ -1,77 +1,74 @@
 import * as React from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import { cn } from "../../lib/utils";
-import { buttonVariants } from "../ui/button";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+export type CalendarProps = React.ComponentProps<typeof DayPicker> & {
+  className?: string;
+  classNames?: Record<string, string>;
+  showOutsideDays?: boolean;
+  dob?: boolean; // Date of birth mode - disables future dates
+};
 
 function Calendar({
   className,
   classNames,
   showOutsideDays = true,
-  dob = false, 
+  dob = false,
   ...props
-}:any) {
+}: CalendarProps) {
   // Disable future dates if dob is true
   const disabledDays = dob ? { after: new Date() } : undefined;
 
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn("p-0 bg-white", className)}
+      className={cn("p-0", className)}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
-        caption: "flex justify-start pt-1 relative items-center",
-        caption_label: "text-sm font-medium text-gray-800",
-        nav: "space-x-1 flex items-start gap-2",
+        caption: "flex justify-center pt-1 relative items-center",
+        caption_label: "text-sm font-medium",
+        nav: "space-x-1 flex items-center",
         nav_button: cn(
-          "h-8 w-8 flex items-center justify-center rounded-md border border-gray-300 bg-white hover:bg-gray-100 transition"
+          buttonVariants({ variant: "outline" }),
+          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
         ),
         nav_button_previous: "absolute left-1",
         nav_button_next: "absolute right-1",
         table: "w-full border-collapse space-y-1",
         head_row: "flex",
-        head_cell: cn(
-          "text-gray-600 rounded-md w-8 font-medium text-xs uppercase tracking-wider"
-        ),
+        head_cell:
+          "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
         row: "flex w-full mt-2",
-        cell: cn(
-          "relative p-0 text-center text-sm focus-within:relative focus-within:z-20",
-          props.mode === "range"
-            ? "[&:has(>.day-range-end)]:rounded-r-md [&:has(>.day-range-start)]:rounded-l-md first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md"
-            : "[&:has([aria-selected])]:rounded-md"
-        ),
+        cell: "hover:text-secondary-foreground dark:hover:text-secondary h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-range-start)]:rounded-l-md first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
         day: cn(
           buttonVariants({ variant: "ghost" }),
-          "h-8 w-8 p-0 font-normal aria-selected:opacity-100 hover:bg-gray-100 rounded-md transition-colors",
-          dob && "future-date:text-gray-400 future-date:opacity-50" 
+          "h-9 w-9 p-0 font-normal aria-selected:opacity-100"
         ),
         day_range_start: "day-range-start",
         day_range_end: "day-range-end",
         day_selected:
           "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-        day_today: "bg-accent text-accent-foreground border border-blue-500",
-        day_outside: cn(
-          "text-gray-400 opacity-50" // Muted styling for next/previous month's days
-        ),
-        day_disabled: "text-gray-400 opacity-50",
+        day_today: "bg-accent text-accent-foreground",
+        day_outside: "text-muted-foreground opacity-50",
+        day_disabled: "text-muted-foreground opacity-50",
         day_range_middle:
           "aria-selected:bg-accent aria-selected:text-accent-foreground",
         day_hidden: "invisible",
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ...props }) => <ChevronLeftIcon className="h-4 w-4 text-gray-600" />,
-        IconRight: ({ ...props }) => <ChevronRightIcon className="h-4 w-4 text-gray-600" />,
+        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
+        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
       }}
-      disabled={disabledDays} // Disable future dates if dob is true
+      disabled={disabledDays}
       {...props}
     />
   );
 }
-
 Calendar.displayName = "Calendar";
 
 export { Calendar };

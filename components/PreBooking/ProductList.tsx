@@ -1,8 +1,10 @@
-// ProductList.tsx
 "use client"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "../ui/skeleton"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
+import { Input } from "../ui/input"
+import { Search } from "lucide-react"
+import { useState, useEffect } from "react"
 import DraggableProduct from "./DraggableProduct"
 
 interface Product {
@@ -20,14 +22,37 @@ interface ProductListProps {
 }
 
 export const ProductList = ({ products, loading, onAddToBooking }: ProductListProps) => {
+  const [searchTerm, setSearchTerm] = useState("")
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products)
+
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      setFilteredProducts(products)
+    } else {
+      const filtered = products.filter(product =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      setFilteredProducts(filtered)
+    }
+  }, [searchTerm, products])
+
   return (
     <Card className="py-4 border h-full">
       <CardHeader className="pb-2">
         <CardTitle className="text-xl md:text-2xl font-semibold px-2">Products</CardTitle>
         <CardDescription className="px-2">Drag products to add to booking</CardDescription>
+        <div className="relative px-2">
+          <Input
+            placeholder="Search products..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-8"
+          />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        </div>
       </CardHeader>
       <CardContent className="py-2">
-        <ScrollArea className="h-[calc(100vh-200px)] rounded-lg shadow-sm overflow-y-auto">
+        <ScrollArea className="h-[calc(100vh-250px)] rounded-lg shadow-sm overflow-y-auto">
           <div className="space-y-2 p-2">
             {loading ? (
               Array.from({ length: 8 }).map((_, index) => (
@@ -45,9 +70,19 @@ export const ProductList = ({ products, loading, onAddToBooking }: ProductListPr
               ))
             ) : (
               <>
-                {products.map((product) => (
-                  <DraggableProduct key={product._id} product={product} onAddToBooking={onAddToBooking} />
-                ))}
+                {filteredProducts.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    {searchTerm ? "No products found" : "No products available"}
+                  </div>
+                ) : (
+                  filteredProducts.map((product) => (
+                    <DraggableProduct 
+                      key={product._id} 
+                      product={product} 
+                      onAddToBooking={onAddToBooking} 
+                    />
+                  ))
+                )}
               </>
             )}
           </div>

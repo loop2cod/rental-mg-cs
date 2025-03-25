@@ -1,30 +1,30 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { DndProvider } from "react-dnd"
 import { HTML5Backend } from "react-dnd-html5-backend"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { DatePicker } from "../ui/date-picker"
 import { useToast } from "../ui/use-toast"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { Badge } from "../ui/badge"
-import { Trash2 } from "lucide-react"
+import { Trash2, Search, Check } from "lucide-react"
 import DroppableBookingItems from "./DroppableBookkingItems"
 import { ProductList } from "./ProductList"
-import { TimePicker } from "../ui/TimePicker"
-import { post } from "@/utilities/AxiosInterceptor"
-import { API_ENDPOINTS } from "@/lib/apiEndpoints"
 import { Loader2 } from "lucide-react"
 import { convertTo24HourFormat } from "@/lib/commonFunctions"
+import { post } from "@/utilities/AxiosInterceptor"
+import { API_ENDPOINTS } from "@/lib/apiEndpoints"
+import { CustomerInfoForm } from "./CustomerInfoForm"
+import { BookingDetailsForm } from "./BookingDetailsForm"
+import { Input } from "../ui/input"
+import { BookingItemsTable } from "./BookingItemsTable"
+import { PaymentSummary } from "./PaymentSummary"
+import { OutsourcedProductsSection } from "./OutsourcedProductsSection"
 
 
 interface ApiResponseType {
@@ -34,81 +34,46 @@ interface ApiResponseType {
   errors?: any;
 }
 
-// Initial data from the JSON
-const initialData = {
-  user_name: "John Doel op",
-  user_phone: "9876543210",
+const emptyInitialData = {
+  user_name: "",
+  user_phone: "",
   user_proof_type: "aadhar",
-  user_proof_id: "123456789012",
-  from_date: "2025-03-20",
-  to_date: "2025-03-25",
+  user_proof_id: "",
+  from_date: new Date().toISOString().split('T')[0],
+  to_date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
   from_time: "10:00",
   to_time: "12:00",
-  booking_date: "2025-03-18",
-  booking_items: [
-    {
-      product_id: "67d4734da2d0768131a5424c",
-      name: "Bheem",
-      price: 101,
-      quantity: 2,
-      total_price: 202,
-      from_date: "2025-03-20",
-      to_date: "2025-03-25",
-      from_time: "10:00",
-      to_time: "12:00",
-    },
-    {
-      product_id: "67d473d8a2d0768131a54255",
-      name: "Product A",
-      price: 100,
-      quantity: 1,
-      total_price: 100,
-      from_date: "2025-03-20",
-      to_date: "2025-03-25",
-      from_time: "10:00",
-      to_time: "12:00",
-    },
-  ],
-  total_quantity: 3,
-  amount_paid: 150,
-  total_amount: 302.0,
+  booking_date: new Date().toISOString().split('T')[0],
+  booking_items: [],
+  outsourced_items: [], // Add this line
+  total_quantity: 0,
+  amount_paid: 0,
+  total_amount: 0,
   payment_method: "cash",
 }
 
 const CreatePreBooking = ({
-  products = [
-    {
-      _id: "67d473d8a2d0768131a54255",
-      name: "Product A",
-      image: "/placeHolder.jpg",
-      unit_cost: 100,
-      quantity: 10,
-    },
-    {
-      _id: "67d56904382e70d8b6f3122a",
-      name: "Product Aewrr",
-      image: "/placeHolder.jpg",
-      unit_cost: 100,
-      quantity: 10,
-    },
-    {
-      _id: "67d5693b382e70d8b6f3122f",
-      name: "Product Aewrrsa",
-      image: "/placeHolder.jpg",
-      unit_cost: 100,
-      quantity: 10,
-    },
-  ],
+  products,
   fetchProducts,
   loading,
 }: any) => {
-  const [formData, setFormData] = useState(initialData)
-  const [fromDate, setFromDate] = useState<Date | undefined>(new Date(initialData.from_date))
-  const [toDate, setToDate] = useState<Date | undefined>(new Date(initialData.to_date))
-  const [bookingDate, setBookingDate] = useState<Date | undefined>(new Date(initialData.booking_date))
+  const [formData, setFormData] = useState(emptyInitialData)
+  const [fromDate, setFromDate] = useState<Date | undefined>(new Date(formData.from_date))
+  const [toDate, setToDate] = useState<Date | undefined>(new Date(formData.to_date))
+  const [bookingDate, setBookingDate] = useState<Date | undefined>(new Date(formData.booking_date))
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { toast } = useToast()
   const isMobile = useIsMobile()
+  const [searchTerm, setSearchTerm] = useState("")
+  const [isSearchFocused, setIsSearchFocused] = useState(false)
+  const [highlightedIndex, setHighlightedIndex] = useState(-1)
+  const searchRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [outsourcedItems, setOutsourcedItems] = useState<any[]>([])
+
+  const filteredProducts = products.filter((product: any) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -120,10 +85,9 @@ const CreatePreBooking = ({
   }
 
   const handleItemChange = (index: number, field: string, value: any) => {
-    const updatedItems = [...formData.booking_items]
+    const updatedItems:any = [...formData.booking_items]
     updatedItems[index] = { ...updatedItems[index], [field]: value }
 
-    // Recalculate total price if price or quantity changes
     if (field === "price" || field === "quantity") {
       const price = field === "price" ? value : updatedItems[index].price
       const quantity = field === "quantity" ? value : updatedItems[index].quantity
@@ -133,8 +97,8 @@ const CreatePreBooking = ({
     setFormData((prev) => ({
       ...prev,
       booking_items: updatedItems,
-      total_quantity: updatedItems.reduce((sum, item) => sum + Number(item.quantity), 0),
-      total_amount: updatedItems.reduce((sum, item) => sum + Number(item.total_price), 0),
+      total_quantity: updatedItems.reduce((sum:any, item:any) => sum + Number(item.quantity), 0),
+      total_amount: updatedItems.reduce((sum:any, item:any) => sum + Number(item.total_price), 0),
     }))
   }
 
@@ -143,19 +107,16 @@ const CreatePreBooking = ({
     setFormData((prev) => ({
       ...prev,
       booking_items: updatedItems,
-      total_quantity: updatedItems.reduce((sum, item) => sum + Number(item.quantity), 0),
-      total_amount: updatedItems.reduce((sum, item) => sum + Number(item.total_price), 0),
+      total_quantity: updatedItems.reduce((sum, item:any) => sum + Number(item.quantity), 0),
+      total_amount: updatedItems.reduce((sum, item:any) => sum + Number(item.total_price), 0),
     }))
   }
 
   const addProductToBooking = (product: any) => {
-    console.log(product)
-    // Check if product already exists in booking items
-    const existingItemIndex = formData.booking_items.findIndex((item) => item.name === product.name)
+    const existingItemIndex = formData.booking_items.findIndex((item:any) => item.name === product.name)
 
     if (existingItemIndex >= 0) {
-      // Update quantity if product already exists
-      const updatedItems = [...formData.booking_items]
+      const updatedItems:any = [...formData.booking_items]
       updatedItems[existingItemIndex].quantity += 1
       updatedItems[existingItemIndex].total_price =
         updatedItems[existingItemIndex].price * updatedItems[existingItemIndex].quantity
@@ -163,8 +124,8 @@ const CreatePreBooking = ({
       setFormData((prev) => ({
         ...prev,
         booking_items: updatedItems,
-        total_quantity: updatedItems.reduce((sum, item) => sum + Number(item.quantity), 0),
-        total_amount: updatedItems.reduce((sum, item) => sum + Number(item.total_price), 0),
+        total_quantity: updatedItems.reduce((sum:any, item:any) => sum + Number(item.quantity), 0),
+        total_amount: updatedItems.reduce((sum:any, item:any) => sum + Number(item.total_price), 0),
       }))
 
       toast({
@@ -172,8 +133,6 @@ const CreatePreBooking = ({
         description: `${product.name} quantity increased`,
       })
     } else {
-      console.log(product)
-      // Add new product to booking items
       const newItem = {
         product_id: product._id,
         name: product.name,
@@ -186,7 +145,7 @@ const CreatePreBooking = ({
         to_time: formData.to_time,
       }
 
-      setFormData((prev) => {
+      setFormData((prev:any) => {
         const updatedItems = [...prev.booking_items, newItem]
         return {
           ...prev,
@@ -204,7 +163,7 @@ const CreatePreBooking = ({
   }
 
   const validateForm = () => {
-    if (!formData.user_name || !formData.user_phone || !formData.user_proof_type || !formData.user_proof_id) {
+    if (!formData.user_name || !formData.user_phone) {
       toast({
         title: "Validation Error",
         description: "Please fill all customer information fields",
@@ -233,39 +192,38 @@ const CreatePreBooking = ({
     setIsSubmitting(true);
   
     try {
-      // Convert times to 24-hour format
       const formattedData = {
         ...formData,
         from_time: convertTo24HourFormat(formData.from_time),
         to_time: convertTo24HourFormat(formData.to_time),
+        outsourced_items: outsourcedItems, // Include outsourced items
       };
   
       const response = await post<ApiResponseType>(
         API_ENDPOINTS.BOOKING.CREATE,
         formattedData,
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
   
-    if(response.success){
-      toast({
-        title: "Booking created",
-        description: "Your booking has been created successfully",
-      });
-    }
-      else{
+      if(response.success){
+        toast({
+          title: "Booking created",
+          description: "Your booking has been created successfully",
+        });
+        // Reset form
+        setFormData(emptyInitialData)
+        setOutsourcedItems([])
+      } else {
         toast({
           title: "Error",
-          description: response.errors.msg || "Failed to create booking. Please try again.",
+          description: response.errors.msg || "Failed to create booking",
           variant: "destructive",
         });
       }
     } catch (error:any) {
-      console.log(error)
       toast({
         title: "Error",
-        description:  error.response?.data?.message || error.response?.data?.errors[0]?.msg || error.message || "Failed to create booking. Please try again.",
+        description: error.response?.data?.message || "Failed to create booking",
         variant: "destructive",
       });
     } finally {
@@ -273,7 +231,36 @@ const CreatePreBooking = ({
     }
   };
 
-  // Choose the appropriate backend based on device
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault()
+      setHighlightedIndex(prev => 
+        prev < filteredProducts.length - 1 ? prev + 1 : prev
+      )
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault()
+      setHighlightedIndex(prev => (prev > 0 ? prev - 1 : 0))
+    } else if (e.key === "Enter" && highlightedIndex >= 0) {
+      e.preventDefault()
+      addProductToBooking(filteredProducts[highlightedIndex])
+      setSearchTerm("")
+      setHighlightedIndex(-1)
+      if (inputRef.current) inputRef.current.focus()
+    } else if (e.key === "Escape") {
+      setIsSearchFocused(false)
+    }
+  }
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsSearchFocused(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
   const dndBackend = HTML5Backend
 
   return (
@@ -287,222 +274,111 @@ const CreatePreBooking = ({
                 <CardDescription>Enter customer and booking details</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Customer Information */}
-                <div>
-                  <h3 className="text-lg font-medium mb-4">Customer Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="user_name">Customer Name</Label>
-                      <Input
-                        id="user_name"
-                        name="user_name"
-                        value={formData.user_name}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="user_phone">Phone Number</Label>
-                      <Input
-                        id="user_phone"
-                        name="user_phone"
-                        value={formData.user_phone}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="user_proof_type">ID Proof Type</Label>
-                      <Select
-                        value={formData.user_proof_type}
-                        onValueChange={(value) => handleSelectChange("user_proof_type", value)}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select ID type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="aadhar">Aadhar Card</SelectItem>
-                          <SelectItem value="passport">Passport</SelectItem>
-                          <SelectItem value="driving_license">Driving License</SelectItem>
-                          <SelectItem value="voter_id">Voter ID</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="user_proof_id">ID Number</Label>
-                      <Input
-                        id="user_proof_id"
-                        name="user_proof_id"
-                        value={formData.user_proof_id}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
+                <CustomerInfoForm 
+                  formData={formData} 
+                  handleInputChange={handleInputChange} 
+                  handleSelectChange={handleSelectChange} 
+                />
 
                 <Separator />
 
-                {/* Booking Details */}
-                <div>
-                  <h3 className="text-lg font-medium mb-4">Booking Details</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4">
-                    <div className="mb-4 space-y-2">
-                      <Label>Booking Date</Label>
-                      <DatePicker setDate={setBookingDate} date={bookingDate} />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2">
-                    <div className="space-y-2">
-                      <Label>From Date</Label>
-                      <DatePicker setDate={setFromDate} date={fromDate} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>To Date</Label>
-                      <DatePicker setDate={setToDate} date={toDate} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>From Time</Label>
-                      <TimePicker
-                        value={formData.from_time}
-                        onChange={(value: any) => setFormData((prev) => ({ ...prev, from_time: value }))}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>To Time</Label>
-                      <TimePicker
-                        value={formData.to_time}
-                        onChange={(value: any) => setFormData((prev) => ({ ...prev, to_time: value }))}
-                      />
-                    </div>
-                  </div>
-                </div>
+                <BookingDetailsForm
+                  formData={formData}
+                  fromDate={fromDate}
+                  setFromDate={setFromDate}
+                  toDate={toDate}
+                  setToDate={setToDate}
+                  bookingDate={bookingDate}
+                  setBookingDate={setBookingDate}
+                  setFormData={setFormData}
+                />
 
                 <Separator />
 
-                {/* Booking Items */}
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-medium">Booking Items</h3>
                     <Badge variant="outline" className="bg-primary/5">
-                      Drag products here
+                      Drag products here or search below
                     </Badge>
                   </div>
 
+                  <div className="relative mb-4" ref={searchRef}>
+                    <div className="relative">
+                      <Input
+                        ref={inputRef}
+                        placeholder="Search products..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onFocus={() => setIsSearchFocused(true)}
+                        onKeyDown={handleKeyDown}
+                        className="pr-10"
+                      />
+                      <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
+                    </div>
+                    
+                    {isSearchFocused && searchTerm && (
+                      <div className="absolute z-10 mt-1 w-full bg-popover shadow-lg rounded-md border border-border max-h-60 overflow-auto">
+                        {filteredProducts.length === 0 ? (
+                          <div className="p-4 text-sm text-muted-foreground">
+                            No products found
+                          </div>
+                        ) : (
+                          <ul>
+                            {filteredProducts.map((product: any, index: number) => (
+                              <li
+                                key={product._id}
+                                className={`px-4 py-2 cursor-pointer flex items-center justify-between ${
+                                  highlightedIndex === index
+                                    ? "bg-accent"
+                                    : "hover:bg-accent/50"
+                                }`}
+                                onClick={() => {
+                                  addProductToBooking(product)
+                                  setSearchTerm("")
+                                  setIsSearchFocused(false)
+                                }}
+                                onMouseEnter={() => setHighlightedIndex(index)}
+                              >
+                                <div>
+                                  <div className="font-medium">{product.name}</div>
+                                  <div className="text-sm text-muted-foreground">
+                                    ₹{product.unit_cost} • {product.quantity} available
+                                  </div>
+                                </div>
+                                {highlightedIndex === index && (
+                                  <Check className="h-4 w-4 text-primary" />
+                                )}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
                   <DroppableBookingItems onDrop={addProductToBooking}>
-                    <ScrollArea className="h-[300px]">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Item Name</TableHead>
-                            <TableHead className="w-[100px]">Price</TableHead>
-                            <TableHead className="w-[80px]">Qty</TableHead>
-                            <TableHead className="w-[120px]">Total</TableHead>
-                            <TableHead className="w-[60px]"></TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {formData.booking_items.length === 0 ? (
-                            <TableRow>
-                              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                                Drag and drop products here or click Add on a product
-                              </TableCell>
-                            </TableRow>
-                          ) : (
-                            formData.booking_items.map((item, index) => (
-                              <TableRow key={index}>
-                                <TableCell>
-                                  <Input
-                                    value={item.name}
-                                    onChange={(e) => handleItemChange(index, "name", e.target.value)}
-                                  />
-                                </TableCell>
-                                <TableCell>
-                                  <Input
-                                    type="number"
-                                    value={item.price}
-                                    onChange={(e) => handleItemChange(index, "price", (e.target.value))}
-                                    disabled
-                                  />
-                                </TableCell>
-                                <TableCell>
-                                  <Input
-                                    type="number"
-                                    value={item.quantity}
-                                    onChange={(e) => handleItemChange(index, "quantity", (e.target.value))}
-                                  />
-                                </TableCell>
-                                <TableCell className="font-medium">₹{(item.total_price || 0).toFixed(2)}</TableCell>
-                                <TableCell>
-                                  <Button variant="ghost" size="icon" onClick={() => removeItem(index)}>
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </TableCell>
-                              </TableRow>
-                            ))
-                          )}
-                        </TableBody>
-                      </Table>
-                    </ScrollArea>
+                    <BookingItemsTable 
+                      bookingItems={formData.booking_items} 
+                      handleItemChange={handleItemChange} 
+                      removeItem={removeItem} 
+                    />
                   </DroppableBookingItems>
                 </div>
+                <OutsourcedProductsSection 
+                  outsourcedItems={outsourcedItems}
+                  setOutsourcedItems={setOutsourcedItems}
+                  setFormData={setFormData}
+                />
 
                 <Separator />
 
-                {/* Payment Summary */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="text-lg font-medium mb-4">Payment Summary</h3>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span>Total Items:</span>
-                        <span>{formData.total_quantity}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Total Amount:</span>
-                        <span>₹{formData.total_amount.toFixed(2)}</span>
-                      </div>
-                      <Separator />
-                      <div className="space-y-2">
-                        <Label htmlFor="payment_method">Payment Method</Label>
-                        <Select
-                          value={formData.payment_method}
-                          onValueChange={(value) => handleSelectChange("payment_method", value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select payment method" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="cash">Cash</SelectItem>
-                            <SelectItem value="card">Card</SelectItem>
-                            <SelectItem value="upi">UPI</SelectItem>
-                            <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="amount_paid">Amount Paid</Label>
-                        <Input
-                          id="amount_paid"
-                          name="amount_paid"
-                          type="number"
-                          value={formData.amount_paid}
-                          onChange={(e) =>
-                            handleInputChange({
-                              target: {
-                                name: "amount_paid",
-                                value: Number(e.target.value),
-                              },
-                            } as any)
-                          }
-                        />
-                      </div>
-                      <div className="flex justify-between font-bold">
-                        <span>Balance:</span>
-                        <span>₹{(formData.total_amount - formData.amount_paid).toFixed(2)}</span>
-                      </div>
-                    </div>
-                  </div>
+                  <PaymentSummary 
+                    formData={formData} 
+                    handleInputChange={handleInputChange} 
+                    handleSelectChange={handleSelectChange} 
+                  />
                 </div>
               </CardContent>
               <CardFooter className="flex justify-between">
@@ -517,7 +393,6 @@ const CreatePreBooking = ({
           </Card>
         </div>
 
-        {/* Products Panel - Collapsible on mobile */}
         <div className="lg:col-span-1 w-full">
           <ProductList products={products} loading={loading} onAddToBooking={addProductToBooking} />
         </div>
