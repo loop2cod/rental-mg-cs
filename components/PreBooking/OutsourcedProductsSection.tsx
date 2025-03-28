@@ -315,7 +315,7 @@ export const OutsourcedProductsSection = ({
     <div className="mt-6">
       <h3 className="text-lg font-medium mb-4">Outsourced Products</h3>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 mb-4">
         <div className="space-y-2">
           <Label>Supplier</Label>
           <div className="flex gap-2">

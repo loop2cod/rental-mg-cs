@@ -8,6 +8,22 @@
   background-color: transparent;
   width: 0%;
 }
+
+.no-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Add smooth transitions for the wheel items */
+.snap-center {
+  scroll-snap-align: center;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
 * {
   -webkit-tap-highlight-color: transparent;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
