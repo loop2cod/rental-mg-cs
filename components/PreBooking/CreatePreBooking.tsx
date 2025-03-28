@@ -25,6 +25,7 @@ import { Input } from "../ui/input"
 import { BookingItemsTable } from "./BookingItemsTable"
 import { PaymentSummary } from "./PaymentSummary"
 import { OutsourcedProductsSection } from "./OutsourcedProductsSection"
+import { useRouter } from "next/navigation"
 
 
 interface ApiResponseType {
@@ -47,6 +48,7 @@ const emptyInitialData = {
   booking_items: [],
   outsourced_items: [], // Add this line
   total_quantity: 0,
+  no_of_days: 1,
   amount_paid: 0,
   total_amount: 0,
   payment_method: "cash",
@@ -57,6 +59,7 @@ const CreatePreBooking = ({
   fetchProducts,
   loading,
 }: any) => {
+  const navigate = useRouter()
   const [formData, setFormData] = useState(emptyInitialData)
   const [fromDate, setFromDate] = useState<Date | undefined>(new Date(formData.from_date))
   const [toDate, setToDate] = useState<Date | undefined>(new Date(formData.to_date))
@@ -87,13 +90,17 @@ const CreatePreBooking = ({
   const handleItemChange = (index: number, field: string, value: any) => {
     const updatedItems:any = [...formData.booking_items]
     updatedItems[index] = { ...updatedItems[index], [field]: value }
-
-    if (field === "price" || field === "quantity") {
+  
+    if (field === "price" || field === "quantity" || field === "no_of_days") {
       const price = field === "price" ? value : updatedItems[index].price
       const quantity = field === "quantity" ? value : updatedItems[index].quantity
-      updatedItems[index].total_price = price * quantity
+      const days = field === "no_of_days" ? value : updatedItems[index].no_of_days || formData.no_of_days
+      updatedItems[index].total_price = price * quantity * days
+      if (field === "no_of_days") {
+        updatedItems[index].no_of_days = days
+      }
     }
-
+  
     setFormData((prev) => ({
       ...prev,
       booking_items: updatedItems,
@@ -101,6 +108,25 @@ const CreatePreBooking = ({
       total_amount: updatedItems.reduce((sum:any, item:any) => sum + Number(item.total_price), 0),
     }))
   }
+
+  const handleNoOfDaysChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const days = Number(e.target.value)
+    setFormData((prev:any) => {
+      const updatedItems = prev.booking_items.map((item:any) => ({
+        ...item,
+        no_of_days: days,
+        total_price: item.price * item.quantity * days
+      }))
+      
+      return {
+        ...prev,
+        no_of_days: days,
+        booking_items: updatedItems,
+        total_amount: updatedItems.reduce((sum:any, item:any) => sum + Number(item.total_price), 0),
+      }
+    })
+  }
+
 
   const removeItem = (index: number) => {
     const updatedItems = formData.booking_items.filter((_, i) => i !== index)
@@ -138,7 +164,8 @@ const CreatePreBooking = ({
         name: product.name,
         price: product.unit_cost,
         quantity: 1,
-        total_price: product.unit_cost,
+        no_of_days: formData.no_of_days, // Add this line
+        total_price: product.unit_cost * Number(formData?.no_of_days), // Multiply by days
         from_date: formData.from_date,
         to_date: formData.to_date,
         from_time: formData.from_time,
@@ -163,6 +190,7 @@ const CreatePreBooking = ({
   }
 
   const validateForm = () => {
+    // Validate customer information
     if (!formData.user_name || !formData.user_phone) {
       toast({
         title: "Validation Error",
@@ -171,16 +199,98 @@ const CreatePreBooking = ({
       })
       return false
     }
-
-    if (formData.booking_items.length === 0) {
+  
+    // Validate phone number is exactly 10 digits
+    const phoneRegex = /^\d{10}$/
+    if (!phoneRegex.test(formData.user_phone)) {
       toast({
         title: "Validation Error",
-        description: "Please add at least one booking item",
+        description: "Phone number must be exactly 10 digits",
         variant: "destructive",
       })
       return false
     }
-
+  
+    // Validate at least one booking item or outsourced item
+    if (formData.booking_items.length === 0 && formData.outsourced_items.length === 0) {
+      toast({
+        title: "Validation Error",
+        description: "Please add at least one booking item or outsourced item",
+        variant: "destructive",
+      })
+      return false
+    }
+  
+    // Validate number of days is at least 1
+    if (formData.no_of_days < 1) {
+      toast({
+        title: "Validation Error",
+        description: "Number of days must be at least 1",
+        variant: "destructive",
+      })
+      return false
+    }
+  
+    // Additional validation for booking items if they exist
+    if (formData.booking_items.length > 0) {
+      for (const item  of formData.booking_items as any) {
+        if (item.quantity < 1) {
+          toast({
+            title: "Validation Error",
+            description: `Quantity for ${item.name} must be at least 1`,
+            variant: "destructive",
+          })
+          return false
+        }
+        if (item.price <= 0) {
+          toast({
+            title: "Validation Error",
+            description: `Price for ${item.name} must be greater than 0`,
+            variant: "destructive",
+          })
+          return false
+        }
+        if (item.no_of_days < 1) {
+          toast({
+            title: "Validation Error",
+            description: `Days for ${item.name} must be at least 1`,
+            variant: "destructive",
+          })
+          return false
+        }
+      }
+    }
+  
+    // Additional validation for outsourced items if they exist
+    if (formData.outsourced_items.length > 0) {
+      for (const item of formData.outsourced_items as any) {
+        if (!item.name || !item.price || !item.quantity) {
+          toast({
+            title: "Validation Error",
+            description: "Please fill all fields for outsourced items",
+            variant: "destructive",
+          })
+          return false
+        }
+        if (item.quantity < 1) {
+          toast({
+            title: "Validation Error",
+            description: `Quantity for ${item.name} must be at least 1`,
+            variant: "destructive",
+          })
+          return false
+        }
+        if (item.price <= 0) {
+          toast({
+            title: "Validation Error",
+            description: `Price for ${item.name} must be greater than 0`,
+            variant: "destructive",
+          })
+          return false
+        }
+      }
+    }
+  
     return true
   }
 
@@ -213,6 +323,7 @@ const CreatePreBooking = ({
         // Reset form
         setFormData(emptyInitialData)
         setOutsourcedItems([])
+        navigate.push('/list-pre-bookings')
       } else {
         toast({
           title: "Error",
@@ -283,15 +394,16 @@ const CreatePreBooking = ({
                 <Separator />
 
                 <BookingDetailsForm
-                  formData={formData}
-                  fromDate={fromDate}
-                  setFromDate={setFromDate}
-                  toDate={toDate}
-                  setToDate={setToDate}
-                  bookingDate={bookingDate}
-                  setBookingDate={setBookingDate}
-                  setFormData={setFormData}
-                />
+  formData={formData}
+  fromDate={fromDate}
+  setFromDate={setFromDate}
+  toDate={toDate}
+  setToDate={setToDate}
+  bookingDate={bookingDate}
+  setBookingDate={setBookingDate}
+  setFormData={setFormData}
+  handleNoOfDaysChange={handleNoOfDaysChange} // Add this prop
+/>
 
                 <Separator />
 
@@ -366,6 +478,7 @@ const CreatePreBooking = ({
                   </DroppableBookingItems>
                 </div>
                 <OutsourcedProductsSection 
+                  formData={formData}
                   outsourcedItems={outsourcedItems}
                   setOutsourcedItems={setOutsourcedItems}
                   setFormData={setFormData}

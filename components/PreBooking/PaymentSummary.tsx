@@ -23,6 +23,10 @@ export const PaymentSummary = ({
           <span>{formData.total_quantity}</span>
         </div>
         <div className="flex justify-between">
+          <span>No. of Days:</span>
+          <span>{formData.no_of_days || 'Nil'}</span>
+        </div>
+        <div className="flex justify-between">
           <span>Total Amount:</span>
           <span>₹{formData.total_amount.toFixed(2)}</span>
         </div>

@@ -29,6 +29,7 @@ interface OutsourcedItem {
   name: string
   price: number
   quantity: number
+  no_of_days: number // Add this
   total_price: number
 }
 
@@ -39,10 +40,12 @@ type ResponseType = {
 }
 
 export const OutsourcedProductsSection = ({ 
+  formData,
   outsourcedItems,
   setOutsourcedItems,
   setFormData
 }: {
+  formData: any,
   outsourcedItems: OutsourcedItem[],
   setOutsourcedItems: (items: OutsourcedItem[]) => void,
   setFormData: React.Dispatch<React.SetStateAction<any>>
@@ -245,29 +248,30 @@ export const OutsourcedProductsSection = ({
       })
       return
     }
-
+  
     const product = products.find(p => p._id === selectedProduct)
     if (!product) return
-
+  
+    // Get no_of_days from formData or default to 1
+    const no_of_days = formData?.no_of_days || 1
+  
     // Check if product already exists in the list
     const existingItemIndex = outsourcedItems.findIndex(
       item => item.product_id === selectedProduct
     )
-
+  
     if (existingItemIndex >= 0) {
       // Update quantity if product already exists
       const updatedItems = [...outsourcedItems]
       updatedItems[existingItemIndex].quantity += quantity
       updatedItems[existingItemIndex].total_price = 
-        updatedItems[existingItemIndex].price * updatedItems[existingItemIndex].quantity
-
+        updatedItems[existingItemIndex].price * 
+        updatedItems[existingItemIndex].quantity * 
+        no_of_days // Multiply by days
+  
       setOutsourcedItems(updatedItems)
-      setFormData((prev: any) => ({
-        ...prev,
-        outsourced_items: updatedItems,
-        total_amount: (prev.total_amount || 0) + (product.unit_cost * quantity)
-      }))
-
+      updateFormDataWithOutsourcedItems(updatedItems)
+  
       toast({
         title: "Quantity updated",
         description: `${product.product_name} quantity increased by ${quantity}`,
@@ -279,25 +283,51 @@ export const OutsourcedProductsSection = ({
         name: product.product_name,
         price: product.unit_cost,
         quantity: quantity,
-        total_price: product.unit_cost * quantity
+        no_of_days: no_of_days, // Add days
+        total_price: product.unit_cost * quantity * no_of_days // Multiply by days
       }
-
+  
       setOutsourcedItems([...outsourcedItems, newItem])
-      setFormData((prev: any) => ({
-        ...prev,
-        outsourced_items: [...prev.outsourced_items || [], newItem],
-        total_amount: (prev.total_amount || 0) + newItem.total_price
-      }))
-
+      updateFormDataWithOutsourcedItems([...outsourcedItems, newItem])
+  
       toast({
         title: "Item added",
         description: `${product.product_name} added to outsourced items`,
       })
     }
-
+  
     setSelectedProduct("")
     setQuantity(1)
   }
+  
+  // Helper function to update form data
+  const updateFormDataWithOutsourcedItems = (items: OutsourcedItem[]) => {
+    setFormData((prev: any) => ({
+      ...prev,
+      outsourced_items: items,
+      total_quantity: 
+        (prev.booking_items?.reduce((sum: number, item: any) => sum + Number(item.quantity), 0) || 0) +
+        items.reduce((sum, item) => sum + Number(item.quantity), 0),
+      total_amount: 
+        (prev.booking_items?.reduce((sum: number, item: any) => sum + Number(item.total_price), 0) || 0) +
+        items.reduce((sum, item) => sum + Number(item.total_price), 0)
+    }))
+  }
+
+  useEffect(() => {
+    if (outsourcedItems.length > 0) {
+      const updatedItems = outsourcedItems.map(item => ({
+        ...item,
+        no_of_days: formData.no_of_days || 1,
+        total_price: item.price * item.quantity * (formData.no_of_days || 1)
+      }))
+      
+      setOutsourcedItems(updatedItems)
+      updateFormDataWithOutsourcedItems(updatedItems)
+    }
+  }, [formData?.no_of_days])
+
+
 
   const removeOutsourcedItem = (index: number) => {
     const removedItem = outsourcedItems[index]
@@ -307,6 +337,7 @@ export const OutsourcedProductsSection = ({
     setFormData((prev: any) => ({
       ...prev,
       outsourced_items: updatedItems,
+      total_quantity: (prev.total_quantity || 0) - removedItem.quantity,
       total_amount: (prev.total_amount || 0) - removedItem.total_price
     }))
   }
@@ -511,31 +542,31 @@ export const OutsourcedProductsSection = ({
         </div>
       )}
 
-      {outsourcedItems.length > 0 && (
-        <div className="border rounded-lg overflow-hidden">
-          <div className="p-4 font-medium bg-muted">Outsourced Items</div>
-          <div className="divide-y">
-            {outsourcedItems.map((item, index) => (
-              <div key={index} className="p-4 flex justify-between items-center hover:bg-muted/50">
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium truncate">{item.name}</div>
-                  <div className="text-sm text-muted-foreground">
-                    ₹{item.price.toFixed(2)} × {item.quantity} = ₹{item.total_price.toFixed(2)}
-                  </div>
-                </div>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => removeOutsourcedItem(index)}
-                  className="shrink-0"
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-              </div>
-            ))}
+{outsourcedItems.length > 0 && (
+  <div className="border rounded-lg overflow-hidden">
+    <div className="p-4 font-medium bg-muted">Outsourced Items</div>
+    <div className="divide-y">
+      {outsourcedItems.map((item, index) => (
+        <div key={index} className="p-4 flex justify-between items-center hover:bg-muted/50">
+          <div className="flex-1 min-w-0">
+            <div className="font-medium truncate">{item.name}</div>
+            <div className="text-sm text-muted-foreground">
+              ₹{item.price.toFixed(2)} × {item.quantity} × {item.no_of_days} days = ₹{item.total_price.toFixed(2)}
+            </div>
           </div>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => removeOutsourcedItem(index)}
+            className="shrink-0"
+          >
+            <Trash2 className="h-4 w-4 text-destructive" />
+          </Button>
         </div>
-      )}
+      ))}
+    </div>
+  </div>
+)}
     </div>
   )
 }

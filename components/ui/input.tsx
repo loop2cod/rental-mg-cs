@@ -1,8 +1,27 @@
 import * as React from "react"
-
 import { cn } from "@/lib/utils"
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+function Input({ className, type, onChange, ...props }: React.ComponentProps<"input">) {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (type === "number" || type === "tel") {
+      let value = e.target.value
+      
+      // Remove leading zeros unless it's a decimal number starting with 0
+      if (/^0[0-9]+$/.test(value)) {
+        value = value.replace(/^0+/, '')
+        if (value === '') value = '0' // Prevent empty value if user deletes everything
+        e.target.value = value
+      }
+      
+      // Call the original onChange if provided
+      if (onChange) {
+        onChange(e)
+      }
+    } else if (onChange) {
+      onChange(e)
+    }
+  }
+
   return (
     <input
       type={type}
@@ -13,6 +32,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
         "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
         className
       )}
+      onChange={handleChange}
       {...props}
     />
   )
