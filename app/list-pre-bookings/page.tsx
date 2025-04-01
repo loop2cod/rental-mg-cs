@@ -10,6 +10,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import {
   SidebarInset,
@@ -113,6 +114,9 @@ const page = () => {
     <div>
 <ListPreBookings
         preBookings={preBookings}
+        fetchPreBookings={fetchPreBookings}
+        itemsPerPage={itemsPerPage}
+        searchTerm={searchTerm}
         onSearch={handleSearch}
         isLoading={isLoading}
         currentPage={currentPage}

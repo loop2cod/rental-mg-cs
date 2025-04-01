@@ -29,7 +29,7 @@ export const BookingDetailsForm = ({
   return (
     <div>
       <h3 className="text-lg font-medium mb-4">Booking Details</h3>
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       <div className="space-y-2 mb-3">
   <Label htmlFor="no_of_days">Number of Days</Label>
   <Input

@@ -1,22 +1,63 @@
 "use client";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { ColumnDef, DataTable } from "../ui/data-table";
 import { Button } from "../ui/button";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, View, X } from "lucide-react";
 import { format } from "date-fns"; // Import date-fns for date formatting
 import { formatCurrency } from "@/lib/commonFunctions";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import { useRouter } from "next/navigation";
+import { patch, post } from "@/utilities/AxiosInterceptor";
+import { API_ENDPOINTS } from "@/lib/apiEndpoints";
+import { CancelBookingDialog } from "./CancelBookingDialog";
 
+
+interface ApiResponseType {
+  success: boolean;
+  data?: any;
+  message?: string;
+  errors?: any;
+}
 const ListPreBookings = ({
   preBookings,
+  fetchPreBookings,
+  itemsPerPage,
+  searchTerm,
   onSearch,
   isLoading,
-  inventory,
   currentPage,
   totalPages,
   totalCount,
   onPageChange,
   onPageSizeChange,
 }: any) => {
+  const router = useRouter()
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
+  const [isCancelling, setIsCancelling] = useState(false);
+
+  const handleCancelBooking = async (remarks: string) => {
+    if (!selectedBookingId) return;
+    
+    setIsCancelling(true);
+    try {
+      const response = await patch<ApiResponseType>(
+        `${API_ENDPOINTS.BOOKING.CANCEL}/${selectedBookingId}`,
+        { remarks },
+        { withCredentials: true }
+      );
+      if (response.success) {
+      setIsDialogOpen(false);
+      fetchPreBookings(currentPage, itemsPerPage, searchTerm);
+      }
+    } catch (error) {
+      console.error("Failed to cancel booking", error);
+      // Handle error - show error message
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
   const columns: ColumnDef<any>[] = useMemo(
     () => [
       {
@@ -112,29 +153,71 @@ const ListPreBookings = ({
         header: "Actions",
         cell: (item) => (
           <div className="flex justify-start gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              className="hover:bg-gray-100"
-            >
-              <Edit className="h-4 w-4 " />
-              <span className="sr-only">Edit</span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              className="hover:bg-gray-100"
-            >
-              <Trash2 className="h-4 w-4" />
-              <span className="sr-only">Cancel</span>
-            </Button>
-          </div>
+              <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.push(`/pre-booking/${item._id}`);
+                  }}
+                >
+                  <View className="h-4 w-4" />
+                  <span className="sr-only">View</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  View Booking
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.push(`/list-pre-bookings/${item._id}`);
+                  }}
+                >
+                  <Edit className="h-4 w-4" />
+                  <span className="sr-only">Edit</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Edit Booking</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+    
+          <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedBookingId(item._id);
+                      setIsDialogOpen(true);
+                    }}
+                  >
+                    <X className="h-4 w-4" />
+                    <span className="sr-only">Cancel</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Cancel Booking</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+        </div>
         ),
         sortable: false,
         searchable: false,
@@ -161,6 +244,12 @@ const ListPreBookings = ({
         onPageChange={onPageChange}
         onPageSizeChange={onPageSizeChange}
         onSearch={onSearch}
+      />
+         <CancelBookingDialog
+        isOpen={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        onCancelBooking={handleCancelBooking}
+        isCancelling={isCancelling}
       />
     </div>
   );

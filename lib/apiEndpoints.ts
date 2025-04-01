@@ -23,9 +23,10 @@ export const API_ENDPOINTS = {
   BOOKING:{
     GET_ALL: `/api/v1/booking/list`,
     CREATE: `/api/v1/booking/add`,
-    UPDATE: `/api/v1/booking/update/:id`,
-    CANCEL: `/api/v1/booking/delete/:id`,
-    GET_BY_ID: `/api/v1/booking/get-booking-details/:id`,
+    UPDATE: `/api/v1/booking/update`,
+    GET_DETAIL: `/api/v1/booking/view`,
+    CANCEL: `/api/v1/booking/cancel`,
+    GET_BY_ID: `/api/v1/booking/details`,
   },
   SUPPLIERS:{
     GET_ALL: `/api/v1/supplier/list-all`,
@@ -37,6 +38,11 @@ export const API_ENDPOINTS = {
     GET_ALL: `/api/v1/inventory/list-all-outsourced`,
     CREATE: `/api/v1/inventory/add-outsourced-product`,
     GET_BY_SUPPLIER: `/api/v1/inventory/list-outsourced`
+  },
+  DASHBOARD:{
+    VALUES: `/api/v1/dashboard/data`,
+    CHART: `/api/v1/dashboard/chart`,
+    RECENT_BOOKINGS: `/api/v1/dashboard/recent`
   }
 } as const;
 

@@ -7,20 +7,7 @@ import { Bar, BarChart, XAxis, CartesianGrid, ResponsiveContainer } from 'rechar
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from '../ui/button';
 
-const chartData = [
-    { name: "Jan", preBooking: 30, confirmed: 20 },
-    { name: "Feb", preBooking: 50, confirmed: 40 },
-    { name: "Mar", preBooking: 40, confirmed: 35 },
-    { name: "Apr", preBooking: 60, confirmed: 50 },
-    { name: "May", preBooking: 70, confirmed: 60 },
-    { name: "Jun", preBooking: 30, confirmed: 20 },
-    { name: "Jul", preBooking: 50, confirmed: 40 },
-    { name: "Aug", preBooking: 40, confirmed: 35 },
-    { name: "Sep", preBooking: 60, confirmed: 50 },
-    { name: "Oct", preBooking: 70, confirmed: 60 },
-    { name: "Nov", preBooking: 60, confirmed: 50 },
-    { name: "Dec", preBooking: 70, confirmed: 60 },
-];
+
 
 const chartConfig = {
     preBooking: {
@@ -34,7 +21,10 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 
-const Section2 = () => {
+const Section2 = ({
+    loading,
+    chartData
+}:any) => {
     return (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-6">
             {/* Chart Section */}

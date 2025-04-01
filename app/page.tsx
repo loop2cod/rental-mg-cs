@@ -19,13 +19,106 @@ import { Tabs, TabsContent} from "@/components/ui/tabs"
 import {  CheckCircle, Clock, IndianRupee, Package} from "lucide-react"
 import Section2 from "@/components/Dashboard/Section2"
 import Section1 from "@/components/Dashboard/Section1"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import Cookies from "js-cookie"
 import { withAuth } from "@/components/Middleware/withAuth"
+import { get } from "@/utilities/AxiosInterceptor"
+import { API_ENDPOINTS } from "@/lib/apiEndpoints"
+import { formatCurrency } from "@/lib/commonFunctions"
 
 
+type ResponseType = {
+  success: boolean
+  data?: any
+  message?: string
+}
+
+type DashboardData = {
+  totalRevenue: number
+  revenueChange: number
+  preBookings: number
+  preBookingChange: number
+  confirmedBookings: number
+  confirmedBookingChange: number
+  totalQuantity: number
+}
+type ChartData = {
+  name: string
+  preBooking: number
+  confirmed: number
+}[]
+
+type RecentBooking = {
+  id: string
+  user: string
+  date: string
+  status: string
+  amount: number
+}
 
 function Home() {
+  const [loading1, setLoading1] = useState(true)
+  const [loading2, setLoading2] = useState(true)
+  const [loading3, setLoading3] = useState(true)
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
+  const [chartData, setChartData] = useState<ChartData | null>(null)
+  const [recentBookings, setRecentBookings] = useState<RecentBooking[] | null>(null)
+
+  const fetchDashboardData = async () => {
+    try {
+   const response = await get<ResponseType>(
+        API_ENDPOINTS.DASHBOARD.VALUES,
+        { withCredentials: true }
+      )
+      if (response.success) {
+        setDashboardData(response.data)
+      }
+    } catch (error: any) {
+      console.log(error)
+    } finally {
+      setLoading1(false)
+    }
+  }
+
+  const fetchDashboardChart = async () => {
+    try {
+      const response = await get<ResponseType>(
+        API_ENDPOINTS.DASHBOARD.CHART,
+        { withCredentials: true }
+      )
+      if (response.success) {
+        setChartData(response.data)
+      }
+    } catch (error: any) {
+      console.log(error)
+    } finally {
+      setLoading2(false)
+    }
+  }
+
+const fetchDashboardBookings = async () => {
+  try {
+    const response = await get<ResponseType>(
+      API_ENDPOINTS.DASHBOARD.RECENT_BOOKINGS,
+      { withCredentials: true }
+    )
+    if (response.success) {
+      setRecentBookings(response.data)
+    }
+  } catch (error: any) {
+    console.log(error)
+  } finally {
+    setLoading3(false)
+  }
+}
+
+  useEffect(() => {
+    fetchDashboardData()
+    fetchDashboardChart()
+    fetchDashboardBookings()
+  }, [])
+
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -59,10 +152,25 @@ function Home() {
             <IndianRupee className="h-4 w-4 text-primary dark:text-secondary-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-base md:text-2xl font-bold">₹45,231.89</div>
-            <p className="text-[10px] md:text-xs text-muted-foreground">
-              <span className="text-primary dark:text-secondary-foreground">+20.1%</span> from last month
-            </p>
+          {loading1 ? (
+  <div className="flex flex-col items-center">
+    <div className="h-6 w-20 md:h-8 md:w-28 bg-gray-300 animate-pulse rounded"></div>
+    <p className="h-3 w-24 md:w-32 bg-gray-200 animate-pulse rounded mt-1"></p>
+  </div>
+) : (
+  <div className="text-center">
+    <div className="text-base md:text-2xl font-bold">
+      {formatCurrency(dashboardData?.totalRevenue || 0)}
+    </div>
+    <p className="text-[10px] md:text-xs text-muted-foreground">
+      <span className="text-primary dark:text-secondary-foreground">
+        +{dashboardData?.revenueChange || 0}%
+      </span>{" "}
+      from last month
+    </p>
+  </div>
+)}
+
           </CardContent>
         </Card>
         <Card className="w-full">
@@ -109,8 +217,8 @@ function Home() {
     </TabsContent>
   </Tabs>
 </div>
-<Section1/>
-        <Section2/>
+<Section1 loading={loading3} bookings={recentBookings}/>
+        <Section2 loading={loading2} chartData={chartData}/>
         </div>
       </SidebarInset>
     </SidebarProvider>

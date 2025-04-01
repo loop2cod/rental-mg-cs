@@ -264,14 +264,15 @@ export const OutsourcedProductsSection = ({
       // Update quantity if product already exists
       const updatedItems = [...outsourcedItems]
       updatedItems[existingItemIndex].quantity += quantity
+      updatedItems[existingItemIndex].no_of_days = no_of_days // Update days
       updatedItems[existingItemIndex].total_price = 
         updatedItems[existingItemIndex].price * 
         updatedItems[existingItemIndex].quantity * 
         no_of_days // Multiply by days
-  
+    
       setOutsourcedItems(updatedItems)
       updateFormDataWithOutsourcedItems(updatedItems)
-  
+    
       toast({
         title: "Quantity updated",
         description: `${product.product_name} quantity increased by ${quantity}`,
@@ -286,10 +287,10 @@ export const OutsourcedProductsSection = ({
         no_of_days: no_of_days, // Add days
         total_price: product.unit_cost * quantity * no_of_days // Multiply by days
       }
-  
+    
       setOutsourcedItems([...outsourcedItems, newItem])
       updateFormDataWithOutsourcedItems([...outsourcedItems, newItem])
-  
+    
       toast({
         title: "Item added",
         description: `${product.product_name} added to outsourced items`,
@@ -551,7 +552,7 @@ export const OutsourcedProductsSection = ({
           <div className="flex-1 min-w-0">
             <div className="font-medium truncate">{item.name}</div>
             <div className="text-sm text-muted-foreground">
-              ₹{item.price.toFixed(2)} × {item.quantity} × {item.no_of_days} days = ₹{item.total_price.toFixed(2)}
+              ₹{item.price.toFixed(2)} × {item.quantity} × {formData.no_of_days} days = ₹{item.total_price.toFixed(2)}
             </div>
           </div>
           <Button 

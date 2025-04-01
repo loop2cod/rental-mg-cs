@@ -74,7 +74,7 @@ const WheelPickerComponent: React.FC<WheelPickerProps> = ({
   }, []);
 
   return (
-    <div className="flex flex-col items-center p-2 w-full max-w-[320px] mx-auto">
+    <div className="flex flex-col items-center p-2 w-full mx-auto text-xs md:text-sm lg:text-base">
       <div className="flex items-center justify-center gap-4 w-full">
         {[
           { ref: hourRef, items: hourItems, value: hourValue, onChange: onHourChange },

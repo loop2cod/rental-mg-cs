@@ -17,14 +17,16 @@ export const BookingItemsTable = ({
 }) => {
   return (
     <ScrollArea className="h-[300px]">
-      <Table>
+      <Table className="text-xs md:text-sm lg:text-base
+        overflow-x-auto
+      ">
         <TableHeader>
           <TableRow>
             <TableHead>Item Name</TableHead>
-            <TableHead className="w-[100px]">Price</TableHead>
-            <TableHead className="w-[80px]">Qty</TableHead>
-            <TableHead className="w-[120px]">Total</TableHead>
-            <TableHead className="w-[60px]"></TableHead>
+            <TableHead >Price</TableHead>
+            <TableHead>Qty</TableHead>
+            <TableHead >Total</TableHead>
+            <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -50,6 +52,7 @@ export const BookingItemsTable = ({
                     value={item.price}
                     onChange={(e) => handleItemChange(index, "price", Number(e.target.value))}
                     disabled
+                    className="text-xs md:text-sm lg:text-base"
                   />
                 </TableCell>
                 <TableCell>
@@ -57,6 +60,7 @@ export const BookingItemsTable = ({
                     type="number"
                     value={item.quantity}
                     onChange={(e) => handleItemChange(index, "quantity", Number(e.target.value))}
+                    className="text-xs md:text-sm lg:text-base"
                   />
                 </TableCell>
                 <TableCell className="font-medium">₹{(item.total_price || 0).toFixed(2)}</TableCell>

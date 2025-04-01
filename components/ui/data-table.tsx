@@ -73,7 +73,6 @@ export function DataTable<T extends Record<string, any>>({
   onSearch,
   isLoading = false,
 }: DataTableProps<T>) {
-  console.log(data)
   const [searchTerm, setSearchTerm] = useState("")
   const [sortField, setSortField] = useState<string | null>(null)
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
