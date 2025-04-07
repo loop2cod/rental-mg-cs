@@ -28,6 +28,14 @@ export const API_ENDPOINTS = {
     CANCEL: `/api/v1/booking/cancel`,
     GET_BY_ID: `/api/v1/booking/details`,
   },
+  ORDER:{
+    GET_ALL: `/api/v1/order/get-orders`,
+    CREATE: `/api/v1/order/create`,
+    GET_BY_ID: `/api/v1/order/details`,
+    UPDATE: `/api/v1/order/update`,
+    DISPATCH: `/api/v1/order/order-dispatch`,
+    RETURN: `/api/v1/order/order-return`,
+  },
   SUPPLIERS:{
     GET_ALL: `/api/v1/supplier/list-all`,
     CREATE: `/api/v1/supplier/add`,

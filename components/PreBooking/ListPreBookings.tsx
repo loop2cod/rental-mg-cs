@@ -66,6 +66,12 @@ const ListPreBookings = ({
         accessorKey: "user_id.name",
         sortable: true,
         searchable: true,
+        cell: (item) => (
+          <div>
+              <div className="font-medium">{item.user_id.name}</div>
+              <div className="text-sm text-gray-500">{item.user_id.mobile}</div>
+          </div>
+      ),
       },
       {
         id: "from_date",
@@ -114,17 +120,12 @@ const ListPreBookings = ({
         id: "items",
         header: "Items",
         accessorKey: "booking_items",
-        cell: (item) => {
-          const items = item.booking_items.map((item: any) => item?.name);
-          return (
-            <div className="text-sm">
-              {items.join(", ")}
-              <span className="text-xs text-gray-500 block">
-                {item.booking_items?.length} items
-              </span>
-            </div>
-          );
-        },
+           cell: (item) => (
+                <div>
+                    <div className="font-medium">Products: {item.booking_items.reduce((sum: number, item: any) => sum + item.quantity, 0)}</div>
+                    <div className="text-sm">Outsourced: {item.outsourced_items.reduce((sum: number, item: any) => sum + item.quantity, 0)}</div>
+                </div>
+            ),
         sortable: true,
         searchable: false,
       },
