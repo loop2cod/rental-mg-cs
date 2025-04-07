@@ -31,7 +31,8 @@ export const API_ENDPOINTS = {
   SUPPLIERS:{
     GET_ALL: `/api/v1/supplier/list-all`,
     CREATE: `/api/v1/supplier/add`,
-    UPDATE: `/api/v1/supplier/update/`,
+    UPDATE: `/api/v1/supplier/update`,
+    OVERVIEW: `/api/v1/supplier/overview`,
     LIST_WITH_PAGINATION: `/api/v1/supplier/list`,
   },
   OUTSOURCED_PRODUCTS:{

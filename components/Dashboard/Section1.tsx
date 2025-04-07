@@ -5,6 +5,7 @@ import { PlusCircle, CheckCircle, Boxes, BarChart3, Users, CalendarCheck } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from '../ui/scroll-area';
+import { Skeleton } from '../ui/skeleton';
 
 const Section1 = ({
     loading,
@@ -57,19 +58,44 @@ const Section1 = ({
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {bookings?.map((booking:any) => (
-                                        <TableRow key={booking.id} className="text-sm">
-                                            <TableCell className="font-medium whitespace-nowrap">{booking.user}</TableCell>
-                                            <TableCell className="whitespace-nowrap">{booking.date}</TableCell>
-                                            <TableCell>
-                                                <Badge variant={booking.status === "Confirmed" ? "default" : "secondary"}>
-                                                    {booking.status}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell className="text-right whitespace-nowrap">₹{booking.amount}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
+  {loading ? (
+    Array.from({ length: 10 }).map((_, index) => (
+      <TableRow key={index} className="text-sm">
+        <TableCell>
+          <Skeleton className="h-4 w-[120px]" />
+        </TableCell>
+        <TableCell>
+          <Skeleton className="h-4 w-[100px]" />
+        </TableCell>
+        <TableCell>
+          <Skeleton className="h-4 w-[80px]" />
+        </TableCell>
+        <TableCell className="text-right">
+          <Skeleton className="h-4 w-[60px] ml-auto" />
+        </TableCell>
+      </TableRow>
+    ))
+  ) : (
+    bookings?.map((booking: any) => (
+      <TableRow key={booking.id} className="text-sm">
+        <TableCell className="font-medium whitespace-nowrap">
+          {booking.user}
+        </TableCell>
+        <TableCell className="whitespace-nowrap">
+          {booking.date}
+        </TableCell>
+        <TableCell>
+          <Badge variant={booking.status === "Confirmed" ? "default" : "secondary"}>
+            {booking.status}
+          </Badge>
+        </TableCell>
+        <TableCell className="text-right whitespace-nowrap">
+          ₹{booking.amount}
+        </TableCell>
+      </TableRow>
+    ))
+  )}
+</TableBody>
                             </Table>
                         </ScrollArea>
                     </CardContent>

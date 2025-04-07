@@ -31,6 +31,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import AddSupplier from "./AddSupplier"
 
 
 const data = {
@@ -85,6 +86,7 @@ const data = {
           title: "Add Supplier",
           url: "/add-supplier",
           icon: PlusCircle,
+          buttonComponent:<AddSupplier />
         },
       ],
     },

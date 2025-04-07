@@ -23,11 +23,71 @@ const chartConfig = {
 
 const Section2 = ({
     loading,
-    chartData
+    chartData = [
+        {
+            "name": "Jan",
+            "preBooking": 0,
+            "confirmed": 0
+        },
+        {
+            "name": "Feb",
+            "preBooking": 0,
+            "confirmed": 0
+        },
+        {
+            "name": "Mar",
+            "preBooking": 0,
+            "confirmed": 0
+        },
+        {
+            "name": "Apr",
+            "preBooking": 0,
+            "confirmed": 0
+        },
+        {
+            "name": "May",
+            "preBooking": 0,
+            "confirmed": 0
+        },
+        {
+            "name": "Jun",
+            "preBooking": 0,
+            "confirmed": 0
+        },
+        {
+            "name": "Jul",
+            "preBooking": 0,
+            "confirmed": 0
+        },
+        {
+            "name": "Aug",
+            "preBooking": 0,
+            "confirmed": 0
+        },
+        {
+            "name": "Sep",
+            "preBooking": 0,
+            "confirmed": 0
+        },
+        {
+            "name": "Oct",
+            "preBooking": 0,
+            "confirmed": 0
+        },
+        {
+            "name": "Nov",
+            "preBooking": 0,
+            "confirmed": 0
+        },
+        {
+            "name": "Dec",
+            "preBooking": 0,
+            "confirmed": 0
+        }
+    ]
 }:any) => {
     return (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-6">
-            {/* Chart Section */}
             <div className="w-full col-span-3">
                 <Card className="shadow-md rounded-xl border border-muted">
                     <CardHeader>

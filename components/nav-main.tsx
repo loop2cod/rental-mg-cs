@@ -30,6 +30,7 @@ export function NavMain({
     items?: {
       title: string
       url: string
+      buttonComponent?: any
     }[]
   }[]
 }) {
@@ -79,19 +80,24 @@ export function NavMain({
 
                       return (
                         <SidebarMenuSubItem key={subItem.title}>
+                        {subItem.buttonComponent ? (
+                          subItem.buttonComponent
+                        ): (
                           <SidebarMenuSubButton
-                            asChild
-                            className={cn(
-                              "flex items-center w-full p-2 rounded-md transition-colors",
-                              isSubActive
-                                ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                                : "text-muted-foreground hover:bg-accent"
-                            )}
-                          >
-                            <a href={subItem.url}>
-                              <span>{subItem.title}</span>
-                            </a>
-                          </SidebarMenuSubButton>
+                          asChild
+                          className={cn(
+                            "flex items-center w-full p-2 rounded-md transition-colors",
+                            isSubActive
+                              ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                              : "text-muted-foreground hover:bg-accent"
+                          )}
+                        >
+                          <a href={subItem.url}>
+                            <span>{subItem.title}</span>
+                          </a>
+                        </SidebarMenuSubButton>
+                        )
+                        }
                         </SidebarMenuSubItem>
                       );
                     })}

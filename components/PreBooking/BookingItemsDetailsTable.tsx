@@ -41,8 +41,6 @@ export function BookingItemsDetailsTable({ items }: BookingItemsDetailsTableProp
                 <TableHead>Item Name</TableHead>
                 <TableHead className="text-right">Price</TableHead>
                 <TableHead className="text-right">Quantity</TableHead>
-                <TableHead className="text-right">Reserved</TableHead>
-                <TableHead className="text-right">Available</TableHead>
                 <TableHead className="text-right">Total</TableHead>
               </TableRow>
             </TableHeader>
@@ -52,16 +50,6 @@ export function BookingItemsDetailsTable({ items }: BookingItemsDetailsTableProp
                   <TableCell className="font-medium">{item.name}</TableCell>
                   <TableCell className="text-right">₹{item.price.toFixed(2)}</TableCell>
                   <TableCell className="text-right">{item.quantity}</TableCell>
-                  <TableCell className="text-right">
-                    <Badge variant="secondary" className="font-normal">
-                      {item.reserved_quantity}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Badge variant="outline" className="font-normal">
-                      {item.available_quantity}
-                    </Badge>
-                  </TableCell>
                   <TableCell className="text-right font-medium">₹{item.total_price.toFixed(2)}</TableCell>
                 </TableRow>
               ))}

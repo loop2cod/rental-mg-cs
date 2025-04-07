@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CreditCard, DollarSign } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "../ui/button"
+import { formatCurrency } from "@/lib/commonFunctions"
 
 interface PaymentSummaryCardProps {
   booking: {
@@ -27,25 +28,25 @@ export function PaymentSummaryCard({ booking }: PaymentSummaryCardProps) {
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <span className="text-sm text-muted-foreground">Subtotal</span>
-            <span className="font-medium">₹{booking.sub_total.toFixed(2)}</span>
+            <span className="font-medium">{formatCurrency(booking?.sub_total || 0)}</span>
           </div>
 
           <div className="flex justify-between items-center">
             <span className="text-sm text-muted-foreground">Discount</span>
-            <span className="font-medium text-destructive">-₹{booking.discount.toFixed(2)}</span>
+            <span className="font-medium text-destructive">-{formatCurrency(booking?.discount || 0)}</span>
           </div>
 
           <div className="border-t pt-2">
             <div className="flex justify-between items-center">
               <span className="text-base font-medium">Total Amount</span>
-              <span className="text-lg font-bold">₹{booking.total_amount.toFixed(2)}</span>
+              <span className="text-lg font-bold">{formatCurrency(booking?.total_amount || 0)}</span>
             </div>
           </div>
 
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <span className="text-sm text-muted-foreground">Amount Paid</span>
-              <span className="font-medium">₹{booking.amount_paid.toFixed(2)}</span>
+              <span className="font-medium">{formatCurrency(booking?.amount_paid || 0)}</span>
             </div>
 
             <Progress value={percentagePaid} className="h-2" />
@@ -53,7 +54,7 @@ export function PaymentSummaryCard({ booking }: PaymentSummaryCardProps) {
             <div className="flex justify-between items-center text-sm">
               <span className="text-muted-foreground">{percentagePaid.toFixed(0)}% Paid</span>
               <span className="font-medium text-primary">
-                Balance: ₹{(booking.total_amount - booking.amount_paid).toFixed(2)}
+                Balance: {formatCurrency(booking?.total_amount - booking?.amount_paid || 0)}
               </span>
             </div>
           </div>

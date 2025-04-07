@@ -2,12 +2,12 @@
 import React, { useMemo, useState } from "react";
 import { ColumnDef, DataTable } from "../ui/data-table";
 import { Button } from "../ui/button";
-import { Edit, Trash2, View, X } from "lucide-react";
-import { format } from "date-fns"; // Import date-fns for date formatting
+import { BookUp2Icon, Edit, View, X } from "lucide-react";
+import { format } from "date-fns";
 import { formatCurrency } from "@/lib/commonFunctions";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { useRouter } from "next/navigation";
-import { patch, post } from "@/utilities/AxiosInterceptor";
+import { patch} from "@/utilities/AxiosInterceptor";
 import { API_ENDPOINTS } from "@/lib/apiEndpoints";
 import { CancelBookingDialog } from "./CancelBookingDialog";
 
@@ -171,6 +171,28 @@ const ListPreBookings = ({
               <TooltipContent>
                 <p>
                   View Booking
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.push(`/order/${item._id}`);
+                  }}
+                >
+                  <BookUp2Icon className="h-4 w-4" />
+                  <span className="sr-only">Make Order</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                Make Order
                 </p>
               </TooltipContent>
             </Tooltip>
