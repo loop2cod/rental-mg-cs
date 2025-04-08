@@ -23,7 +23,7 @@ export function OrderPaymentSummaryCard({ booking }: PaymentSummaryCardProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <div className="space-y-2">
           <div className="flex justify-between items-center">
             <span className="text-sm text-muted-foreground">Total Amount</span>
             <span className="font-medium">{formatCurrency(booking.total_amount)}</span>

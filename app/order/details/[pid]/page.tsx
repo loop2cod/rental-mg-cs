@@ -93,7 +93,7 @@ const Page = () => {
           </div>
         </header>
         <div className="p-4">
-            <OrderOverview data={order} loading={isLoading}/>
+            <OrderOverview data={order} loading={isLoading} fetchOrder={fetchOrder} />
         </div>
       </SidebarInset>
     </SidebarProvider>

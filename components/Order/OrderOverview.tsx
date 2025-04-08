@@ -9,7 +9,13 @@ import { OrderOutsourcedItemsDetailsTable } from './OrderOutsourcedItemsDetailsT
 import { OrderItemsDetailsTable } from './OrderItemsDetailsTable'
 import { OrderDispatchHistory } from './OrderDispatchHistory'
 
-const OrderOverview = ({ data, loading }: any) => {
+const OrderOverview = ({ data, loading,fetchOrder }: any) => {
+
+  const handleDispatchSuccess = () => {
+    fetchOrder()
+  }
+
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -58,16 +64,20 @@ const OrderOverview = ({ data, loading }: any) => {
       </div>
 
       <div className="space-y-4">
-        {data?.order_items?.length > 0 && (
+      {data?.order_items?.length > 0 && (
           <OrderItemsDetailsTable 
             items={data?.order_items} 
-            dispatchItems={data?.dispatch_items} 
+            dispatchItems={data?.dispatch_items}
+            orderId={data?._id}
+            onDispatchSuccess={handleDispatchSuccess}
           />
         )}
         {data?.outsourced_items?.length > 0 && (
           <OrderOutsourcedItemsDetailsTable 
             items={data?.outsourced_items} 
-            dispatchItems={data?.outsourced_dispatch_items} 
+            dispatchItems={data?.outsourced_dispatch_items}
+            orderId={data?._id}
+            onDispatchSuccess={handleDispatchSuccess}
           />
         )}
       </div>

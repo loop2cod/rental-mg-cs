@@ -4,16 +4,16 @@ export const OrderCustomerInfoCard = ({ customer }: { customer: any }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Customer Information</CardTitle>
+        <CardTitle className="text-xl">Customer Information</CardTitle>
       </CardHeader>
-      <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">Name</p>
-          <p className="font-medium">{customer?.name}</p>
+      <CardContent className="grid grid-cols-1 gap-4">
+        <div className="space-y-2 text-sm md:text-base">
+          <p className="text-muted-foreground">Name</p>
+          <p className="font-semibold">{customer?.name}</p>
         </div>
-        <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">Phone</p>
-          <p className="font-medium">{customer?.mobile}</p>
+        <div className="space-y-2 text-sm md:text-base">
+          <p className="text-muted-foreground">Phone</p>
+          <p className="font-semibold">{customer?.mobile}</p>
         </div>
       </CardContent>
     </Card>

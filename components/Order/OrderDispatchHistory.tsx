@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { format } from "date-fns"
+import { format, parse } from "date-fns"
 import { Badge } from "@/components/ui/badge"
 
 interface DispatchItem {
@@ -21,10 +21,10 @@ export function OrderDispatchHistory({
   title = "Dispatch History"
 }: OrderDispatchHistoryProps) {
   return (
-    <Card className="shadow-none border-0">
+    <Card className="shadow-none !border-none rounded-none">
       <CardContent className="p-0">
         <div className="text-sm font-medium mb-2 px-2">{title}</div>
-        <div className="rounded-md border">
+        <div className="rounded-md">
           <Table>
             <TableHeader>
               <TableRow>
@@ -38,7 +38,7 @@ export function OrderDispatchHistory({
                 <TableRow key={item._id}>
                   <TableCell>{item.quantity}</TableCell>
                   <TableCell>
-                    {format(new Date(item.dispatch_date), "PPP")} at {item.dispatch_time}
+                    {format(new Date(item.dispatch_date), "PPP")} at {item?.dispatch_time ? format(parse(item?.dispatch_time, "HH:mm", new Date()), "hh:mm a") : "-"}
                   </TableCell>
                   <TableCell>
                     <Badge variant="secondary">{item.status}</Badge>
