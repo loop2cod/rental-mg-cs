@@ -27,7 +27,7 @@ interface ResponseType {
   message?: string;
 }
 
-const page = () => {
+const Page = () => {
   const [inventory, setInventory] = useState<any>([])
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -137,4 +137,4 @@ const page = () => {
   )
 }
 
-export default withAuth(page)
+export default withAuth(Page)

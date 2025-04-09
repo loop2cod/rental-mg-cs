@@ -30,7 +30,7 @@ type ResponseType = {
   data?: any;
   message?: string;
 }
-const page = () => {
+const Page = () => {
     const {pid} = useParams()
 const [loading, setLoading] = useState(true)
   const [products, setProducts] = useState<any[]>([])
@@ -39,7 +39,7 @@ const [loading, setLoading] = useState(true)
   const fetchProducts = async () => {
     try {
       // setLoading(true) // Start loading
-      const response = await get<ResponseType>(API_ENDPOINTS.INVENTORY.GET_ALL_WITHOUT_PAGINATION,{withCredentials: true})
+      const response = await get<ResponseType>(API_ENDPOINTS.INVENTORY.GET_ALL_WITH_QUANTITY,{withCredentials: true})
       if (response.success) {
         setProducts(response.data)
       } else {
@@ -96,4 +96,4 @@ const [loading, setLoading] = useState(true)
   )
 }
 
-export default withAuth(page)
+export default withAuth(Page)

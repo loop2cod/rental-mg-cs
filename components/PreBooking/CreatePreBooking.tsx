@@ -45,6 +45,7 @@ const emptyInitialData = {
   from_time: "10:00",
   to_time: "12:00",
   booking_date: new Date().toISOString().split('T')[0],
+  address: "",
   booking_items: [],
   outsourced_items: [], // Add this line
   total_quantity: 0,

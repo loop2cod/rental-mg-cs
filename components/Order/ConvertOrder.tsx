@@ -55,8 +55,9 @@ const ConvertOrder = ({
     to_date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
     from_time: "10:00",
     to_time: "12:00",
-    booking_date: new Date().toISOString().split('T')[0],
-    booking_items: [],
+    order_date: new Date().toISOString().split('T')[0],
+    address: "",
+    order_items: [],
     outsourced_items: [],
     total_quantity: 0,
     no_of_days: 1,
@@ -70,7 +71,7 @@ const ConvertOrder = ({
   const [formData, setFormData] = useState(emptyInitialData)
   const [fromDate, setFromDate] = useState<Date | undefined>(new Date(formData.from_date))
   const [toDate, setToDate] = useState<Date | undefined>(new Date(formData.to_date))
-  const [bookingDate, setBookingDate] = useState<Date | undefined>(new Date(formData.booking_date))
+  const [bookingDate, setBookingDate] = useState<Date | undefined>(new Date(formData.order_date))
   const [searchTerm, setSearchTerm] = useState("")
   const [isSearchFocused, setIsSearchFocused] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(-1)
@@ -122,8 +123,9 @@ const ConvertOrder = ({
             to_date: booking.to_date.split('T')[0],
             from_time: booking.from_time,
             to_time: booking.to_time,
-            booking_date: booking.booking_date.split('T')[0],
-            booking_items: bookingItems,
+            order_date: booking.booking_date.split('T')[0],
+            address: booking.address,
+            order_items: bookingItems,
             outsourced_items: outsourcedItems,
             total_quantity: [
               ...bookingItems,
@@ -164,26 +166,46 @@ const ConvertOrder = ({
   }
 
   const handleItemChange = (index: number, field: string, value: any) => {
-    const updatedItems: any = [...formData.booking_items]
-    updatedItems[index] = { ...updatedItems[index], [field]: value }
-
-    if (field === "price" || field === "quantity" || field === "no_of_days") {
-      const price = field === "price" ? value : updatedItems[index].price
-      const quantity = field === "quantity" ? value : updatedItems[index].quantity
-      const days = field === "no_of_days" ? value : updatedItems[index].no_of_days || formData.no_of_days
-      updatedItems[index].total_price = price * quantity * days
-      if (field === "no_of_days") {
-        updatedItems[index].no_of_days = days
+    // Ensure we're working with a number for quantity, price, and days
+    const numericValue = field === "quantity" || field === "price" || field === "no_of_days" 
+      ? Number(value) 
+      : value;
+  
+    setFormData((prev) => {
+      // Create a new copy of the order items array
+      const updatedItems:any = [...prev.order_items];
+      
+      // Update the specific field for the item at the given index
+      updatedItems[index] = { 
+        ...updatedItems[index], 
+        [field]: numericValue 
+      };
+  
+      // Recalculate totals if price, quantity, or days changed
+      if (field === "price" || field === "quantity" || field === "no_of_days") {
+        const price = field === "price" ? numericValue : updatedItems[index].price;
+        const quantity = field === "quantity" ? numericValue : updatedItems[index].quantity;
+        const days = field === "no_of_days" ? numericValue : (updatedItems[index].no_of_days || prev.no_of_days);
+        
+        updatedItems[index].total_price = price * quantity * days;
+        
+        if (field === "no_of_days") {
+          updatedItems[index].no_of_days = days;
+        }
       }
-    }
-
-    setFormData((prev) => ({
-      ...prev,
-      booking_items: updatedItems,
-      total_quantity: updatedItems.reduce((sum: any, item: any) => sum + Number(item.quantity), 0),
-      total_amount: updatedItems.reduce((sum: any, item: any) => sum + Number(item.total_price), 0),
-    }))
-  }
+  
+      // Calculate new totals
+      const total_quantity = updatedItems.reduce((sum: any, item: any) => sum + Number(item.quantity), 0);
+      const total_amount = updatedItems.reduce((sum: any, item: any) => sum + Number(item.total_price), 0);
+  
+      return {
+        ...prev,
+        order_items: updatedItems,
+        total_quantity,
+        total_amount,
+      };
+    });
+  };
 
   const handleNoOfDaysChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const days = Number(e.target.value)
@@ -204,7 +226,7 @@ const ConvertOrder = ({
   }
 
   const removeItem = (index: number) => {
-    const updatedItems = formData.booking_items.filter((_, i) => i !== index)
+    const updatedItems = formData.order_items.filter((_, i) => i !== index)
     setFormData((prev) => ({
       ...prev,
       booking_items: updatedItems,
@@ -214,10 +236,10 @@ const ConvertOrder = ({
   }
 
   const addProductToBooking = (product: any) => {
-    const existingItemIndex = formData.booking_items.findIndex((item: any) => item.name === product.name)
+    const existingItemIndex = formData.order_items.findIndex((item: any) => item.name === product.name)
 
     if (existingItemIndex >= 0) {
-      const updatedItems: any = [...formData.booking_items]
+      const updatedItems: any = [...formData.order_items]
       updatedItems[existingItemIndex].quantity += 1
       updatedItems[existingItemIndex].total_price =
         updatedItems[existingItemIndex].price * updatedItems[existingItemIndex].quantity * updatedItems[existingItemIndex].no_of_days
@@ -239,6 +261,7 @@ const ConvertOrder = ({
         name: product.name,
         price: product.unit_cost,
         quantity: 1,
+        available_quantity: product.available_quantity,
         no_of_days: formData.no_of_days,
         total_price: product.unit_cost * formData.no_of_days,
         from_date: formData.from_date,
@@ -248,10 +271,10 @@ const ConvertOrder = ({
       }
 
       setFormData((prev: any) => {
-        const updatedItems = [...prev.booking_items, newItem]
+        const updatedItems = [...prev.order_items, newItem]
         return {
           ...prev,
-          booking_items: updatedItems,
+          order_items: updatedItems,
           total_quantity: updatedItems.reduce((sum, item) => sum + Number(item.quantity), 0),
           total_amount: updatedItems.reduce((sum, item) => sum + Number(item.total_price), 0),
         }
@@ -273,7 +296,7 @@ const ConvertOrder = ({
       })
       return false
     }
-
+  
     const phoneRegex = /^\d{10}$/
     if (!phoneRegex.test(formData.user_phone)) {
       toast({
@@ -283,8 +306,8 @@ const ConvertOrder = ({
       })
       return false
     }
-
-    if (formData.booking_items.length === 0 && formData.outsourced_items.length === 0) {
+  
+    if (formData.order_items.length === 0 && formData.outsourced_items.length === 0) {
       toast({
         title: "Validation Error",
         description: "Please add at least one booking item or outsourced item",
@@ -292,7 +315,7 @@ const ConvertOrder = ({
       })
       return false
     }
-
+  
     if (formData.no_of_days < 1) {
       toast({
         title: "Validation Error",
@@ -301,13 +324,21 @@ const ConvertOrder = ({
       })
       return false
     }
-
-    if (formData.booking_items.length > 0) {
-      for (const item of formData.booking_items as any) {
+  
+    if (formData.order_items.length > 0) {
+      for (const item of formData.order_items as any) {
         if (item.quantity < 1) {
           toast({
             title: "Validation Error",
             description: `Quantity for ${item.name} must be at least 1`,
+            variant: "destructive",
+          })
+          return false
+        }
+        if (item.quantity > (item.available_quantity || 0)) {
+          toast({
+            title: "Validation Error",
+            description: `Quantity for ${item.name} exceeds available stock (${item.available_quantity || 0})`,
             variant: "destructive",
           })
           return false
@@ -330,7 +361,7 @@ const ConvertOrder = ({
         }
       }
     }
-
+  
     if (formData.outsourced_items.length > 0) {
       for (const item of formData.outsourced_items as any) {
         if (!item.name || !item.price || !item.quantity) {
@@ -359,7 +390,7 @@ const ConvertOrder = ({
         }
       }
     }
-
+  
     return true
   }
 
@@ -370,7 +401,7 @@ const ConvertOrder = ({
   
     // Calculate final amounts including both booking and outsourced items
     const sub_total = [
-      ...formData.booking_items,
+      ...formData.order_items,
       ...formData.outsourced_items
     ].reduce((sum, item:any) => sum + Number(item.total_price || item.price * item.quantity * (item.no_of_days || formData.no_of_days)), 0)
     
@@ -382,6 +413,7 @@ const ConvertOrder = ({
     try {
       const formattedData = {
         ...formData,
+        booking_id: bookingId,
         from_time: convertTo24HourFormat(formData.from_time),
         to_time: convertTo24HourFormat(formData.to_time),
         outsourced_items: outsourcedItems,
@@ -389,34 +421,34 @@ const ConvertOrder = ({
         discount,
         total_amount,
         total_quantity: [
-          ...formData.booking_items,
+          ...formData.order_items,
           ...formData.outsourced_items
         ].reduce((sum, item:any) => sum + Number(item.quantity), 0)
       }
   
-      const response = await put<ApiResponseType>(
-        `${API_ENDPOINTS.BOOKING.UPDATE}/${bookingId}`,
+      const response = await post<ApiResponseType>(
+        `${API_ENDPOINTS.ORDER.CREATE}`,
         formattedData,
         { withCredentials: true }
       )
   
       if (response.success) {
         toast({
-          title: "Booking updated",
-          description: "Your booking has been updated successfully",
+          title: "Order created",
+          description: "Your order has been created successfully",
         })
-        navigate.push('/list-pre-bookings')
+        navigate.push('/list-orders')
       } else {
         toast({
           title: "Error",
-          description: response.errors?.msg || "Failed to update booking",
+          description: response.errors?.msg || "Failed to update order",
           variant: "destructive",
         })
       }
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to update booking",
+        description: error.response?.data?.message || "Failed to update order",
         variant: "destructive",
       })
     } finally {
@@ -544,7 +576,7 @@ const ConvertOrder = ({
                                 <div>
                                   <div className="font-medium">{product.name}</div>
                                   <div className="text-sm text-muted-foreground">
-                                    ₹{product.unit_cost} • {product.quantity} available
+                                    ₹{product.unit_cost} • {product.available_quantity} available
                                   </div>
                                 </div>
                                 {highlightedIndex === index && (
@@ -560,7 +592,7 @@ const ConvertOrder = ({
 
                   <DroppableOrderItems onDrop={addProductToBooking}>
                     <OrderItemsTable
-                      bookingItems={formData.booking_items}
+                      bookingItems={formData.order_items}
                       handleItemChange={handleItemChange}
                       removeItem={removeItem}
                     />
@@ -576,11 +608,11 @@ const ConvertOrder = ({
       ...prev,
       outsourced_items: items,
       total_quantity: [
-        ...prev.booking_items,
+        ...prev.order_items,
         ...items
       ].reduce((sum, item) => sum + Number(item.quantity), 0),
       total_amount: [
-        ...prev.booking_items,
+        ...prev.order_items,
         ...items
       ].reduce((sum, item) => sum + Number(item.total_price || item.price * item.quantity * (item.no_of_days || prev.no_of_days)), 0) - Number(prev.discount || 0)
     }))
@@ -596,12 +628,12 @@ const ConvertOrder = ({
     ...formData,
     // Calculate subtotal including both booking and outsourced items
     sub_total: [
-      ...formData.booking_items,
+      ...formData.order_items,
       ...formData.outsourced_items
     ].reduce((sum, item:any) => sum + Number(item.total_price || item.price * item.quantity * (item.no_of_days || formData.no_of_days)), 0),
     // Ensure total_amount is calculated correctly
     total_amount: [
-      ...formData.booking_items,
+      ...formData.order_items,
       ...formData.outsourced_items
     ].reduce((sum, item:any) => sum + Number(item.total_price || item.price * item.quantity * (item.no_of_days || formData.no_of_days)), 0) - Number(formData.discount || 0)
   }}
@@ -615,7 +647,7 @@ const ConvertOrder = ({
                   Cancel
                 </Button>
                 <Button type="submit" disabled={isSubmitting} onClick={handleSubmit}>
-                  {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Update Booking"}
+                  {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Make Order"}
                 </Button>
               </CardFooter>
             </ScrollArea>

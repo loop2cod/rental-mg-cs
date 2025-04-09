@@ -36,7 +36,7 @@ const DraggableProduct = ({ product, onAddToBooking }: any) => {
         <div className="flex flex-col">
           <h3 className="text-sm md:text-base font-medium">{product?.name}</h3>
           <p className="text-xs text-muted-foreground">{product?.category_name || "Table"}</p>
-          <p className="text-xs text-muted-foreground">Quantity: {product?.quantity}</p>
+          <p className="text-xs text-muted-foreground">Availablity: {product?.available_quantity}</p>
         </div>
       </div>
       <div className="flex flex-col items-end gap-1">

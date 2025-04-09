@@ -28,7 +28,7 @@ interface ResponseType {
   message?: string;
 }
 
-const page = () => {
+const Page = () => {
     const [orders, setOrders] = useState([])
     const [currentPage, setCurrentPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
@@ -126,4 +126,4 @@ const page = () => {
   )
 }
 
-export default withAuth(page)
+export default withAuth(Page)

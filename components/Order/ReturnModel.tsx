@@ -54,8 +54,8 @@ export function ReturnModal({ open, onOpenChange, orderId, items, onSuccess }: R
         .map(item => ({
           [item.type === 'product' ? 'product_id' : 'out_product_id']: item.id,
           quantity: quantities[item.id],
-          return_date: format(date || new Date(), 'yyyy-MM-dd'),
-          return_time: time
+          dispatch_date: format(date || new Date(), 'yyyy-MM-dd'),
+          dispatch_time: time
         }))
 
       if (returnData.length === 0) {

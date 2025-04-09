@@ -3,6 +3,7 @@
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "../ui/textarea"
 
 export const CustomerInfoForm = ({ formData, handleInputChange, handleSelectChange }: {
   formData: any,
@@ -58,6 +59,17 @@ export const CustomerInfoForm = ({ formData, handleInputChange, handleSelectChan
             value={formData.user_proof_id}
             onChange={handleInputChange}
             required
+          />
+        </div>
+        <div className="space-y-2 col-span-2">
+          <Label htmlFor="address">Address</Label>
+          <Textarea
+            id="address"
+            name="address"
+            value={formData.address}
+            onChange={(e:any) => handleInputChange(e)}
+            required
+            className="w-full"
           />
         </div>
       </div>

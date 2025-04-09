@@ -29,7 +29,7 @@ type ResponseType = {
   data?: any;
   message?: string;
 }
-const page = () => {
+const Page = () => {
     const {pid} = useParams()
 const [loading, setLoading] = useState(true)
   const [products, setProducts] = useState<any[]>([])
@@ -95,4 +95,4 @@ const [loading, setLoading] = useState(true)
   )
 }
 
-export default withAuth(page)
+export default withAuth(Page)
