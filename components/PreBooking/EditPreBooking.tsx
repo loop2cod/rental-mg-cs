@@ -1,5 +1,4 @@
 "use client"
-
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { DndProvider } from "react-dnd"
@@ -23,9 +22,9 @@ import { CustomerInfoForm } from "./CustomerInfoForm"
 import { BookingDetailsForm } from "./BookingDetailsForm"
 import { Input } from "../ui/input"
 import { BookingItemsTable } from "./BookingItemsTable"
-import { PaymentSummary } from "./PaymentSummary"
 import { OutsourcedProductsSection } from "./OutsourcedProductsSection"
 import { useRouter } from "next/navigation"
+import { EditPaymentSummary } from "./EditPaymentSummary"
 
 interface ApiResponseType {
   success: boolean;
@@ -89,30 +88,30 @@ const EditPreBooking = ({
           `${API_ENDPOINTS.BOOKING.GET_DETAIL}/${bookingId}`,
           { withCredentials: true }
         )
-  
+
         if (response.success && response.data) {
           const booking = response.data
           const noOfDays = booking?.no_of_days || 1
-  
+
           const bookingItems = booking.booking_items.map((item: any) => ({
             ...item,
             no_of_days: noOfDays,
             total_price: item.price * item.quantity * noOfDays
           }))
-  
+
           const outsourcedItems = (booking.outsourced_items || []).map((item: any) => ({
             ...item,
             no_of_days: noOfDays,
             total_price: item.price * item.quantity * noOfDays
           }))
-  
+
           const sub_total = [
             ...bookingItems,
             ...outsourcedItems
           ].reduce((sum, item) => sum + Number(item.total_price), 0)
-  
+
           const total_amount = sub_total - (Number(booking.discount) || 0)
-  
+
           setFormData({
             user_name: booking.user_id.name,
             user_phone: booking.user_id.mobile,
@@ -136,7 +135,7 @@ const EditPreBooking = ({
             total_amount,
             payment_method: booking.payment_method || "cash",
           })
-  
+
           setOutsourcedItems(outsourcedItems)
           setFromDate(new Date(booking.from_date))
           setToDate(new Date(booking.to_date))
@@ -148,7 +147,7 @@ const EditPreBooking = ({
         setIsLoading(false)
       }
     }
-  
+
     if (bookingId) {
       fetchBookingDetails()
     }
@@ -365,20 +364,20 @@ const EditPreBooking = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-  
+
     if (!validateForm()) return
-  
+
     // Calculate final amounts including both booking and outsourced items
     const sub_total = [
       ...formData.booking_items,
       ...formData.outsourced_items
-    ].reduce((sum, item:any) => sum + Number(item.total_price || item.price * item.quantity * (item.no_of_days || formData.no_of_days)), 0)
-    
+    ].reduce((sum, item: any) => sum + Number(item.total_price || item.price * item.quantity * (item.no_of_days || formData.no_of_days)), 0)
+
     const discount = Number(formData.discount) || 0
     const total_amount = sub_total - discount
-  
+
     setIsSubmitting(true)
-  
+
     try {
       const formattedData = {
         ...formData,
@@ -391,15 +390,15 @@ const EditPreBooking = ({
         total_quantity: [
           ...formData.booking_items,
           ...formData.outsourced_items
-        ].reduce((sum, item:any) => sum + Number(item.quantity), 0)
+        ].reduce((sum, item: any) => sum + Number(item.quantity), 0)
       }
-  
+
       const response = await put<ApiResponseType>(
         `${API_ENDPOINTS.BOOKING.UPDATE}/${bookingId}`,
         formattedData,
         { withCredentials: true }
       )
-  
+
       if (response.success) {
         toast({
           title: "Booking updated",
@@ -409,14 +408,14 @@ const EditPreBooking = ({
       } else {
         toast({
           title: "Error",
-          description: response.errors?.msg || "Failed to update booking",
+          description: response.message || response.errors[0].msg || "Failed to update booking",
           variant: "destructive",
         })
       }
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to update booking",
+        description: error.response?.data?.errors[0].msg || error.response?.data?.message || "Failed to update booking",
         variant: "destructive",
       })
     } finally {
@@ -531,8 +530,8 @@ const EditPreBooking = ({
                               <li
                                 key={product._id}
                                 className={`px-4 py-2 cursor-pointer flex items-center justify-between ${highlightedIndex === index
-                                    ? "bg-accent"
-                                    : "hover:bg-accent/50"
+                                  ? "bg-accent"
+                                  : "hover:bg-accent/50"
                                   }`}
                                 onClick={() => {
                                   addProductToBooking(product)
@@ -568,46 +567,46 @@ const EditPreBooking = ({
                 </div>
 
                 <OutsourcedProductsSection
-  formData={formData}
-  outsourcedItems={outsourcedItems}
-  setOutsourcedItems={(items) => {
-    setOutsourcedItems(items)
-    setFormData((prev:any) => ({
-      ...prev,
-      outsourced_items: items,
-      total_quantity: [
-        ...prev.booking_items,
-        ...items
-      ].reduce((sum, item) => sum + Number(item.quantity), 0),
-      total_amount: [
-        ...prev.booking_items,
-        ...items
-      ].reduce((sum, item) => sum + Number(item.total_price || item.price * item.quantity * (item.no_of_days || prev.no_of_days)), 0) - Number(prev.discount || 0)
-    }))
-  }}
-  setFormData={setFormData}
-/>
+                  formData={formData}
+                  outsourcedItems={outsourcedItems}
+                  setOutsourcedItems={(items) => {
+                    setOutsourcedItems(items)
+                    setFormData((prev: any) => ({
+                      ...prev,
+                      outsourced_items: items,
+                      total_quantity: [
+                        ...prev.booking_items,
+                        ...items
+                      ].reduce((sum, item) => sum + Number(item.quantity), 0),
+                      total_amount: [
+                        ...prev.booking_items,
+                        ...items
+                      ].reduce((sum, item) => sum + Number(item.total_price || item.price * item.quantity * (item.no_of_days || prev.no_of_days)), 0) - Number(prev.discount || 0)
+                    }))
+                  }}
+                  setFormData={setFormData}
+                />
 
                 <Separator />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <PaymentSummary
-  formData={{
-    ...formData,
-    // Calculate subtotal including both booking and outsourced items
-    sub_total: [
-      ...formData.booking_items,
-      ...formData.outsourced_items
-    ].reduce((sum, item:any) => sum + Number(item.total_price || item.price * item.quantity * (item.no_of_days || formData.no_of_days)), 0),
-    // Ensure total_amount is calculated correctly
-    total_amount: [
-      ...formData.booking_items,
-      ...formData.outsourced_items
-    ].reduce((sum, item:any) => sum + Number(item.total_price || item.price * item.quantity * (item.no_of_days || formData.no_of_days)), 0) - Number(formData.discount || 0)
-  }}
-  handleInputChange={handleInputChange}
-  handleSelectChange={handleSelectChange}
-/>
+                  <EditPaymentSummary
+                    formData={{
+                      ...formData,
+                      // Calculate subtotal including both booking and outsourced items
+                      sub_total: [
+                        ...formData.booking_items,
+                        ...formData.outsourced_items
+                      ].reduce((sum, item: any) => sum + Number(item.total_price || item.price * item.quantity * (item.no_of_days || formData.no_of_days)), 0),
+                      // Ensure total_amount is calculated correctly
+                      total_amount: [
+                        ...formData.booking_items,
+                        ...formData.outsourced_items
+                      ].reduce((sum, item: any) => sum + Number(item.total_price || item.price * item.quantity * (item.no_of_days || formData.no_of_days)), 0) - Number(formData.discount || 0)
+                    }}
+                    handleInputChange={handleInputChange}
+                    handleSelectChange={handleSelectChange}
+                  />
                 </div>
               </CardContent>
               <CardFooter className="flex justify-between">

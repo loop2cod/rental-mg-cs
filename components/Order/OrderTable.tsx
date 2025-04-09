@@ -154,7 +154,7 @@ const OrderTable = ({
                                     className="h-8 w-8 hover:bg-gray-100"
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        router.push(`/orders/${item._id}/edit`);
+                                        router.push(`/order/update/${item._id}`);
                                     }}
                                 >
                                     <Edit className="h-4 w-4" />

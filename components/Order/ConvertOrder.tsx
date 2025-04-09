@@ -24,8 +24,8 @@ import { BookingDetailsForm } from "../PreBooking/BookingDetailsForm"
 import DroppableOrderItems from "./DroppableOrderItems"
 import {OrderItemsTable} from "./OrderItemsTable"
 import { OutsourcedProductsSection } from "../PreBooking/OutsourcedProductsSection"
-import { PaymentSummary } from "../PreBooking/PaymentSummary"
 import {OrderProductList} from "./OrderProductList"
+import { PaymentSummary } from "./PaymentSummary"
 
 interface ApiResponseType {
   success: boolean;
@@ -210,7 +210,7 @@ const ConvertOrder = ({
   const handleNoOfDaysChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const days = Number(e.target.value)
     setFormData((prev: any) => {
-      const updatedItems = prev.booking_items.map((item: any) => ({
+      const updatedItems = prev.order_items?.map((item: any) => ({
         ...item,
         no_of_days: days,
         total_price: item.price * item.quantity * days
@@ -219,8 +219,8 @@ const ConvertOrder = ({
       return {
         ...prev,
         no_of_days: days,
-        booking_items: updatedItems,
-        total_amount: updatedItems.reduce((sum: any, item: any) => sum + Number(item.total_price), 0),
+        order_items: updatedItems,
+        total_amount: updatedItems?.reduce((sum: any, item: any) => sum + Number(item.total_price), 0),
       }
     })
   }
@@ -229,7 +229,7 @@ const ConvertOrder = ({
     const updatedItems = formData.order_items.filter((_, i) => i !== index)
     setFormData((prev) => ({
       ...prev,
-      booking_items: updatedItems,
+      order_items: updatedItems,
       total_quantity: updatedItems.reduce((sum, item: any) => sum + Number(item.quantity), 0),
       total_amount: updatedItems.reduce((sum, item: any) => sum + Number(item.total_price), 0),
     }))
@@ -246,7 +246,7 @@ const ConvertOrder = ({
 
       setFormData((prev) => ({
         ...prev,
-        booking_items: updatedItems,
+        order_items: updatedItems,
         total_quantity: updatedItems.reduce((sum: any, item: any) => sum + Number(item.quantity), 0),
         total_amount: updatedItems.reduce((sum: any, item: any) => sum + Number(item.total_price), 0),
       }))

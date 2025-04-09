@@ -1,8 +1,7 @@
 'use client'
 import { AppSidebar } from "@/components/app-sidebar"
 import { withAuth } from "@/components/Middleware/withAuth"
-import CreatePreBooking from "@/components/PreBooking/CreatePreBooking"
-import EditPreBooking from "@/components/PreBooking/EditPreBooking"
+import EditOrder from "@/components/Order/EditOrder"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -21,7 +20,7 @@ import { toast } from "@/components/ui/use-toast"
 import { API_ENDPOINTS } from "@/lib/apiEndpoints"
 import { get } from "@/utilities/AxiosInterceptor"
 import { useParams } from "next/navigation"
-import { useEffect, useLayoutEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
 
 type ResponseType = {
@@ -30,15 +29,14 @@ type ResponseType = {
   message?: string;
 }
 const Page = () => {
-    const {pid} = useParams()
-const [loading, setLoading] = useState(true)
+  const { pid } = useParams()
+  const [loading, setLoading] = useState(true)
   const [products, setProducts] = useState<any[]>([])
 
-  // Fetch categories from the API
+
   const fetchProducts = async () => {
     try {
-      // setLoading(true) // Start loading
-      const response = await get<ResponseType>(API_ENDPOINTS.INVENTORY.GET_ALL_WITHOUT_PAGINATION,{withCredentials: true})
+      const response = await get<ResponseType>(API_ENDPOINTS.INVENTORY.GET_ALL_WITH_QUANTITY, { withCredentials: true })
       if (response.success) {
         setProducts(response.data)
       } else {
@@ -47,28 +45,27 @@ const [loading, setLoading] = useState(true)
           description: response.message || "Failed to fetch Products",
           variant: "destructive",
         })
-    }
-  }catch (error:any) {
-    console.log(error)
-        toast({
-          title: "Error",
-          description: error.response?.data?.message || error.message || "Failed to fetch Products",
-          variant: "destructive",
-        })
-    }finally{
-      setLoading(false); // End loading
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || error.message || "Failed to fetch Products",
+        variant: "destructive",
+      })
+    } finally {
+      setLoading(false);
     }
   }
 
   useEffect(() => {
     fetchProducts()
-    }, [])
+  }, [])
 
   return (
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
@@ -81,19 +78,15 @@ const [loading, setLoading] = useState(true)
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="/list-pre-bookings">Pre-Bookings</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Edit Pre-Booking</BreadcrumbPage>
+                  <BreadcrumbPage>View Pre-Bookings</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
           </div>
         </header>
-<div>
-<EditPreBooking products={products} fetchProducts={fetchProducts} loading={loading} bookingId={pid}/>
-</div>
+        <div>
+          <EditOrder products={products} fetchProducts={fetchProducts} loading={loading} bookingId={pid} />
+        </div>
       </SidebarInset>
     </SidebarProvider>
   )

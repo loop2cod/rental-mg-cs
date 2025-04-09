@@ -8,6 +8,7 @@ import { DataTable, type ColumnDef } from "@/components/ui/data-table"
 import { Badge } from "../ui/badge"
 import { useMemo } from "react"
 import { useRouter } from "next/navigation"
+import { formatCurrency } from "@/lib/commonFunctions"
 
 interface InventoryTableProps {
   onSearch?: (term: string) => void
@@ -97,7 +98,7 @@ export function InventoryTable({
       id: "price",
       header: "Price",
       accessorKey: "unit_cost",
-      cell: (item: any) => `₹${item?.unit_cost.toFixed(2)}`,
+      cell: (item: any) => `${formatCurrency(item?.unit_cost||0)}`,
       sortable: true,
       searchable: false,
     },
