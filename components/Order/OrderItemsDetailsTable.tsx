@@ -10,6 +10,7 @@ import { OrderDispatchHistory } from "./OrderDispatchHistory"
 import { Button } from "@/components/ui/button"
 import { DispatchModal } from "./DispatchModal"
 import { ReturnModal } from './ReturnModel'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface OrderItem {
   _id: string
@@ -22,9 +23,18 @@ interface OrderItem {
   available_quantity?: number
 }
 
+interface DispatchItem {
+  _id: string
+  product_id: string
+  quantity: number
+  dispatch_date: string
+  dispatch_time: string
+  status: 'dispatched' | 'returned'
+}
+
 interface OrderItemsDetailsTableProps {
   items: OrderItem[]
-  dispatchItems?: any[]
+  dispatchItems?: DispatchItem[]
   orderId: string
   onDispatchSuccess?: () => void
 }
@@ -61,50 +71,76 @@ export function OrderItemsDetailsTable({
 
   const getDispatchedQuantity = (productId: string) => {
     return dispatchItems
-      ?.filter(item => item.product_id === productId)
+      ?.filter(item => item.product_id === productId && item.status === 'dispatched')
       ?.reduce((sum, item) => sum + item.quantity, 0) || 0
   }
 
+  const getReturnedQuantity = (productId: string) => {
+    return dispatchItems
+      ?.filter(item => item.product_id === productId && item.status === 'returned')
+      ?.reduce((sum, item) => sum + item.quantity, 0) || 0
+  }
+
+  const getAvailableForReturnQuantity = (productId: string) => {
+    const dispatched = getDispatchedQuantity(productId)
+    const returned = getReturnedQuantity(productId)
+    return dispatched - returned
+  }
+
   const handleBulkDispatch = () => {
-    setSelectedItems(items.map(item => ({
-      id: item.product_id,
-      name: item.name,
-      type: 'product',
-      maxQuantity: item.quantity - getDispatchedQuantity(item.product_id)
-    })))
+    setSelectedItems(items.map(item => {
+      const dispatched = getDispatchedQuantity(item.product_id)
+      const returned = getReturnedQuantity(item.product_id)
+      const remaining = item.quantity - dispatched - returned
+      
+      return {
+        id: item.product_id,
+        name: item.name,
+        type: 'product',
+        maxQuantity: remaining > 0 ? remaining : 0
+      }
+    }))
     setDispatchModalOpen(true)
   }
 
   const handleSingleDispatch = (item: OrderItem) => {
+    const dispatched = getDispatchedQuantity(item.product_id)
+    const returned = getReturnedQuantity(item.product_id)
+    const remaining = item.quantity - dispatched - returned
+    
     setSelectedItems([{
       id: item.product_id,
       name: item.name,
       type: 'product',
-      maxQuantity: item.quantity - getDispatchedQuantity(item.product_id)
+      maxQuantity: remaining > 0 ? remaining : 0
     }])
     setDispatchModalOpen(true)
   }
 
   const handleBulkReturn = () => {
-    setSelectedReturnItems(items.map(item => ({
-      id: item.product_id,
-      name: item.name,
-      type: 'product',
-      maxQuantity: getDispatchedQuantity(item.product_id)
-    })))
+    setSelectedReturnItems(items
+      .filter(item => getAvailableForReturnQuantity(item.product_id) > 0)
+      .map(item => ({
+        id: item.product_id,
+        name: item.name,
+        type: 'product',
+        maxQuantity: getAvailableForReturnQuantity(item.product_id)
+      })))
     setReturnModalOpen(true)
   }
 
   const handleSingleReturn = (item: OrderItem) => {
-    setSelectedReturnItems([{
-      id: item.product_id,
-      name: item.name,
-      type: 'product',
-      maxQuantity: getDispatchedQuantity(item.product_id)
-    }])
-    setReturnModalOpen(true)
+    const availableForReturn = getAvailableForReturnQuantity(item.product_id)
+    if (availableForReturn > 0) {
+      setSelectedReturnItems([{
+        id: item.product_id,
+        name: item.name,
+        type: 'product',
+        maxQuantity: availableForReturn
+      }])
+      setReturnModalOpen(true)
+    }
   }
-
 
   return (
     <Card>
@@ -120,22 +156,24 @@ export function OrderItemsDetailsTable({
               size="sm"
               onClick={handleBulkDispatch}
               className='text-xs'
-              disabled={items.every(item =>
-                item.quantity <= getDispatchedQuantity(item.product_id)
-              )}
+              disabled={items.every(item => {
+                const dispatched = getDispatchedQuantity(item.product_id)
+                const returned = getReturnedQuantity(item.product_id)
+                return item.quantity <= (dispatched + returned)
+              })}
             >
-              <Truck /> Dispatch All
+              <Truck className="mr-1 h-4 w-4" /> Dispatch All
             </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={handleBulkReturn}
               className='text-xs'
-              disabled={items.every(item =>
-                getDispatchedQuantity(item.product_id) <= 0
+              disabled={items.every(item => 
+                getAvailableForReturnQuantity(item.product_id) <= 0
               )}
             >
-              <Undo /> Return All
+              <Undo className="mr-1 h-4 w-4" /> Return All
             </Button>
             <Badge variant="outline" className="ml-auto">
               {items.length} {items.length === 1 ? "item" : "items"}
@@ -154,6 +192,7 @@ export function OrderItemsDetailsTable({
                 <TableHead className="text-right">Price</TableHead>
                 <TableHead className="text-right">Quantity</TableHead>
                 <TableHead className="text-right">Dispatched</TableHead>
+                <TableHead className="text-right">Returned</TableHead>
                 <TableHead className="text-right">Total</TableHead>
                 <TableHead className="text-right">Action</TableHead>
               </TableRow>
@@ -163,8 +202,11 @@ export function OrderItemsDetailsTable({
                 const productDispatchItems = getProductDispatchItems(item.product_id)
                 const hasDispatchHistory = productDispatchItems.length > 0
                 const dispatchedQuantity = getDispatchedQuantity(item.product_id)
+                const returnedQuantity = getReturnedQuantity(item.product_id)
                 const dispatchPercentage = (dispatchedQuantity / item.quantity) * 100
-                const remainingQuantity = item.quantity - dispatchedQuantity
+                const returnPercentage = (returnedQuantity / item.quantity) * 100
+                const remainingQuantity = item.quantity - dispatchedQuantity - returnedQuantity
+                const availableForReturn = getAvailableForReturnQuantity(item.product_id)
 
                 return (
                   <React.Fragment key={item._id}>
@@ -195,8 +237,21 @@ export function OrderItemsDetailsTable({
                           />
                         </div>
                       </TableCell>
-                      <TableCell className="text-right font-medium">{formatCurrency(item.total_price)}</TableCell>
                       <TableCell className="text-right">
+                        <div className="flex flex-col items-end gap-1">
+                          <span>
+                            {returnedQuantity} of {item.quantity}
+                          </span>
+                          <Progress
+                            value={returnPercentage}
+                            className="h-2 w-20"
+                          />
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right font-medium">
+                        {formatCurrency(item.total_price)}
+                      </TableCell>
+                      <TableCell className="text-right space-x-1">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -207,7 +262,7 @@ export function OrderItemsDetailsTable({
                           className='text-xs'
                           disabled={remainingQuantity <= 0}
                         >
-                          <Truck /> Dispatch
+                          <Truck className="mr-1 h-4 w-4" /> Dispatch
                         </Button>
                         <Button
                           variant="ghost"
@@ -217,16 +272,16 @@ export function OrderItemsDetailsTable({
                             handleSingleReturn(item)
                           }}
                           className='text-xs'
-                          disabled={getDispatchedQuantity(item.product_id) <= 0}
+                          disabled={availableForReturn <= 0}
                         >
-                          <Undo /> Return
+                          <Undo className="mr-1 h-4 w-4" /> Return
                         </Button>
                       </TableCell>
                     </TableRow>
 
                     {expandedProduct === item.product_id && (
                       <TableRow>
-                        <TableCell colSpan={7} className="p-0">
+                        <TableCell colSpan={8} className="p-0">
                           <div className="bg-primary/10">
                             <OrderDispatchHistory
                               dispatchItems={productDispatchItems}
