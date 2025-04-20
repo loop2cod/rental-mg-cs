@@ -50,6 +50,7 @@ const EditPreBooking = ({
     user_phone: "",
     user_proof_type: "aadhar",
     user_proof_id: "",
+    address: "",
     from_date: new Date().toISOString().split('T')[0],
     to_date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
     from_time: "10:00",
@@ -117,6 +118,7 @@ const EditPreBooking = ({
             user_phone: booking.user_id.mobile,
             user_proof_type: booking.user_id.proof_type,
             user_proof_id: booking.user_id.proof_id,
+            address: booking.address,
             from_date: booking.from_date.split('T')[0],
             to_date: booking.to_date.split('T')[0],
             from_time: booking.from_time,
@@ -379,8 +381,14 @@ const EditPreBooking = ({
     setIsSubmitting(true)
 
     try {
+      // Adjust dates to handle timezone offset
+      const fromDateAdjusted = new Date(fromDate!.getTime() - (fromDate!.getTimezoneOffset() * 60000))
+      const toDateAdjusted = new Date(toDate!.getTime() - (toDate!.getTimezoneOffset() * 60000))
+
       const formattedData = {
         ...formData,
+        from_date: fromDateAdjusted.toISOString().split('T')[0],
+        to_date: toDateAdjusted.toISOString().split('T')[0], 
         from_time: convertTo24HourFormat(formData.from_time),
         to_time: convertTo24HourFormat(formData.to_time),
         outsourced_items: outsourcedItems,

@@ -330,14 +330,19 @@ const CreatePreBooking = ({
     setIsSubmitting(true);
   
     try {
+      const fromDateAdjusted = new Date(fromDate!.getTime() - (fromDate!.getTimezoneOffset() * 60000))
+      const toDateAdjusted = new Date(toDate!.getTime() - (toDate!.getTimezoneOffset() * 60000))
+
       const formattedData = {
         ...formData,
+        from_date: fromDateAdjusted.toISOString().split('T')[0],
+        to_date: toDateAdjusted.toISOString().split('T')[0],
         from_time: convertTo24HourFormat(formData.from_time),
         to_time: convertTo24HourFormat(formData.to_time),
         outsourced_items: outsourcedItems,
         sub_total: subtotal,
-        discount, 
-        total_amount, 
+        discount,
+        total_amount,
       };
   
       const response = await post<ApiResponseType>(

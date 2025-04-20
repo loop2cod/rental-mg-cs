@@ -1,14 +1,14 @@
-
 "use client"
 
 import Image from "next/image"
-import { Edit, Trash2 } from "lucide-react"
+import { Edit, Trash2, Loader2, Eye, EyeIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DataTable, type ColumnDef } from "@/components/ui/data-table"
 import { Badge } from "../ui/badge"
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { formatCurrency } from "@/lib/commonFunctions"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface InventoryTableProps {
   onSearch?: (term: string) => void
@@ -36,6 +36,17 @@ export function InventoryTable({
   onPageSizeChange,
 }: InventoryTableProps) {
   const router = useRouter()
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  // Handle delete with loading state
+  const handleDelete = async (id: string) => {
+    setDeletingId(id)
+    try {
+      await onDelete(id)
+    } finally {
+      setDeletingId(null)
+    }
+  }
 
   // Define columns for the data table using useMemo
   const columns: ColumnDef<any>[] = useMemo(() => [
@@ -114,9 +125,34 @@ export function InventoryTable({
       header: "Actions",
       cell: (item) => (
         <div className="flex justify-start gap-2">
+             <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+             <Button
+            variant="ghost"
+            size="lg"
+            onClick={(e) => {
+              e.stopPropagation()
+              onEdit(item)
+            }}
+          >
+            <EyeIcon className="h-4 w-4" />
+            <span className="sr-only">View</span>
+          </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>
+              View Product
+            </p>
+          </TooltipContent>
+          </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
           <Button
             variant="ghost"
-            size="icon"
+            size="lg"
             onClick={(e) => {
               e.stopPropagation()
               onEdit(item)
@@ -125,23 +161,47 @@ export function InventoryTable({
             <Edit className="h-4 w-4" />
             <span className="sr-only">Edit</span>
           </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>
+              Edit Product
+            </p>
+          </TooltipContent>
+          </Tooltip>
+          </TooltipProvider>
+          <TooltipProvider>
+          <Tooltip>
+          <TooltipTrigger asChild>
           <Button
             variant="ghost"
-            size="icon"
+            size="lg"
             onClick={(e) => {
               e.stopPropagation()
-              onDelete(item._id)
+              handleDelete(item._id)
             }}
+            disabled={deletingId === item._id}
           >
-            <Trash2 className="h-4 w-4" />
+            {deletingId === item._id ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Trash2 className="h-4 w-4" />
+            )}
             <span className="sr-only">Delete</span>
-          </Button>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>
+              Delete Product
+            </p>
+          </TooltipContent>
+          </Tooltip>
+          </TooltipProvider>
         </div>
       ),
       sortable: false,
       searchable: false,
     },
-  ], [onEdit, onDelete])
+  ], [onEdit, handleDelete, deletingId])
 
   return (
     <div className="px-2 md:px-2 lg:px-4">

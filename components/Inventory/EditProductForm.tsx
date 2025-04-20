@@ -16,7 +16,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "../ui/use-toast"
 import { API_ENDPOINTS } from "@/lib/apiEndpoints"
-import { get, put } from "@/utilities/AxiosInterceptor"
+import { get, put, del } from "@/utilities/AxiosInterceptor"
+import { Progress } from "@/components/ui/progress"
 
 // Define validation schema using Zod
 const formSchema = z.object({
@@ -36,10 +37,13 @@ interface ResponseType {
 export default function EditProductForm({ categories, productId }: { categories: any, productId: any }) {
     const router = useRouter()
     const fileInputRef = useRef<HTMLInputElement>(null)
-    const [images, setImages] = useState<string[]>([])
+    const [images, setImages] = useState<{url: string; key: string}[]>([])
     const [features, setFeatures] = useState<{ key: string; value: string }[]>([{ key: "", value: "" }])
     const [loading, setLoading] = useState(false) // Loading state
     const [productCategoryName, setProductCategoryName] = useState<string>("") // Store product's category name
+    const [uploadingImages, setUploadingImages] = useState(false)
+    const [uploadProgress, setUploadProgress] = useState(0) // Track upload progress
+    const [deletingImageIndex, setDeletingImageIndex] = useState<number | null>(null) // Track which image is being deleted
 
     // Initialize the form using useForm with Zod resolver
     const form = useForm({
@@ -87,9 +91,9 @@ export default function EditProductForm({ categories, productId }: { categories:
                     setFeatures(featuresArray.length > 0 ? featuresArray : [{ key: "", value: "" }]);
 
                     // Filter out invalid image paths and set only valid URLs
-                    const validImages = product.images.filter((image: string) =>
-                        image.startsWith("http")
-                    );
+                    const validImages = product.images
+                        .filter((image: string) => image.startsWith("http"))
+                        .map((image: string) => ({ url: image, key: image.split('/').pop() || '' }));
                     setImages(validImages);
                 } else {
                     toast({
@@ -135,13 +139,7 @@ export default function EditProductForm({ categories, productId }: { categories:
                 }, {} as Record<string, string>);
 
             formData.append("features", JSON.stringify(validFeatures));
-
-            // Append images as files
-            if (fileInputRef.current?.files) {
-                for (let i = 0; i < fileInputRef.current.files.length; i++) {
-                    formData.append("images", fileInputRef.current.files[i]);
-                }
-            }
+            formData.append("images", JSON.stringify(images.map(img => img.url)));
 
             // Send the request
             const response = await put<ResponseType>(
@@ -180,17 +178,114 @@ export default function EditProductForm({ categories, productId }: { categories:
         }
     };
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
-            const newImages = Array.from(e.target.files).map((file) => URL.createObjectURL(file))
-            setImages([...images, ...newImages])
+            setUploadingImages(true);
+            setUploadProgress(0);
+            
+            try {
+                const files = Array.from(e.target.files);
+                const newImages = [...images];
+                
+                for (const file of files) {
+                    // Get presigned URL
+                    const response = await get<ResponseType>(
+                        API_ENDPOINTS.FILE.GET_URL,
+                        { 
+                            withCredentials: true,
+                            params: {
+                                fileName: file.name,
+                                fileType: file.type
+                            }
+                        }
+                    );
+                    
+                    if (!response.success || !response.data) {
+                        throw new Error("Failed to get upload URL");
+                    }
+                    
+                    const { uploadURL, publicURL } = response.data;
+                    
+                    // Upload with progress tracking
+                    const xhr = new XMLHttpRequest();
+                    xhr.upload.addEventListener('progress', (event) => {
+                        if (event.lengthComputable) {
+                            const percentComplete = Math.round((event.loaded / event.total) * 100);
+                            setUploadProgress(percentComplete);
+                        }
+                    });
+                    
+                    await new Promise((resolve, reject) => {
+                        xhr.onload = () => {
+                            if (xhr.status >= 200 && xhr.status < 300) {
+                                resolve(xhr.response);
+                            } else {
+                                reject(new Error(`Upload failed with status ${xhr.status}`));
+                            }
+                        };
+                        xhr.onerror = () => reject(new Error('Upload failed'));
+                        xhr.open('PUT', uploadURL, true);
+                        xhr.setRequestHeader('Content-Type', file.type);
+                        xhr.send(file);
+                    });
+                    
+                    newImages.push({ url: publicURL, key: file.name });
+                }
+                
+                setImages(newImages);
+                setUploadProgress(0);
+                
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = '';
+                }
+                
+                toast({
+                    title: "Upload successful",
+                    description: `${files.length} image(s) uploaded successfully.`,
+                });
+            } catch (error: any) {
+                toast({
+                    title: "Upload failed",
+                    description: error.message || "Failed to upload images",
+                    variant: "destructive",
+                });
+            } finally {
+                setUploadingImages(false);
+            }
         }
     }
 
-    const removeImage = (index: number) => {
-        const newImages = [...images]
-        newImages.splice(index, 1)
-        setImages(newImages)
+    const removeImage = async (index: number, url: string) => {
+        try {
+            setDeletingImageIndex(index); // Track which image is being deleted
+            
+            // Delete the file from R2 bucket
+            await del<ResponseType>(
+                API_ENDPOINTS.FILE.DELETE,
+                { 
+                    withCredentials: true,
+                    data: { fileUrl: url }
+                }
+            );
+            
+            // Remove from state
+            const newImages = [...images];
+            newImages.splice(index, 1);
+            setImages(newImages);
+            
+            toast({
+                title: "Image removed",
+                description: "Image has been deleted successfully.",
+            });
+        } catch (error: any) {
+            toast({
+                title: "Error",
+                description: error.message || "Failed to delete image",
+                variant: "destructive",
+            });
+        } finally {
+            setDeletingImageIndex(null); // Reset deleting state
+        }
     }
 
     const addFeatureField = () => {
@@ -359,7 +454,7 @@ export default function EditProductForm({ categories, productId }: { categories:
                                 {images.map((image, index) => (
                                     <div key={index} className="relative aspect-square rounded-md overflow-hidden border">
                                         <img
-                                            src={image || "/placeHolder.jpg"}
+                                            src={image.url || "/placeHolder.jpg"}
                                             alt={`Product image ${index + 1}`}
                                             className="object-cover"
                                         />
@@ -368,21 +463,34 @@ export default function EditProductForm({ categories, productId }: { categories:
                                             variant="destructive"
                                             size="icon"
                                             className="absolute top-1 right-1 h-6 w-6"
-                                            onClick={() => removeImage(index)}
-                                            disabled={loading}
+                                            onClick={() => removeImage(index, image.url)}
+                                            disabled={loading || uploadingImages || deletingImageIndex === index}
                                         >
-                                            <X className="h-3 w-3" />
+                                            {deletingImageIndex === index ? (
+                                                <div className="animate-spin h-3 w-3 border-2 border-white border-t-transparent rounded-full" />
+                                            ) : (
+                                                <X className="h-3 w-3" />
+                                            )}
                                         </Button>
                                     </div>
                                 ))}
 
                                 {images.length < 5 && (
                                     <div
-                                        className="border border-dashed rounded-md flex flex-col items-center justify-center p-4 aspect-square cursor-pointer hover:bg-muted/50 transition-colors"
-                                        onClick={() => fileInputRef.current?.click()}
+                                        className={`border border-dashed rounded-md flex flex-col items-center justify-center p-4 aspect-square ${uploadingImages ? 'opacity-50' : 'cursor-pointer hover:bg-muted/50'} transition-colors`}
+                                        onClick={() => !uploadingImages && fileInputRef.current?.click()}
                                     >
-                                        <ImageIcon className="h-8 w-8 text-muted-foreground mb-2" />
-                                        <p className="text-sm text-muted-foreground text-center">Click to upload</p>
+                                        {uploadingImages ? (
+                                            <div className="mt-2 space-y-1">
+                                                <p className="text-xs">Uploading...</p>
+                                                <Progress value={uploadProgress} className="h-2" />
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <ImageIcon className="h-8 w-8 text-muted-foreground mb-2" />
+                                                <p className="text-sm text-muted-foreground text-center">Click to upload</p>
+                                            </>
+                                        )}
                                         <input
                                             type="file"
                                             ref={fileInputRef}
@@ -390,7 +498,7 @@ export default function EditProductForm({ categories, productId }: { categories:
                                             accept="image/*"
                                             multiple
                                             className="hidden"
-                                            disabled={loading}
+                                            disabled={loading || uploadingImages}
                                         />
                                     </div>
                                 )}
@@ -398,7 +506,7 @@ export default function EditProductForm({ categories, productId }: { categories:
                         </div>
 
                         <div className="flex justify-end">
-                            <Button type="submit" disabled={loading}>
+                            <Button type="submit" disabled={loading || uploadingImages || deletingImageIndex !== null}>
                                 {loading ? "Updating..." : "Update Product"}
                             </Button>
                         </div>

@@ -51,9 +51,16 @@ import { formatCurrency } from "./commonFunctions"
     }
   }
   
+  // Determine if landscape orientation is needed based on column count
+  function needsLandscapeOrientation(columns: ColumnDef<any>[]): boolean {
+    const filteredColumns = columns.filter(col => col.id !== 'actions' && col.id !== 'image')
+    return filteredColumns.length > 6
+  }
+  
   // Generate PDF content for all table types
   function generatePdfContent<T>(data: T[], columns: ColumnDef<T>[], title: string): string {
     const filteredColumns = columns.filter(col => col.id !== 'actions' && col.id !== 'image')
+    const isLandscape = needsLandscapeOrientation(columns)
     
     return `
       <!DOCTYPE html>
@@ -61,20 +68,81 @@ import { formatCurrency } from "./commonFunctions"
       <head>
         <title>${title}</title>
         <style>
-          @page { size: A4; margin: 1cm; }
-          body { font-family: Arial, sans-serif; font-size: 10px; }
-          h1 { text-align: center; margin: 0 0 10px 0; font-size: 16px; }
-          table { width: 100%; border-collapse: collapse; }
-          th, td { border: 1px solid #ddd; padding: 4px; text-align: left; }
-          th { background-color: #f5f5f5; font-weight: bold; }
-          .text-right { text-align: right; }
-          .text-center { text-align: center; }
-          .nowrap { white-space: nowrap; }
-          .footer { text-align: center; margin-top: 10px; font-size: 9px; color: #666; }
+          @page { 
+            size: A4 ${isLandscape ? 'landscape' : 'portrait'}; 
+            margin: 0.5cm;
+          }
+          body { 
+            font-family: Arial, sans-serif; 
+            font-size: 10px;
+            line-height: 1.4;
+          }
+          .header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+          }
+          h1 { 
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+          }
+          .subtitle {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+          }
+          table { 
+            width: 100%; 
+            border-collapse: collapse;
+            margin-bottom: 20px;
+          }
+          th, td { 
+            border: 1px solid #ddd; 
+            padding: 8px; 
+            text-align: left;
+          }
+          th { 
+            background-color: #f5f5f5; 
+            font-weight: bold;
+            color: #333;
+          }
+          tr:nth-child(even) { 
+            background-color: #f9f9f9;
+          }
+          .text-right { 
+            text-align: right; 
+          }
+          .text-center { 
+            text-align: center; 
+          }
+          .nowrap { 
+            white-space: nowrap; 
+          }
+          .footer { 
+            text-align: center; 
+            margin-top: 20px; 
+            font-size: 9px; 
+            color: #666;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+          }
+          .page-break {
+            page-break-after: always;
+          }
+          @media print {
+            tr { page-break-inside: avoid; }
+            thead { display: table-header-group; }
+            tfoot { display: table-footer-group; }
+          }
         </style>
       </head>
       <body>
-        <h1>${title}</h1>
+        <div class="header">
+          <h1>${title}</h1>
+          <div class="subtitle">Generated on ${formatDate(new Date())}</div>
+        </div>
         <table>
           <thead>
             <tr>
@@ -105,11 +173,13 @@ import { formatCurrency } from "./commonFunctions"
                     case 'features':
                       return `<td>${cellFormatters.features(item.features)}</td>`
                     case 'price':
+                      return `<td class="text-right">${formatCurrency(item.unit_cost || 0)}</td>`
                     case 'unit_cost':
-                      return `<td class="text-right">${formatCurrency(item[col.id])}</td>`
+                      return `<td class="text-right">${formatCurrency(item.unit_cost || 0)}</td>`
                     case 'quantity':
+                      return `<td class="text-right">${item.inventoryQuantity || 0}</td>`
                     case 'inventoryQuantity':
-                      return `<td class="text-right">${item[col.id] || 0}</td>`
+                      return `<td class="text-right">${item.inventoryQuantity || 0}</td>`
                       
                     // Order/Booking table columns
                     case 'customer_name':
@@ -128,7 +198,7 @@ import { formatCurrency } from "./commonFunctions"
                       return `<td>Products: ${products}<br>Outsourced: ${outsourced}</td>`
                     case 'total_amount':
                     case 'amount_paid':
-                      return `<td class="text-right">${formatCurrency(item[col.id])}</td>`
+                      return `<td class="text-right">${formatCurrency(item[col.id] || 0)}</td>`
                     case 'status':
                       return `<td>${item.status || '-'}</td>`
                       
@@ -151,7 +221,10 @@ import { formatCurrency } from "./commonFunctions"
             `).join('')}
           </tbody>
         </table>
-        <div class="footer">Generated on ${formatDate(new Date())}</div>
+        <div class="footer">
+          <div>Page 1 of 1</div>
+          <div>Generated by Rental Management System</div>
+        </div>
       </body>
       </html>
     `
@@ -178,50 +251,52 @@ import { formatCurrency } from "./commonFunctions"
         switch (col.id) {
           // Inventory table columns
           case 'name':
-            return `"${item.name || '-'}"`
+            return `"${(item.name || '-').replace(/"/g, '""')}"`
           case 'categoryName':
-            return `"${item.categoryName || '-'}"`
+            return `"${(item.categoryName || '-').replace(/"/g, '""')}"`
           case 'features':
-            return `"${cellFormatters.features(item.features)}"`
+            return `"${cellFormatters.features(item.features).replace(/"/g, '""')}"`
           case 'price':
+            return formatCurrency(item.unit_cost || 0)
           case 'unit_cost':
-            return formatCurrency(item.unit_cost||0)
+            return formatCurrency(item.unit_cost || 0)
           case 'quantity':
+            return item.inventoryQuantity || 0
           case 'inventoryQuantity':
             return item.inventoryQuantity || 0
             
           // Order/Booking table columns
           case 'customer_name':
           case 'user':
-            return `"${cellFormatters.contactInfo(item.user_id?.name, item.user_id?.mobile)}"`
+            return `"${cellFormatters.contactInfo(item.user_id?.name, item.user_id?.mobile).replace(/"/g, '""')}"`
           case 'from_date':
-            return `"${cellFormatters.dateWithTime(item.from_date, item.from_time)}"`
+            return `"${cellFormatters.dateWithTime(item.from_date, item.from_time).replace(/"/g, '""')}"`
           case 'to_date':
-            return `"${cellFormatters.dateWithTime(item.to_date, item.to_time)}"`
+            return `"${cellFormatters.dateWithTime(item.to_date, item.to_time).replace(/"/g, '""')}"`
           case 'booking_date':
           case 'order_date':
-            return `"${formatDate(item[col.id])}"`
+            return `"${formatDate(item[col.id]).replace(/"/g, '""')}"`
           case 'items':
             const products = item.booking_items?.reduce((sum: number, i: any) => sum + i.quantity, 0) || 0
             const outsourced = item.outsourced_items?.reduce((sum: number, i: any) => sum + i.quantity, 0) || 0
             return `"Products: ${products}, Outsourced: ${outsourced}"`
           case 'total_amount':
           case 'amount_paid':
-            return formatCurrency(item[col.id])
+            return formatCurrency(item[col.id] || 0)
           case 'status':
-            return `"${item.status || '-'}"`
+            return `"${(item.status || '-').replace(/"/g, '""')}"`
             
           // Supplier table columns
           case 'contact':
-            return `"${item.contact || '-'}"`
+            return `"${(item.contact || '-').replace(/"/g, '""')}"`
           case 'address':
-            return `"${item.address || '-'}"`
+            return `"${(item.address || '-').replace(/"/g, '""')}"`
             
           // Default case
           default:
             if (col.accessorKey) {
               const value = getNestedValue(item, col.accessorKey)
-              return typeof value === 'string' ? `"${value}"` : value
+              return typeof value === 'string' ? `"${value.replace(/"/g, '""')}"` : value
             }
             return '""'
         }
@@ -243,6 +318,7 @@ import { formatCurrency } from "./commonFunctions"
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+    URL.revokeObjectURL(url)
   }
   
   // Export to PDF

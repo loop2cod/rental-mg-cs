@@ -6,11 +6,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from '../ui/scroll-area';
 import { Skeleton } from '../ui/skeleton';
+import { useRouter } from 'next/navigation';
 
 const Section1 = ({
     loading,
     bookings
 }:any) => {
+  const router = useRouter();
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -21,15 +23,16 @@ const Section1 = ({
                 </div>
                 <div className="grid grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4 w-full px-3 pt-3">
                     {[
-                        { icon: PlusCircle, label: "New Booking" },
-                        { icon: CheckCircle, label: "Orders" },
-                        { icon: CalendarCheck, label: "Pre-Bookings" },
-                        { icon: Boxes, label: "Inventory" },
-                        { icon: BarChart3, label: "Reports" },
-                        { icon: Users, label: "Suppliers" },
-                    ].map(({ icon: Icon, label }, index) => (
+                        { icon: PlusCircle, label: "New Booking", link: "/pre-booking" },
+                        { icon: CheckCircle, label: "Orders", link: "/list-orders" },
+                        { icon: CalendarCheck, label: "Pre-Bookings", link: "/list-pre-bookings" },
+                        { icon: Boxes, label: "Inventory", link: "/list-inventory" },
+                        { icon: PlusCircle, label: "Add Product", link: "/add-product" },
+                        { icon: Users, label: "Suppliers", link: "/list-suppliers" },
+                    ].map(({ icon: Icon, label, link }, index) => (
                         <Button
                             key={index}
+                            onClick={() => router.push(link)}
                             className="bg-primary hover:bg-primary/90 text-primary-foreground h-auto py-3 flex flex-col items-center gap-2 text-sm sm:text-base cursor-pointer border rounded"
                         >
                             <Icon className="h-5 w-5 sm:h-6 sm:w-6" />

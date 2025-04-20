@@ -18,7 +18,8 @@ import {
 } from "@/components/ui/sidebar"
 import { toast } from "@/components/ui/use-toast"
 import { API_ENDPOINTS } from "@/lib/apiEndpoints"
-import { get } from "@/utilities/AxiosInterceptor"
+import { del, get } from "@/utilities/AxiosInterceptor"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 interface ResponseType {
@@ -28,6 +29,7 @@ interface ResponseType {
 }
 
 const Page = () => {
+  const router = useRouter()
   const [inventory, setInventory] = useState<any>([])
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -79,13 +81,37 @@ const Page = () => {
     setCurrentPage(1);
   };
 
-  const handleDeleteProduct = (id: string) => {
-    setInventory(inventory.filter((item: any) => item._id !== id))
+  const handleDeleteProduct = async (id: string): Promise<void> => {
+    try{
+      const response = await del<ResponseType>(`${API_ENDPOINTS.INVENTORY.DELETE}/${id}`, {
+        withCredentials: true,
+      });
+      if (response.success) {
+        toast({
+          title: "Success",
+          description: response.message || "Product deleted successfully",
+        });
+        // Refresh the inventory data after successful deletion
+        await fetchInventory(currentPage, itemsPerPage, searchTerm);
+      } else {
+        toast({
+          title: "Error",
+          description: response.message || "Failed to delete product",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || error.message || "Failed to delete product",
+        variant: "destructive",
+      });
+      throw error; // Re-throw to be caught by the component
+    }
   }
 
   const openEditDialog = (item: any) => {
-    setCurrentItem(item)
-    setIsEditDialogOpen(true)
+    router.push(`/list-inventory/details/${item?._id}`)
   }
 
   const handlePageChange = (page: number) => {

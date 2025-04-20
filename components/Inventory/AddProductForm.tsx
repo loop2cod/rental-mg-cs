@@ -17,9 +17,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "../ui/use-toast"
 import { API_ENDPOINTS } from "@/lib/apiEndpoints"
 import { post, get,del } from "@/utilities/AxiosInterceptor"
-import { Progress } from "@/components/ui/progress" // Import Progress component
+import { Progress } from "@/components/ui/progress"
 
-// Define validation schema using Zod
+
 const formSchema = z.object({
   name: z.string().min(1, "Product name is required"),
   unit_cost: z.string().min(1, "Unit cost is required").regex(/^\d+(\.\d{1,2})?$/, "Invalid unit cost"),
