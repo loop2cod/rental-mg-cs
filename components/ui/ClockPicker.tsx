@@ -18,7 +18,7 @@ export function ClockPicker({ value, onChange, onClose }: ClockPickerProps) {
       const [time, period] = value.split(" ")
       const [hours, minutes] = time.split(":")
       const hour = parseInt(hours)
-      setSelectedHour(hour > 12 ? hour - 12 : hour)
+      setSelectedHour(hour > 12 ? hour - 12 : hour === 0 ? 12 : hour)
       setSelectedMinute(parseInt(minutes))
       setAmPm(hour >= 12 ? "PM" : "AM")
     }

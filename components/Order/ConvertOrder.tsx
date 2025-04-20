@@ -411,11 +411,16 @@ const ConvertOrder = ({
     setIsSubmitting(true)
   
     try {
+        const fromDateAdjusted = new Date(fromDate!.getTime() - (fromDate!.getTimezoneOffset() * 60000))
+      const toDateAdjusted = new Date(toDate!.getTime() - (toDate!.getTimezoneOffset() * 60000))
+
       const formattedData = {
         ...formData,
         booking_id: bookingId,
-        from_time: convertTo24HourFormat(formData.from_time),
-        to_time: convertTo24HourFormat(formData.to_time),
+        from_date: fromDateAdjusted.toISOString().split('T')[0],
+        to_date: toDateAdjusted.toISOString().split('T')[0],
+        from_time: formData.from_time.replace(/\s+(AM|PM)$/i, ''),
+        to_time: formData.to_time.replace(/\s+(AM|PM)$/i, ''),
         outsourced_items: outsourcedItems,
         sub_total,
         discount,

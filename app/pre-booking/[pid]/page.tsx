@@ -28,12 +28,12 @@ import { BookingItemsDetailsTable } from "@/components/PreBooking/BookingItemsDe
 import { OutsourcedItemsDetailsTable } from "@/components/PreBooking/OutsourcedItemsDetailsTable"
 import { PaymentSummaryCard } from "@/components/PreBooking/PaymentSummaryCard"
 
-
 type ResponseType = {
   success: boolean
   data?: any
   message?: string
 }
+
 const Page = () => {
   const { pid } = useParams()
   const [loading, setLoading] = useState(true)
@@ -123,7 +123,10 @@ const Page = () => {
           {preBooking.outsourced_items.length > 0 && (
             <OutsourcedItemsDetailsTable items={preBooking.outsourced_items} />
           )}
-          <PaymentSummaryCard booking={preBooking} />
+          <PaymentSummaryCard 
+            booking={preBooking} 
+            onPaymentUpdate={fetchPreBooking}
+          />
         </div>
       </SidebarInset>
     </SidebarProvider>

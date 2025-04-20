@@ -53,8 +53,8 @@ const EditOrder = ({
     user_proof_id: "",
     from_date: new Date().toISOString().split('T')[0],
     to_date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
-    from_time: "10:00",
-    to_time: "12:00",
+    from_time: "10:00 AM",
+    to_time: "12:00 PM",
     order_date: new Date().toISOString().split('T')[0],
     address: "",
     order_items: [],
@@ -411,11 +411,16 @@ const EditOrder = ({
     setIsSubmitting(true)
   
     try {
+      const fromDateAdjusted = new Date(fromDate!.getTime() - (fromDate!.getTimezoneOffset() * 60000))
+      const toDateAdjusted = new Date(toDate!.getTime() - (toDate!.getTimezoneOffset() * 60000))
+
       const formattedData = {
         ...formData,
         booking_id: bookingId,
-        from_time: convertTo24HourFormat(formData.from_time),
-        to_time: convertTo24HourFormat(formData.to_time),
+        from_date: fromDateAdjusted.toISOString().split('T')[0],
+        to_date: toDateAdjusted.toISOString().split('T')[0],
+        from_time: formData.from_time.replace(/\s+(AM|PM)$/i, ''),
+        to_time: formData.to_time.replace(/\s+(AM|PM)$/i, ''),
         outsourced_items: outsourcedItems,
         sub_total,
         discount,
@@ -503,8 +508,8 @@ const EditOrder = ({
           <Card className="py-0">
             <ScrollArea className="h-[92vh] py-4">
               <CardHeader>
-                <CardTitle className="text-2xl">Make Order</CardTitle>
-                <CardDescription>Make an order for the booking</CardDescription>
+                <CardTitle className="text-2xl">Edit Order</CardTitle>
+                <CardDescription>Edit the order for the booking</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <CustomerInfoForm
@@ -647,7 +652,7 @@ const EditOrder = ({
                   Cancel
                 </Button>
                 <Button type="submit" disabled={isSubmitting} onClick={handleSubmit}>
-                  {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Make Order"}
+                  {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Edit Order"}
                 </Button>
               </CardFooter>
             </ScrollArea>
