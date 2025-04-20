@@ -16,7 +16,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "../ui/use-toast"
 import { API_ENDPOINTS } from "@/lib/apiEndpoints"
-import { post, get } from "@/utilities/AxiosInterceptor"
+import { post, get,del } from "@/utilities/AxiosInterceptor"
+import { Progress } from "@/components/ui/progress" // Import Progress component
 
 // Define validation schema using Zod
 const formSchema = z.object({
@@ -27,8 +28,6 @@ const formSchema = z.object({
   description: z.string().min(1, "Description is required"),
 })
 
-
-
 interface ResponseType {
   success: boolean;
   data?: any;
@@ -38,12 +37,13 @@ interface ResponseType {
 export default function AddProductForm({ categories }: any) {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [images, setImages] = useState<{url: string; key: string}[]>([]) // Modified to store both URL and key
+  const [images, setImages] = useState<{url: string; key: string}[]>([])
   const [features, setFeatures] = useState<{ key: string; value: string }[]>([{ key: "", value: "" }])
-  const [loading, setLoading] = useState(false) // Loading state
-  const [uploadingImages, setUploadingImages] = useState(false) // New state for image upload loading
+  const [loading, setLoading] = useState(false)
+  const [uploadingImages, setUploadingImages] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0) // Track upload progress
+  const [deletingImageIndex, setDeletingImageIndex] = useState<number | null>(null) // Track which image is being deleted
 
-  // Initialize the form using useForm with Zod resolver
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -56,21 +56,17 @@ export default function AddProductForm({ categories }: any) {
   })
 
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
-    if (loading) return; // Prevent multiple submissions
-    setLoading(true); // Start loading
+    if (loading) return;
+    setLoading(true);
 
     try {
-      // Prepare form data for submission
       const formData = new FormData();
-
-      // Append basic fields
       formData.append("name", data.name);
       formData.append("unit_cost", data.unit_cost);
       formData.append("quantity", data.quantity);
       formData.append("category_id", data.category);
       formData.append("description", data.description);
 
-      // Append features as JSON
       const validFeatures = features
         .filter((f) => f.key && f.value)
         .reduce((acc, f) => {
@@ -79,11 +75,8 @@ export default function AddProductForm({ categories }: any) {
         }, {} as Record<string, string>); 
 
       formData.append("features", JSON.stringify(validFeatures));
-
-      // Append image URLs instead of files
       formData.append("images", JSON.stringify(images.map(img => img.url)));
       
-      // Send the request
       const response = await post<ResponseType>(
         API_ENDPOINTS.INVENTORY.CREATE,
         formData,
@@ -116,82 +109,99 @@ export default function AddProductForm({ categories }: any) {
         variant: "destructive",
       });
     } finally {
-      setLoading(false); // End loading
+      setLoading(false);
     }
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-        setUploadingImages(true);
+      setUploadingImages(true);
+      setUploadProgress(0);
+      
+      try {
+        const files = Array.from(e.target.files);
+        const newImages = [...images];
         
-        try {
-            const files = Array.from(e.target.files);
-            const newImages = [...images];
-            
-            for (const file of files) {
-                // Get presigned URL for upload with fileName and fileType as query params
-                const response = await get<ResponseType>(
-                    API_ENDPOINTS.FILE.GET_URL,
-                    { 
-                        withCredentials: true,
-                        params: {
-                            fileName: file.name,
-                            fileType: file.type
-                        }
-                    }
-                );
-                
-                if (!response.success || !response.data) {
-                    throw new Error("Failed to get upload URL");
-                }
-                
-                const { uploadURL, publicURL } = response.data;
-                
-                // Upload file to presigned URL
-                const uploadResponse = await fetch(uploadURL, {
-                    method: 'PUT',
-                    body: file,
-                    headers: {
-                        'Content-Type': file.type,
-                    },
-                });
-                
-                if (!uploadResponse.ok) {
-                    throw new Error(`Upload failed with status ${uploadResponse.status}`);
-                }
-                
-                // Add the public URL to our images state
-                newImages.push({ url: publicURL, key: file.name });
+        for (const file of files) {
+          // Get presigned URL
+          const response = await get<ResponseType>(
+            API_ENDPOINTS.FILE.GET_URL,
+            { 
+              withCredentials: true,
+              params: {
+                fileName: file.name,
+                fileType: file.type
+              }
             }
-            
-            setImages(newImages);
-            
-            // Clear the file input
-            if (fileInputRef.current) {
-                fileInputRef.current.value = '';
+          );
+          
+          if (!response.success || !response.data) {
+            throw new Error("Failed to get upload URL");
+          }
+          
+          const { uploadURL, publicURL } = response.data;
+          
+          // Upload with progress tracking
+          const xhr = new XMLHttpRequest();
+          xhr.upload.addEventListener('progress', (event) => {
+            if (event.lengthComputable) {
+              const percentComplete = Math.round((event.loaded / event.total) * 100);
+              setUploadProgress(percentComplete);
             }
-            
-            toast({
-                title: "Upload successful",
-                description: `${files.length} image(s) uploaded successfully.`,
-            });
-        } catch (error: any) {
-            toast({
-                title: "Upload failed",
-                description: error.message || "Failed to upload images",
-                variant: "destructive",
-            });
-        } finally {
-            setUploadingImages(false);
+          });
+          
+          await new Promise((resolve, reject) => {
+            xhr.onload = () => {
+              if (xhr.status >= 200 && xhr.status < 300) {
+                resolve(xhr.response);
+              } else {
+                reject(new Error(`Upload failed with status ${xhr.status}`));
+              }
+            };
+            xhr.onerror = () => reject(new Error('Upload failed'));
+            xhr.open('PUT', uploadURL, true);
+            xhr.setRequestHeader('Content-Type', file.type);
+            xhr.send(file);
+          });
+          
+          newImages.push({ url: publicURL, key: file.name });
         }
+        
+        setImages(newImages);
+        setUploadProgress(0);
+        
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        
+        toast({
+          title: "Upload successful",
+          description: `${files.length} image(s) uploaded successfully.`,
+        });
+      } catch (error: any) {
+        toast({
+          title: "Upload failed",
+          description: error.message || "Failed to upload images",
+          variant: "destructive",
+        });
+      } finally {
+        setUploadingImages(false);
+      }
     }
-};
+  };
 
-  const removeImage = async (index: number) => {
+  const removeImage = async (index: number, url: string) => {
     try {
-      const imageToRemove = images[index];
+      setDeletingImageIndex(index); // Track which image is being deleted
       
       // Delete the file from R2 bucket
+      await del<ResponseType>(
+        API_ENDPOINTS.FILE.DELETE,
+        { 
+          withCredentials: true,
+          data: { fileUrl: url }
+        }
+      );
       
       // Remove from state
       const newImages = [...images];
@@ -208,6 +218,8 @@ export default function AddProductForm({ categories }: any) {
         description: error.message || "Failed to delete image",
         variant: "destructive",
       });
+    } finally {
+      setDeletingImageIndex(null); // Reset deleting state
     }
   }
 
@@ -381,10 +393,14 @@ export default function AddProductForm({ categories }: any) {
                       variant="destructive"
                       size="icon"
                       className="absolute top-1 right-1 h-6 w-6"
-                      onClick={() => removeImage(index)}
-                      disabled={loading || uploadingImages}
+                      onClick={() => removeImage(index, image.url)}
+                      disabled={loading || uploadingImages || deletingImageIndex === index}
                     >
-                      <X className="h-3 w-3" />
+                      {deletingImageIndex === index ? (
+                        <div className="animate-spin h-3 w-3 border-2 border-white border-t-transparent rounded-full" />
+                      ) : (
+                        <X className="h-3 w-3" />
+                      )}
                     </Button>
                   </div>
                 ))}
@@ -395,10 +411,10 @@ export default function AddProductForm({ categories }: any) {
                     onClick={() => !uploadingImages && fileInputRef.current?.click()}
                   >
                     {uploadingImages ? (
-                      <div className="flex flex-col items-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-2"></div>
-                        <p className="text-sm text-muted-foreground text-center">Uploading...</p>
-                      </div>
+                          <div className="mt-2 space-y-1">
+                          <p className="text-xs">Uploading...</p>
+                          <Progress value={uploadProgress} className="h-2" />
+                        </div>
                     ) : (
                       <>
                         <ImageIcon className="h-8 w-8 text-muted-foreground mb-2" />
@@ -420,7 +436,7 @@ export default function AddProductForm({ categories }: any) {
             </div>
 
             <div className="flex justify-end">
-              <Button type="submit" disabled={loading || uploadingImages}>
+              <Button type="submit" disabled={loading || uploadingImages || deletingImageIndex !== null}>
                 {loading ? "Creating..." : "Create Product"}
               </Button>
             </div>

@@ -56,6 +56,7 @@ export const API_ENDPOINTS = {
   },
   FILE:{
     GET_URL: `/api/v1/file/generate-presigned-url`,
+    DELETE: `/api/v1/file/delete-file`,
   }
 } as const;
 
