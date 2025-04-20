@@ -53,6 +53,9 @@ export const API_ENDPOINTS = {
     VALUES: `/api/v1/dashboard/data`,
     CHART: `/api/v1/dashboard/chart`,
     RECENT_BOOKINGS: `/api/v1/dashboard/recent`
+  },
+  FILE:{
+    GET_URL: `/api/v1/file/generate-presigned-url`,
   }
 } as const;
 

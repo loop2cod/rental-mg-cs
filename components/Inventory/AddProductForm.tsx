@@ -16,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "../ui/use-toast"
 import { API_ENDPOINTS } from "@/lib/apiEndpoints"
-import { post } from "@/utilities/AxiosInterceptor"
+import { post, get } from "@/utilities/AxiosInterceptor"
 
 // Define validation schema using Zod
 const formSchema = z.object({
@@ -38,9 +38,10 @@ interface ResponseType {
 export default function AddProductForm({ categories }: any) {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [images, setImages] = useState<string[]>([])
+  const [images, setImages] = useState<{url: string; key: string}[]>([]) // Modified to store both URL and key
   const [features, setFeatures] = useState<{ key: string; value: string }[]>([{ key: "", value: "" }])
   const [loading, setLoading] = useState(false) // Loading state
+  const [uploadingImages, setUploadingImages] = useState(false) // New state for image upload loading
 
   // Initialize the form using useForm with Zod resolver
   const form = useForm({
@@ -79,13 +80,9 @@ export default function AddProductForm({ categories }: any) {
 
       formData.append("features", JSON.stringify(validFeatures));
 
-      // Append images as files
-      if (fileInputRef.current?.files) {
-        for (let i = 0; i < fileInputRef.current.files.length; i++) {
-          formData.append("images", fileInputRef.current.files[i]);
-        }
-      }
-
+      // Append image URLs instead of files
+      formData.append("images", JSON.stringify(images.map(img => img.url)));
+      
       // Send the request
       const response = await post<ResponseType>(
         API_ENDPOINTS.INVENTORY.CREATE,
@@ -123,17 +120,95 @@ export default function AddProductForm({ categories }: any) {
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const newImages = Array.from(e.target.files).map((file) => URL.createObjectURL(file))
-      setImages([...images, ...newImages])
+        setUploadingImages(true);
+        
+        try {
+            const files = Array.from(e.target.files);
+            const newImages = [...images];
+            
+            for (const file of files) {
+                // Get presigned URL for upload with fileName and fileType as query params
+                const response = await get<ResponseType>(
+                    API_ENDPOINTS.FILE.GET_URL,
+                    { 
+                        withCredentials: true,
+                        params: {
+                            fileName: file.name,
+                            fileType: file.type
+                        }
+                    }
+                );
+                
+                if (!response.success || !response.data) {
+                    throw new Error("Failed to get upload URL");
+                }
+                
+                const { uploadURL, publicURL } = response.data;
+                
+                // Upload file to presigned URL
+                const uploadResponse = await fetch(uploadURL, {
+                    method: 'PUT',
+                    body: file,
+                    headers: {
+                        'Content-Type': file.type,
+                    },
+                });
+                
+                if (!uploadResponse.ok) {
+                    throw new Error(`Upload failed with status ${uploadResponse.status}`);
+                }
+                
+                // Add the public URL to our images state
+                newImages.push({ url: publicURL, key: file.name });
+            }
+            
+            setImages(newImages);
+            
+            // Clear the file input
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+            
+            toast({
+                title: "Upload successful",
+                description: `${files.length} image(s) uploaded successfully.`,
+            });
+        } catch (error: any) {
+            toast({
+                title: "Upload failed",
+                description: error.message || "Failed to upload images",
+                variant: "destructive",
+            });
+        } finally {
+            setUploadingImages(false);
+        }
     }
-  }
+};
 
-  const removeImage = (index: number) => {
-    const newImages = [...images]
-    newImages.splice(index, 1)
-    setImages(newImages)
+  const removeImage = async (index: number) => {
+    try {
+      const imageToRemove = images[index];
+      
+      // Delete the file from R2 bucket
+      
+      // Remove from state
+      const newImages = [...images];
+      newImages.splice(index, 1);
+      setImages(newImages);
+      
+      toast({
+        title: "Image removed",
+        description: "Image has been deleted successfully.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete image",
+        variant: "destructive",
+      });
+    }
   }
 
   const addFeatureField = () => {
@@ -296,7 +371,7 @@ export default function AddProductForm({ categories }: any) {
                 {images.map((image, index) => (
                   <div key={index} className="relative aspect-square rounded-md overflow-hidden border">
                     <Image
-                      src={image || "/placeHolder.jpg"}
+                      src={image.url || "/placeHolder.jpg"}
                       alt={`Product image ${index + 1}`}
                       fill
                       className="object-cover"
@@ -307,7 +382,7 @@ export default function AddProductForm({ categories }: any) {
                       size="icon"
                       className="absolute top-1 right-1 h-6 w-6"
                       onClick={() => removeImage(index)}
-                      disabled={loading}
+                      disabled={loading || uploadingImages}
                     >
                       <X className="h-3 w-3" />
                     </Button>
@@ -316,11 +391,20 @@ export default function AddProductForm({ categories }: any) {
 
                 {images.length < 5 && (
                   <div
-                    className="border border-dashed rounded-md flex flex-col items-center justify-center p-4 aspect-square cursor-pointer hover:bg-muted/50 transition-colors"
-                    onClick={() => fileInputRef.current?.click()}
+                    className={`border border-dashed rounded-md flex flex-col items-center justify-center p-4 aspect-square ${uploadingImages ? 'opacity-50' : 'cursor-pointer hover:bg-muted/50'} transition-colors`}
+                    onClick={() => !uploadingImages && fileInputRef.current?.click()}
                   >
-                    <ImageIcon className="h-8 w-8 text-muted-foreground mb-2" />
-                    <p className="text-sm text-muted-foreground text-center">Click to upload</p>
+                    {uploadingImages ? (
+                      <div className="flex flex-col items-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-2"></div>
+                        <p className="text-sm text-muted-foreground text-center">Uploading...</p>
+                      </div>
+                    ) : (
+                      <>
+                        <ImageIcon className="h-8 w-8 text-muted-foreground mb-2" />
+                        <p className="text-sm text-muted-foreground text-center">Click to upload</p>
+                      </>
+                    )}
                     <input
                       type="file"
                       ref={fileInputRef}
@@ -328,7 +412,7 @@ export default function AddProductForm({ categories }: any) {
                       accept="image/*"
                       multiple
                       className="hidden"
-                      disabled={loading}
+                      disabled={loading || uploadingImages}
                     />
                   </div>
                 )}
@@ -336,7 +420,7 @@ export default function AddProductForm({ categories }: any) {
             </div>
 
             <div className="flex justify-end">
-              <Button type="submit" disabled={loading}>
+              <Button type="submit" disabled={loading || uploadingImages}>
                 {loading ? "Creating..." : "Create Product"}
               </Button>
             </div>
