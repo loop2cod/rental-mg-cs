@@ -77,7 +77,7 @@ interface ResponseType {
   message?: string
 }
 
-const ProductOverview = ({ pid }: { pid: string }) => {
+const ProductOverview = ({ pid }: any) => {
   const [loading, setLoading] = useState(true)
   const [productData, setProductData] = useState<any>({})
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null)
