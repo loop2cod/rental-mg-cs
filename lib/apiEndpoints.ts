@@ -14,6 +14,7 @@ export const API_ENDPOINTS = {
     UPDATE: `/api/v1/inventory/update-product/:id`,
     DELETE: `/api/v1/inventory/delete-product`,
     GET_BY_ID: `/api/v1/inventory/get-product-details/:id`,
+    OVERVIEW:  `/api/v1/order/get-product-orders-history`,
   },
   CATEGORY:{
     GET_ALL: `/api/v1/category/all`,

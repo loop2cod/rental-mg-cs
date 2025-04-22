@@ -16,7 +16,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Tabs, TabsContent } from "@/components/ui/tabs"
-import { CheckCircle, Clock, IndianRupee, Package } from "lucide-react"
+import { CheckCircle, Clock, EyeOff, IndianRupee, Package } from "lucide-react"
 import Section2 from "@/components/Dashboard/Section2"
 import Section1 from "@/components/Dashboard/Section1"
 import { useEffect, useState } from "react"
@@ -25,6 +25,9 @@ import { withAuth } from "@/components/Middleware/withAuth"
 import { get } from "@/utilities/AxiosInterceptor"
 import { API_ENDPOINTS } from "@/lib/apiEndpoints"
 import { formatCurrency } from "@/lib/commonFunctions"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 
 
 type ResponseType = {
@@ -63,6 +66,9 @@ function Home() {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
   const [chartData, setChartData] = useState<ChartData | null>(null)
   const [recentBookings, setRecentBookings] = useState<RecentBooking[] | null>(null)
+  const [isRevenueBlurred, setIsRevenueBlurred] = useState(true)
+  const [showPinDialog, setShowPinDialog] = useState(false)
+  const [pinError, setPinError] = useState(false)
 
   const fetchDashboardData = async () => {
     try {
@@ -118,6 +124,19 @@ function Home() {
     fetchDashboardBookings()
   }, [])
 
+  const handlePinSubmit = (pin: string) => {
+    if (pin === "2288") {
+      setIsRevenueBlurred(false)
+      setShowPinDialog(false)
+      setPinError(false)
+    } else {
+      setPinError(true)
+    }
+  }
+
+  const handleBlurRevenue = () => {
+    setIsRevenueBlurred(true)
+  }
 
   return (
     <SidebarProvider>
@@ -141,15 +160,25 @@ function Home() {
           <div className="flex-col md:flex">
             <Tabs defaultValue="overview" className="space-y-4">
               <TabsContent value="overview" className="space-y-4">
-                {/* Grid layout for cards */}
                 <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
-                  {/* Total Revenue Card */}
                   <Card className="w-full">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                       <CardTitle className="text-xs md:text-sm font-medium">
                         Total Revenue
                       </CardTitle>
-                      <IndianRupee className="h-4 w-4 text-primary dark:text-secondary-foreground" />
+                      <div className="flex items-center gap-2">
+                        {!isRevenueBlurred && (
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-6 w-6"
+                            onClick={handleBlurRevenue}
+                          >
+                            <EyeOff className="h-4 w-4" />
+                          </Button>
+                        )}
+                        <IndianRupee className="h-4 w-4 text-primary dark:text-secondary-foreground" />
+                      </div>
                     </CardHeader>
                     <CardContent>
                       {loading1 ? (
@@ -158,19 +187,63 @@ function Home() {
                           <p className="h-3 w-24 md:w-32 bg-gray-200 animate-pulse rounded mt-1"></p>
                         </div>
                       ) : (
-                        <div>
-                          <div className="text-base md:text-2xl font-bold">
-                            {formatCurrency(dashboardData?.totalRevenue || 0)}
+                        <div className="relative">
+                          <div className={isRevenueBlurred ? "blur-sm" : ""}>
+                            <div className="text-base md:text-2xl font-bold">
+                              {formatCurrency(dashboardData?.totalRevenue || 0)}
+                            </div>
+                            <p className="text-[10px] md:text-xs text-muted-foreground">
+                              <span className="text-primary dark:text-secondary-foreground">
+                                +{dashboardData?.revenueChange || 0}%
+                              </span>{" "}
+                              from last month
+                            </p>
                           </div>
-                          <p className="text-[10px] md:text-xs text-muted-foreground">
-                            <span className="text-primary dark:text-secondary-foreground">
-                              +{dashboardData?.revenueChange || 0}%
-                            </span>{" "}
-                            from last month
-                          </p>
+                          {isRevenueBlurred && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <Dialog open={showPinDialog} onOpenChange={setShowPinDialog}>
+                                <DialogTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="text-xs">
+                                    View Revenue
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                  <DialogHeader>
+                                    <DialogTitle>Enter PIN to View Revenue</DialogTitle>
+                                  </DialogHeader>
+                                  <div className="grid gap-4 py-4">
+                                    <div className="grid gap-2">
+                                      <Input
+                                        type="password"
+                                        placeholder="Enter PIN"
+                                        max={4}
+                                        className={pinError ? "border-destructive" : ""}
+                                        onKeyDown={(e) => {
+                                          if (e.key === 'Enter') {
+                                            handlePinSubmit(e.currentTarget.value)
+                                          }
+                                        }}
+                                      />
+                                      {pinError && (
+                                        <p className="text-sm text-destructive">Incorrect PIN. Please try again.</p>
+                                      )}
+                                  <div>    <Button 
+                                        onClick={() => {
+                                          const input = document.querySelector('input[type="password"]') as HTMLInputElement;
+                                          handlePinSubmit(input?.value || "")
+                                        }}
+                                      >
+                                        Submit
+                                      </Button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </DialogContent>
+                              </Dialog>
+                            </div>
+                          )}
                         </div>
                       )}
-
                     </CardContent>
                   </Card>
                   <Card className="w-full">

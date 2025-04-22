@@ -130,7 +130,7 @@ export function InventoryTable({
             size="lg"
             onClick={(e) => {
               e.stopPropagation()
-              onEdit(item)
+              router.push(`/list-inventory/overview/${item._id}`)
             }}
           >
             <EyeIcon className="h-4 w-4" />

@@ -38,6 +38,7 @@ interface ApiResponseType {
 const emptyInitialData = {
   user_name: "",
   user_phone: "",
+  user_secondary_mobile: "",
   user_proof_type: "aadhar",
   user_proof_id: "",
   from_date: new Date().toISOString().split('T')[0],

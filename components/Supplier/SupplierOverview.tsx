@@ -125,7 +125,7 @@ const SupplierOverview = ({ data, loading }: { data?: any; loading: boolean }) =
         <Card>
           <CardHeader className="pb-2">
             <CardDescription className="text-sm font-medium">Total Purchases</CardDescription>
-            <CardTitle className="text-4xl">{total_purchase_amount ? formatCurrency(total_purchase_amount) : 'NIL'}</CardTitle>
+            <CardTitle className="text-4xl">{total_purchase_amount && formatCurrency(total_purchase_amount||0)}</CardTitle>
           </CardHeader>
         </Card>
         <Card>

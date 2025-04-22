@@ -115,7 +115,7 @@ const Page = () => {
         </header>
 
         <div className="p-4 space-y-6">
-          <CustomerInfoCard customer={preBooking.user_id} />
+          <CustomerInfoCard customer={preBooking.user} />
           <BookingDetailsCard booking={preBooking} />
           {preBooking.booking_items.length > 0 && (
             <BookingItemsDetailsTable items={preBooking.booking_items} />

@@ -14,7 +14,7 @@ export const CustomerInfoForm = ({ formData, handleInputChange, handleSelectChan
     <div>
       <h3 className="text-lg font-medium mb-4">Customer Information</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
+        <div className="md:col-span-2 space-y-2">
           <Label htmlFor="user_name">Customer Name</Label>
           <Input
             id="user_name"
@@ -32,6 +32,15 @@ export const CustomerInfoForm = ({ formData, handleInputChange, handleSelectChan
             value={formData.user_phone}
             onChange={handleInputChange}
             required
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="user_secondary_mobile">Secondary Mobile (Optional)</Label>
+          <Input
+            id="user_secondary_mobile"
+            name="user_secondary_mobile"
+            value={formData.user_secondary_mobile}
+            onChange={handleInputChange}
           />
         </div>
         <div className="space-y-2">
