@@ -60,37 +60,37 @@ export default function AddProductForm({ categories }: any) {
     setLoading(true);
 
     try {
-      const formData = new FormData();
-      formData.append("name", data.name);
-      formData.append("unit_cost", data.unit_cost);
-      formData.append("quantity", data.quantity);
-      formData.append("category_id", data.category);
-      formData.append("description", data.description);
-
       const validFeatures = features
         .filter((f) => f.key && f.value)
         .reduce((acc, f) => {
-          acc[f.key] = f.value; 
-          return acc;
-        }, {} as Record<string, string>); 
+          acc[f.key] = f.value;
+          return acc; 
+        }, {} as Record<string, string>);
 
-      formData.append("features", JSON.stringify(validFeatures));
-      formData.append("images", JSON.stringify(images.map(img => img.url)));
+      const jsonData = {
+        name: data.name,
+        unit_cost: data.unit_cost,
+        quantity: data.quantity,
+        category_id: data.category,
+        description: data.description,
+        features: validFeatures,
+        images: images.map(img => img.url)
+      };
       
       const response = await post<ResponseType>(
         API_ENDPOINTS.INVENTORY.CREATE,
-        formData,
+        jsonData,
         {
           withCredentials: true,
           headers: {
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "application/json",
           },
         }
       );
 
       if (response.success) {
         toast({
-          title: "Product created",
+          title: "Product created", 
           description: `${data.name} has been added to your inventory.`,
         });
         router.push("/list-inventory");

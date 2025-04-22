@@ -73,10 +73,7 @@ export function InventoryTable({
       searchable: true,
       cell: (item: any) => (
         <span
-        onClick={
-          () => router.push(`/list-inventory/details/${item?._id}`)
-        }
-         className="underline decoration-secondary-foreground decoration-2 underline-offset-4 cursor-pointer">
+         className="decoration-secondary-foreground decoration-2 underline-offset-4">
           {item?.name}
         </span>
       ),

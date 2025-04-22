@@ -120,17 +120,7 @@ export default function EditProductForm({ categories, productId }: { categories:
         setLoading(true); // Start loading
 
         try {
-            // Prepare form data for submission
-            const formData = new FormData();
-
-            // Append basic fields
-            formData.append("name", data.name);
-            formData.append("unit_cost", data.unit_cost);
-            formData.append("quantity", data.quantity);
-            formData.append("category_id", data.category);
-            formData.append("description", data.description);
-
-            // Append features as JSON
+            // Prepare JSON data
             const validFeatures = features
                 .filter((f) => f.key && f.value)
                 .reduce((acc, f) => {
@@ -138,17 +128,24 @@ export default function EditProductForm({ categories, productId }: { categories:
                     return acc;
                 }, {} as Record<string, string>);
 
-            formData.append("features", JSON.stringify(validFeatures));
-            formData.append("images", JSON.stringify(images.map(img => img.url)));
+            const jsonData = {
+                name: data.name,
+                unit_cost: data.unit_cost,
+                quantity: data.quantity, 
+                category_id: data.category,
+                description: data.description,
+                features: validFeatures,
+                images: images.map(img => img.url)
+            };
 
             // Send the request
             const response = await put<ResponseType>(
                 API_ENDPOINTS.INVENTORY.UPDATE.replace(":id", productId),
-                formData,
+                jsonData,
                 {
                     withCredentials: true,
                     headers: {
-                        "Content-Type": "multipart/form-data",
+                        "Content-Type": "application/json",
                     },
                 }
             );
@@ -161,7 +158,7 @@ export default function EditProductForm({ categories, productId }: { categories:
                 router.push("/list-inventory");
             } else {
                 toast({
-                    title: "Error",
+                    title: "Error", 
                     description: response.message || "Failed to update product",
                     variant: "destructive",
                 });
@@ -171,7 +168,7 @@ export default function EditProductForm({ categories, productId }: { categories:
                 title: "Error",
                 description:
                     error.response?.data?.message || error.message || "Failed to update product",
-                variant: "destructive",
+                variant: "destructive", 
             });
         } finally {
             setLoading(false); // End loading

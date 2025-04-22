@@ -52,7 +52,12 @@ export const API_ENDPOINTS = {
   DASHBOARD:{
     VALUES: `/api/v1/dashboard/data`,
     CHART: `/api/v1/dashboard/chart`,
-    RECENT_BOOKINGS: `/api/v1/dashboard/recent`
+    RECENT_BOOKINGS: `/api/v1/dashboard/recent`,
+  },
+  NOTIFICATIONS:{
+    GET_ALL: `/api/v1/dashboard/notifications`,
+    DELETE_ALL: `/api/v1/dashboard/notifications`,
+    DELETE_ONE: `/api/v1/dashboard/notification`
   },
   FILE:{
     GET_URL: `/api/v1/file/generate-presigned-url`,
