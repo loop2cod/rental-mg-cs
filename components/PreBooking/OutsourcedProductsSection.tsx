@@ -29,7 +29,7 @@ interface OutsourcedProduct {
 }
 
 interface OutsourcedItem {
-  product_id: string
+  out_product_id: string
   name: string
   price: number
   quantity: number
@@ -265,7 +265,7 @@ export const OutsourcedProductsSection = ({
   
     // Check if product already exists in the list
     const existingItemIndex = outsourcedItems.findIndex(
-      item => item.product_id === selectedProduct
+      item => item.out_product_id === selectedProduct
     )
   
     if (existingItemIndex >= 0) {
@@ -288,7 +288,7 @@ export const OutsourcedProductsSection = ({
     } else {
       // Add new item if product doesn't exist
       const newItem: OutsourcedItem = {
-        product_id: selectedProduct,
+        out_product_id: selectedProduct,
         name: product.product_name,
         price: product.unit_cost,
         quantity: quantity,
