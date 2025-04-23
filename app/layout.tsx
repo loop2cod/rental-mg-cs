@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Rental management",
-  description: "Rental management for software",
+  title: "Momenz",
+  description: "Momenz management for software",
 };
 
 export default async function RootLayout({

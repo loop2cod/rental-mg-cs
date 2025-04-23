@@ -47,7 +47,7 @@ const OrderOverview = ({ data, loading,fetchOrder }: any) => {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Order Overview</h1>
-          <p className="text-muted-foreground">Order ID: </p>
+          <p className="text-muted-foreground">Order ID: {data?.order_id}</p>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Status:</span>

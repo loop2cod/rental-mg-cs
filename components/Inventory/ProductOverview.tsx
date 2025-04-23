@@ -33,6 +33,7 @@ import { toast } from "../ui/use-toast"
 import { formatCurrency } from "@/lib/commonFunctions"
 import { Progress } from "../ui/progress"
 import React from 'react'
+import { printProductOverview } from "@/components/PdfPrint/printProductOverview"
 
 interface ResponseType {
   success: boolean
@@ -208,6 +209,11 @@ const ProductOverview = ({ pid }: any) => {
 
   return (
     <div className="space-y-6 px-2 md:px-2 lg:px-4">
+      <div className="flex justify-end mb-2">
+        <Button onClick={() => printProductOverview(productData)}>
+          Print PDF
+        </Button>
+      </div>
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
@@ -471,7 +477,7 @@ const ProductOverview = ({ pid }: any) => {
                                   <div className="space-y-4 text-sm">
                                     <div className="p-3 border rounded-md">
                                       <p className="font-medium mb-1">Delivery Address</p>
-                                      <p className="text-muted-foreground">{order.address}</p>
+                                      <p className="text-muted-foreground text-pretty">{order.address}</p>
                                     </div>
 
                                     <div className="p-3 border rounded-md">
