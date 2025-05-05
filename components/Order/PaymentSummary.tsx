@@ -21,7 +21,7 @@ export const PaymentSummary = ({
   ) || 0;
 
   const outsourcedItemsTotal = formData.outsourced_items?.reduce(
-    (sum: number, item: any) => sum + (Number(item.price || 0) * Number(item.quantity || 0) * Number(item.no_of_days || 1)), 
+    (sum: number, item: any) => sum + Number(item.total_price || 0), 
     0
   ) || 0;
 

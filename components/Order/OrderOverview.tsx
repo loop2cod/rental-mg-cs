@@ -58,7 +58,7 @@ const OrderOverview = ({ data, loading,fetchOrder }: any) => {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <OrderCustomerInfoCard customer={data?.user_id} />
+        <OrderCustomerInfoCard customer={data?.user} />
         <OrderDetailsCard booking={data} />
         <OrderPaymentSummaryCard booking={data} />
       </div>

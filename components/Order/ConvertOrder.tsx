@@ -49,6 +49,7 @@ const ConvertOrder = ({
   const emptyInitialData = {
     user_name: "",
     user_phone: "",
+    user_secondary_mobile: "",
     user_proof_type: "aadhar",
     user_proof_id: "",
     from_date: new Date().toISOString().split('T')[0],
@@ -95,17 +96,9 @@ const ConvertOrder = ({
           const booking = response.data
           const noOfDays = booking?.no_of_days || 1
   
-          const bookingItems = booking.booking_items.map((item: any) => ({
-            ...item,
-            no_of_days: noOfDays,
-            total_price: item.price * item.quantity * noOfDays
-          }))
+          let bookingItems = booking?.booking_items
   
-          const outsourcedItems = (booking.outsourced_items || []).map((item: any) => ({
-            ...item,
-            no_of_days: noOfDays,
-            total_price: item.price * item.quantity * noOfDays
-          }))
+          let outsourcedItems = booking?.outsourced_items
   
           const sub_total = [
             ...bookingItems,
@@ -113,10 +106,11 @@ const ConvertOrder = ({
           ].reduce((sum, item) => sum + Number(item.total_price), 0)
   
           const total_amount = sub_total - (Number(booking.discount) || 0)
-  
+
           setFormData({
             user_name: booking.user.name,
             user_phone: booking.user.mobile,
+            user_secondary_mobile: booking.user.secondary_mobile,
             user_proof_type: booking.user.proof_type,
             user_proof_id: booking.user.proof_id,
             from_date: booking.from_date.split('T')[0],
@@ -145,7 +139,7 @@ const ConvertOrder = ({
           setBookingDate(new Date(booking.booking_date))
         }
       } catch (error) {
-        // Error handling
+       console.log(error)
       } finally {
         setIsLoading(false)
       }
@@ -263,7 +257,7 @@ const ConvertOrder = ({
         quantity: 1,
         available_quantity: product.available_quantity,
         no_of_days: formData.no_of_days,
-        total_price: product.unit_cost * formData.no_of_days,
+        total_price: product.unit_cost * 1 * formData.no_of_days,
         from_date: formData.from_date,
         to_date: formData.to_date,
         from_time: formData.from_time,

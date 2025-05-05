@@ -4,7 +4,7 @@ import { useDrag } from "react-dnd"
 import { GripHorizontal, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-const DraggableProduct = ({ product, onAddToBooking }: any) => {
+const OrderDraggableProduct = ({ product, onAddToBooking }: any) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "product",
     item: { product },
@@ -34,12 +34,13 @@ const DraggableProduct = ({ product, onAddToBooking }: any) => {
           </div>
         </div>
         <div className="flex flex-col">
-          <p className="text-sm font-medium">{product?.name}</p>
+          <h3 className="text-sm font-medium">{product?.name}</h3>
           <p className="text-xs text-muted-foreground">{product?.category_name || "Table"}</p>
+          <p className="text-xs text-muted-foreground">Availablity: {product?.available_quantity}</p>
         </div>
       </div>
       <div className="flex flex-col items-end gap-1">
-        <p className="text-sm font-semibold">₹{product?.unit_cost} <span className="text-muted-foreground text-xs">/day</span></p>
+        <p className="text-sm font-semibold">₹{product?.unit_cost} <span className="text-muted-foreground text-xs">/ day</span></p>
         <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => onAddToBooking(product)}>
           <Plus className="h-3 w-3 mr-1" /> Add
         </Button>
@@ -48,4 +49,4 @@ const DraggableProduct = ({ product, onAddToBooking }: any) => {
   )
 }
 
-export default DraggableProduct
+export default OrderDraggableProduct

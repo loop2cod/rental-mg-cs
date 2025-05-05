@@ -9,6 +9,7 @@ import { Button } from '../ui/button';
 import { del, get } from '@/utilities/AxiosInterceptor';
 import { API_ENDPOINTS } from '@/lib/apiEndpoints';
 import { toast } from '../ui/use-toast';
+import { format } from 'date-fns';
 
 
 
@@ -169,7 +170,7 @@ const Section2 = ({
                                                 <div>
                                                     <p className="font-medium text-sm sm:text-base">{notification.message}</p>
                                                     <p className="text-xs text-muted-foreground mt-1">
-                                                        {new Date(notification.created_At).toLocaleString()}
+                                                        {format(new Date(notification.createdAt), 'PPpp')}
                                                     </p>
                                                 </div>
                                                 <Button

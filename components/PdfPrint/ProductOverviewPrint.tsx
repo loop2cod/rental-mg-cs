@@ -131,7 +131,7 @@ const ProductOverviewPrint: React.FC<ProductOverviewPrintProps> = ({ productData
         <div style={{ display: "flex", gap: "24px" }}>
           <div style={{ flex: "0 0 180px", textAlign: "center" }}>
             <img
-              src={product.image || "/placeholder.svg?height=180&width=180"}
+              src={product.images[0] || "/placeholder.svg?height=180&width=180"}
               alt={product.name}
               style={{
                 width: "180px",

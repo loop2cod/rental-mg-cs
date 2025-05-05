@@ -203,7 +203,22 @@ const CreatePreBooking = ({
       })
       return false
     }
-
+    if(!fromDate){
+      toast({
+        title: "Validation Error",
+        description: "Please select a from date",
+        variant: "destructive",
+      })
+      return false;
+    }
+    if(!toDate){
+      toast({
+        title: "Validation Error",
+        description: "Please select a to date",
+        variant: "destructive",
+      })
+      return false;
+    }
     // Validate phone number is exactly 10 digits
     const phoneRegex = /^\d{10}$/
     if (!phoneRegex.test(formData.user_phone)) {
@@ -369,6 +384,7 @@ const CreatePreBooking = ({
         });
       }
     } catch (error: any) {
+      console.log(error)
       toast({
         title: "Error",
         description: error.response?.data?.errors[0].msg || error.response?.data?.message || "Failed to create booking",

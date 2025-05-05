@@ -311,16 +311,36 @@ export const OutsourcedProductsSection = ({
   
   // Helper function to update form data
   const updateFormDataWithOutsourcedItems = (items: OutsourcedItem[]) => {
-    setFormData((prev: any) => ({
-      ...prev,
-      outsourced_items: items,
-      total_quantity: 
-        (prev.booking_items?.reduce((sum: number, item: any) => sum + Number(item.quantity), 0) || 0) +
-        items.reduce((sum, item) => sum + Number(item.quantity), 0),
-      total_amount: 
-        (prev.booking_items?.reduce((sum: number, item: any) => sum + Number(item.total_price), 0) || 0) +
-        items.reduce((sum, item) => sum + Number(item.total_price), 0)
-    }))
+    setFormData((prev: any) => {
+      // Calculate total quantity
+      const orderItemsQuantity = (prev.order_items || []).reduce(
+        (sum: number, item: any) => sum + Number(item.quantity || 0), 
+        0
+      )
+      const outsourcedItemsQuantity = items.reduce(
+        (sum, item) => sum + Number(item.quantity || 0), 
+        0
+      )
+      const totalQuantity = orderItemsQuantity + outsourcedItemsQuantity
+
+      // Calculate total amount
+      const orderItemsTotal = (prev.order_items || []).reduce(
+        (sum: number, item: any) => sum + Number(item.total_price || 0), 
+        0
+      )
+      const outsourcedItemsTotal = items.reduce(
+        (sum, item) => sum + Number(item.total_price || 0), 
+        0
+      )
+      const totalAmount = orderItemsTotal + outsourcedItemsTotal - Number(prev.discount || 0)
+
+      return {
+        ...prev,
+        outsourced_items: items,
+        total_quantity: totalQuantity,
+        total_amount: totalAmount
+      }
+    })
   }
 
   useEffect(() => {
@@ -366,12 +386,20 @@ export const OutsourcedProductsSection = ({
 
     const updatedItems = [...outsourcedItems]
     const item = updatedItems[index]
-    const quantityDiff = editingQuantity - item.quantity
+    
+    // Ensure all values are numbers
+    const price = Number(item.price) || 0
+    const noOfDays = Number(item.no_of_days) || Number(formData.no_of_days) || 1
+    const quantity = Number(editingQuantity)
+    
+    // Calculate total price
+    const totalPrice = price * quantity * noOfDays
     
     updatedItems[index] = {
       ...item,
-      quantity: editingQuantity,
-      total_price: item.price * editingQuantity * item.no_of_days
+      quantity: quantity,
+      no_of_days: noOfDays,
+      total_price: totalPrice
     }
     
     setOutsourcedItems(updatedItems)
@@ -380,7 +408,7 @@ export const OutsourcedProductsSection = ({
     
     toast({
       title: "Quantity updated",
-      description: `${item.name} quantity updated to ${editingQuantity}`,
+      description: `${item.name} quantity updated to ${quantity}`,
     })
   }
 

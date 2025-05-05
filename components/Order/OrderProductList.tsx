@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Input } from "../ui/input"
 import { Search } from "lucide-react"
 import { useState, useEffect } from "react"
-import DraggableProduct from "../PreBooking/DraggableProduct"
+import OrderDraggableProduct from "./OrderDraggableProduct"
 
 interface Product {
   _id: string
@@ -76,7 +76,7 @@ export const OrderProductList = ({ products, loading, onAddToBooking }: ProductL
                   </div>
                 ) : (
                   filteredProducts.map((product) => (
-                    <DraggableProduct 
+                    <OrderDraggableProduct
                       key={product._id} 
                       product={product} 
                       onAddToBooking={onAddToBooking} 

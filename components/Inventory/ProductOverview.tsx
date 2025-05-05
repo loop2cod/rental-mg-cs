@@ -274,7 +274,7 @@ const ProductOverview = ({ pid }: any) => {
                 <h3 className="text-2xl font-bold mt-1">{formatCurrency(totalRevenue||0)}</h3>
               </div>
               <div className="h-12 w-12  rounded-full flex items-center justify-center">
-                <DollarSign className="h-6 w-6" />
+                <IndianRupee className="h-6 w-6" />
               </div>
             </div>
             <div className="mt-4">
@@ -298,7 +298,7 @@ const ProductOverview = ({ pid }: any) => {
             <div className="md:w-1/3 flex justify-center">
               <div className="relative w-full max-w-[250px] aspect-square  rounded-md overflow-hidden flex items-center justify-center">
                 <Image
-                  src={product.image||'/placeholder.svg?height=250&width=250'}
+                  src={product.images[0]||'/placeholder.svg?height=250&width=250'}
                   alt={product.name}
                   width={250}
                   height={250}

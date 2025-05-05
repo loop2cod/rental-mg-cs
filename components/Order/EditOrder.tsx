@@ -49,6 +49,7 @@ const EditOrder = ({
   const emptyInitialData = {
     user_name: "",
     user_phone: "",
+    user_secondary_mobile: "",
     user_proof_type: "aadhar",
     user_proof_id: "",
     from_date: new Date().toISOString().split('T')[0],
@@ -117,6 +118,7 @@ const EditOrder = ({
           setFormData({
             user_name: booking.user_id.name,
             user_phone: booking.user_id.mobile,
+            user_secondary_mobile: booking.user_id.secondary_mobile,
             user_proof_type: booking.user_id.proof_type,
             user_proof_id: booking.user_id.proof_id,
             from_date: booking.from_date.split('T')[0],
