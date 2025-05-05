@@ -51,7 +51,17 @@ export const BookingDetailsForm = ({
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2">
         <div className="space-y-2">
           <Label>From Date</Label>
-          <DatePicker setDate={setFromDate} date={fromDate} />
+          <DatePicker 
+            setDate={(date) => {
+              setFromDate(date);
+              if (date) {
+                const nextDay = new Date(date);
+                nextDay.setDate(nextDay.getDate() + 1);
+                setToDate(nextDay);
+              }
+            }} 
+            date={fromDate} 
+          />
         </div>
         <div className="space-y-2">
           <Label>To Date</Label>

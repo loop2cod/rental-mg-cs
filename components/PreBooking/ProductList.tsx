@@ -3,9 +3,11 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "../ui/skeleton"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { Input } from "../ui/input"
-import { Search } from "lucide-react"
+import { Search, Plus } from "lucide-react"
 import { useState, useEffect } from "react"
 import DraggableProduct from "./DraggableProduct"
+import { Button } from "../ui/button"
+import { useRouter } from "next/navigation"
 
 interface Product {
   _id: string
@@ -24,6 +26,7 @@ interface ProductListProps {
 export const ProductList = ({ products, loading, onAddToBooking }: ProductListProps) => {
   const [searchTerm, setSearchTerm] = useState("")
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(products)
+  const router = useRouter()
 
   useEffect(() => {
     if (searchTerm.trim() === "") {
@@ -39,7 +42,18 @@ export const ProductList = ({ products, loading, onAddToBooking }: ProductListPr
   return (
     <Card className="py-4 border h-full">
       <CardHeader className="pb-2">
-        <CardTitle className="text-xl md:text-2xl font-semibold px-2">Products</CardTitle>
+        <div className="flex justify-between items-center px-2">
+          <CardTitle className="text-xl md:text-2xl font-semibold">Products</CardTitle>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => router.push('/add-product')}
+            className="flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Add Product
+          </Button>
+        </div>
         <CardDescription className="px-2">Drag products to add to booking</CardDescription>
         <div className="relative px-2">
           <Input
