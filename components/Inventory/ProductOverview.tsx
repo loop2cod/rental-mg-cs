@@ -34,6 +34,7 @@ import { formatCurrency } from "@/lib/commonFunctions"
 import { Progress } from "../ui/progress"
 import React from 'react'
 import { printProductOverview } from "@/components/PdfPrint/printProductOverview"
+import { format, parse } from "date-fns"
 
 interface ResponseType {
   success: boolean
@@ -74,6 +75,26 @@ interface ResponseType {
       }
       status: string
     }>
+    bookings: Array<{
+      _id: string
+      user_id: string
+      address: string
+      from_date: string
+      to_date: string
+      from_time: string
+      to_time: string
+      booking_date: string
+      booking_items: {
+        product_id: string
+        name: string
+        price: number
+        quantity: number
+        total_price: number
+        _id: string
+      }
+      status: string
+      booking_id: string
+    }>
   }
   message?: string
 }
@@ -82,7 +103,7 @@ const ProductOverview = ({ pid }: any) => {
   const [loading, setLoading] = useState(true)
   const [productData, setProductData] = useState<any>({})
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null)
-
+  const [expandedBookingId, setExpandedBookingId] = useState<string | null>(null)
 
   const getProductOverview = async () => {
     setLoading(true)
@@ -120,6 +141,14 @@ const ProductOverview = ({ pid }: any) => {
       setExpandedOrderId(null)
     } else {
       setExpandedOrderId(orderId)
+    }
+  }
+
+  const toggleBookingDetails = (bookingId: string) => {
+    if (expandedBookingId === bookingId) {
+      setExpandedBookingId(null)
+    } else {
+      setExpandedBookingId(bookingId)
     }
   }
 
@@ -183,8 +212,6 @@ const ProductOverview = ({ pid }: any) => {
     return <ProductOverviewSkeleton />
   }
 
-
-
   if (!productData) {
     return (
       <Card>
@@ -197,7 +224,7 @@ const ProductOverview = ({ pid }: any) => {
     )
   }
 
-  const { product, orders }:any = productData
+  const { product, orders, bookings } = productData
   const totalQuantity = product.available_quantity + product.reserved_quantity
   const availablePercentage = (product.available_quantity / totalQuantity) * 100
 
@@ -365,14 +392,168 @@ const ProductOverview = ({ pid }: any) => {
         </CardContent>
       </Card>
 
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-xl flex items-center gap-2">
+            <CalendarIcon className="h-5 w-5" />
+           Bookings
+          </CardTitle>
+          <CardDescription>
+            Showing {bookings.length} bookings for this product
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {bookings.length === 0 ? (
+            <div className="text-center py-6 text-muted-foreground">
+              <p>No bookings found for this product</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[50px]"></TableHead>
+                    <TableHead>Booking ID</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Quantity</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Booking Period</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {bookings.map((booking: any) => (
+                    <React.Fragment key={booking._id}>
+                      <TableRow
+                        className={`cursor-pointer ${expandedBookingId === booking._id ? " border-b-0" : ""}`}
+                        onClick={() => toggleBookingDetails(booking._id)}
+                      >
+                        <TableCell className="p-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 p-0"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              toggleBookingDetails(booking._id)
+                            }}
+                          >
+                            {expandedBookingId === booking._id ? (
+                              <ChevronUp className="h-4 w-4" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger className="cursor-help underline decoration-dotted underline-offset-2">
+                                {booking.booking_id}
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>ID: {booking.booking_id}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </TableCell>
+                        <TableCell>
+                          {new Date(booking.booking_date).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                        </TableCell>
+                        <TableCell className="font-medium">{booking.booking_items.quantity}</TableCell>
+                        <TableCell className="font-medium">{formatCurrency(booking.total_amount)}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-col text-sm">
+                            <div className="flex items-center gap-1">
+                              <CalendarIcon className="h-3 w-3 text-muted-foreground" />
+                              <span>{formatDateRange(booking.from_date, booking.to_date)}</span>
+                            </div>
+                            <div className="flex items-center gap-1 mt-1 text-muted-foreground">
+                              <Clock className="h-3 w-3" />
+                              <span>
+                                {format(parse(booking.from_time, 'HH:mm', new Date()), 'h:mm a')} - {format(parse(booking.to_time, 'HH:mm', new Date()), 'h:mm a')}
+                              </span>
+                            </div>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+
+                      {/* Expanded Booking Details */}
+                      {expandedBookingId === booking._id && (
+                        <TableRow>
+                          <TableCell colSpan={7} className="p-0">
+                            <div className="border-t border-dashed mx-4 pt-4 pb-2">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+                                <div className=" p-4 rounded-md border">
+                                  <h3 className="font-medium mb-3 flex items-center gap-2">
+                                    <Truck className="h-4 w-4" />
+                                    Booking Information
+                                  </h3>
+                                  <div className="space-y-4 text-sm">
+                                    <div className="p-3 border rounded-md">
+                                      <p className="font-medium mb-1">Delivery Address</p>
+                                      <p className="text-muted-foreground text-pretty">{booking.address}</p>
+                                    </div>
+
+                                    <div className="p-3 border rounded-md">
+                                      <div className="flex items-center gap-2 mb-2">
+                                        <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                                        <span className="font-medium">Booking Period</span>
+                                      </div>
+                                      <div className="flex items-center justify-between text-sm">
+                                        <div className="flex flex-col">
+                                          <span className="text-xs text-muted-foreground">From</span>
+                                          <span>
+                                            {new Date(booking.from_date).toLocaleDateString("en-US", {
+                                              weekday: "short",
+                                              month: "short",
+                                              day: "numeric",
+                                              year: "numeric",
+                                            })}
+                                          </span>
+                                        </div>
+                                        <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                                        <div className="flex flex-col">
+                                          <span className="text-xs text-muted-foreground">To</span>
+                                          <span>
+                                            {new Date(booking.to_date).toLocaleDateString("en-US", {
+                                              weekday: "short",
+                                              month: "short",
+                                              day: "numeric",
+                                              year: "numeric",
+                                            })}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
       {/* Orders Information */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-xl flex items-center gap-2">
             <ShoppingCart className="h-5 w-5" />
-            Recent Orders
+             Orders
           </CardTitle>
-          <CardDescription>Showing all {orders.length} orders for this product</CardDescription>
+          <CardDescription>
+            Showing {orders.length} orders for this product
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {orders.length === 0 ? (
@@ -385,7 +566,7 @@ const ProductOverview = ({ pid }: any) => {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[50px]"></TableHead>
-                    <TableHead>Order ID</TableHead>
+                    <TableHead>ID</TableHead>
                     <TableHead>Date</TableHead>
                     <TableHead>Quantity</TableHead>
                     <TableHead>Amount</TableHead>
@@ -394,10 +575,10 @@ const ProductOverview = ({ pid }: any) => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {orders.map((order:any) => (
+                  {orders.map((order: any) => (
                     <React.Fragment key={order._id}>
                       <TableRow
-                        className={` cursor-pointer ${expandedOrderId === order._id ? " border-b-0" : ""}`}
+                        className={`cursor-pointer ${expandedOrderId === order._id ? " border-b-0" : ""}`}
                         onClick={() => toggleOrderDetails(order._id)}
                       >
                         <TableCell className="p-2">
@@ -421,10 +602,10 @@ const ProductOverview = ({ pid }: any) => {
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger className="cursor-help underline decoration-dotted underline-offset-2">
-                                {order._id.substring(order._id.length - 8)}
+                                {order.order_id}
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p>Full ID: {order._id}</p>
+                                <p>ID: {order.order_id}</p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -456,7 +637,7 @@ const ProductOverview = ({ pid }: any) => {
                             <div className="flex items-center gap-1 mt-1 text-muted-foreground">
                               <Clock className="h-3 w-3" />
                               <span>
-                                {order.from_time} - {order.to_time}
+                                {format(parse(order.from_time, 'HH:mm', new Date()), 'h:mm a')} - {format(parse(order.to_time, 'HH:mm', new Date()), 'h:mm a')}
                               </span>
                             </div>
                           </div>
@@ -509,77 +690,6 @@ const ProductOverview = ({ pid }: any) => {
                                             })}
                                           </span>
                                         </div>
-                                      </div>
-                                    </div>
-
-                                    <div className="p-3 border rounded-md">
-                                      <div className="flex items-center gap-2 mb-2">
-                                        <Clock className="h-4 w-4 text-muted-foreground" />
-                                        <span className="font-medium">Time Window</span>
-                                      </div>
-                                      <div className="flex items-center justify-between text-sm">
-                                        <div className="flex flex-col">
-                                          <span className="text-xs text-muted-foreground">From</span>
-                                          <span>{order.from_time}</span>
-                                        </div>
-                                        <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                                        <div className="flex flex-col">
-                                          <span className="text-xs text-muted-foreground">To</span>
-                                          <span>{order.to_time}</span>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <div className="p-4 rounded-md border">
-                                  <h3 className="font-medium mb-3 flex items-center gap-2">
-                                    <IndianRupee className="h-4 w-4" />
-                                    Payment Summary
-                                  </h3>
-                                  <div className="space-y-3">
-                                    <div className="p-3 border rounded-md">
-                                      <div className="flex justify-between text-sm mb-2">
-                                        <span className="text-muted-foreground">Product</span>
-                                        <span className="font-medium">{order.order_items.name}</span>
-                                      </div>
-                                      <div className="flex justify-between text-sm mb-2">
-                                        <span className="text-muted-foreground">Unit Price</span>
-                                        <span>{formatCurrency(order.order_items.price)}</span>
-                                      </div>
-                                      <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Quantity</span>
-                                        <span>{order.order_items.quantity} units</span>
-                                      </div>
-                                    </div>
-
-                                    <div className="p-3 border rounded-md">
-                                      <div className="flex justify-between text-sm mb-2">
-                                        <span className="text-muted-foreground">Subtotal</span>
-                                        <span>{formatCurrency(order.sub_total)}</span>
-                                      </div>
-                                      <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Discount</span>
-                                        <span>-{formatCurrency(order.discount||0)}</span>
-                                      </div>
-                                      <Separator className="my-2" />
-                                      <div className="flex justify-between font-medium">
-                                        <span>Total</span>
-                                        <span className="text-lg">{formatCurrency(order.total_amount)}</span>
-                                      </div>
-                                    </div>
-
-                                    <div className="p-3 borderrounded-md ">
-                                      <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Order Date</span>
-                                        <span className="font-medium">
-                                          {new Date(order.order_date).toLocaleDateString("en-US", {
-                                            weekday: "long",
-                                            month: "long",
-                                            day: "numeric",
-                                            year: "numeric",
-                                          })}
-                                        </span>
                                       </div>
                                     </div>
                                   </div>

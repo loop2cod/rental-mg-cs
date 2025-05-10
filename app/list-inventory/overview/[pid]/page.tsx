@@ -44,11 +44,11 @@ const Page = () => {
                 <BreadcrumbItem className="hidden md:block">
                   <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   <BreadcrumbLink href="/list-inventory">View Inventory</BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   <BreadcrumbPage>Product Overview</BreadcrumbPage>
                 </BreadcrumbItem>

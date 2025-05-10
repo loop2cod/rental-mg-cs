@@ -54,7 +54,7 @@ const badgeStyle = {
 
 const ProductOverviewPrint: React.FC<ProductOverviewPrintProps> = ({ productData }) => {
   if (!productData) return null
-  const { product, orders = [] } = productData
+  const { product, orders = [], bookings = [] } = productData
   const totalQuantity = product.available_quantity + product.reserved_quantity
   const availablePercentage = (product.available_quantity / totalQuantity) * 100
   const totalOrderedQuantity = orders.reduce((total: number, order: any) => total + order.order_items.quantity, 0)
@@ -189,7 +189,94 @@ const ProductOverviewPrint: React.FC<ProductOverviewPrintProps> = ({ productData
           </div>
         </div>
       </div>
+     {/* Bookings Information */}
+     <div style={cardStyle}>
+        <div style={sectionTitleStyle}>Recent Bookings</div>
+        <div style={{ color: "#6b7280", marginBottom: "8px" }}>
+          Showing all {bookings.length} bookings for this product
+        </div>
+        {bookings.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "24px", color: "#888" }}>
+            No bookings found for this product
+          </div>
+        ) : (
+          <table style={tableStyle} className="bookings-table">
+            <thead>
+              <tr>
+                <th style={thStyle}>Booking ID</th>
+                <th style={thStyle}>Booking Date</th>
+                <th style={thStyle}>Quantity</th>
+                <th style={thStyle}>Amount</th>
+                <th style={thStyle}>Booking Period</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bookings.map((booking: any) => (
+                <React.Fragment key={booking._id}>
+                  <tr>
+                    <td style={tdStyle}>{booking.booking_id}</td>
+                    <td style={tdStyle}>
+                      {new Date(booking.booking_date).toLocaleDateString()}
+                    </td>
+                    <td style={tdStyle}>{booking.booking_items.quantity}</td>
+                    <td style={tdStyle}>{formatCurrency(booking.total_amount)}</td>
+                    <td style={tdStyle}>
+                      {formatDateRange(booking.from_date, booking.to_date)}
+                    </td>
+                  </tr>
+                  {/* Expanded Booking Details */}
+                  <tr>
+                    <td style={{ ...tdStyle, background: "#f9fafb", padding: "16px" }} colSpan={5}>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+                        <div style={{ border: "1px solid #e5e7eb", borderRadius: "6px", padding: "16px" }}>
+                          <div style={{ fontWeight: 600, marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
+                            Booking Information
+                          </div>
+                          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                            <div style={{ border: "1px solid #e5e7eb", borderRadius: "6px", padding: "12px" }}>
+                              <div style={{ fontWeight: 500, marginBottom: "4px" }}>Delivery Address</div>
+                              <div style={{ color: "#6b7280" }}>{booking.address}</div>
+                            </div>
 
+                            <div style={{ border: "1px solid #e5e7eb", borderRadius: "6px", padding: "12px" }}>
+                              <div style={{ fontWeight: 500, marginBottom: "8px" }}>Booking Period</div>
+                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                <div>
+                                  <div style={{ fontSize: "10px", color: "#6b7280" }}>From</div>
+                                  <div>
+                                    {new Date(booking.from_date).toLocaleDateString("en-US", {
+                                      weekday: "short",
+                                      month: "short",
+                                      day: "numeric",
+                                      year: "numeric"
+                                    })}
+                                  </div>
+                                </div>
+                                <div style={{ color: "#6b7280" }}>→</div>
+                                <div>
+                                  <div style={{ fontSize: "10px", color: "#6b7280" }}>To</div>
+                                  <div>
+                                    {new Date(booking.to_date).toLocaleDateString("en-US", {
+                                      weekday: "short",
+                                      month: "short",
+                                      day: "numeric",
+                                      year: "numeric"
+                                    })}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
       {/* Orders Information */}
       <div style={cardStyle}>
         <div style={sectionTitleStyle}>Recent Orders</div>

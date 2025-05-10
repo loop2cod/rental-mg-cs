@@ -11,7 +11,9 @@ export function printProductOverview(productData: any) {
 
   // Render the component to a string
   const htmlString = ReactDOMServer.renderToString(
-    React.createElement(ProductOverviewPrint, { productData })
+    React.createElement(ProductOverviewPrint, { 
+      productData: productData
+    })
   )
   container.innerHTML = htmlString
 
@@ -45,6 +47,21 @@ export function printProductOverview(productData: any) {
           @page { size: A4 landscape; margin: 1cm; }
           body { font-family: Arial, sans-serif; }
           ${styles}
+          /* Additional styles for separated sections */
+          .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+          }
+          .section-description {
+            color: #6b7280;
+            margin-bottom: 1rem;
+          }
+          /* Hide status column for bookings */
+          .bookings-table th:nth-child(6),
+          .bookings-table td:nth-child(6) {
+            display: none;
+          }
         </style>
       </head>
       <body>
