@@ -22,7 +22,7 @@ interface AuthResponse {
 }
 
 const Page = () => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL
+  const apiUrl ="https://server.momenz.in"
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
