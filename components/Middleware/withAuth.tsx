@@ -9,7 +9,7 @@ import Cookies from 'js-cookie';
 import axios from 'axios';
 import data from '../app-sidebar';
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://server.momenz.in';
+const apiUrl = 'https://server.momenz.in'
 
 // Define the expected response type
 interface AuthResponse {
