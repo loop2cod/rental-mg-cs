@@ -37,7 +37,7 @@ import AddSupplier from "./AddSupplier"
 const data = {
   user: {
     name: "Admin",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: "https://github.com/shadcn.png",
   },
   navMain: [
     {
