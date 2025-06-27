@@ -3,13 +3,12 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useLayoutEffect, useState, useCallback, useMemo } from 'react';
 import Spinner from '../Spinner';
-import { post } from '../../utilities/AxiosInterceptor';
 import { API_ENDPOINTS } from '../../lib/apiEndpoints';
 import Cookies from 'js-cookie';
 import axios from 'axios';
-import data from '../app-sidebar';
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://server.momenz.in'
+// const apiUrl ='https://server.momenz.in'
+const apiUrl ='http://localhost:5000'
 
 // Define the expected response type
 interface AuthResponse {

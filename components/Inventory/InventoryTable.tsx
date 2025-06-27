@@ -118,6 +118,13 @@ export function InventoryTable({
       searchable: false,
     },
     {
+      id: "available",
+      header: "Available",
+      accessorKey: "available_quantity",
+      sortable: true,
+      searchable: false,
+    },
+    {
       id: "actions",
       header: "Actions",
       cell: (item) => (

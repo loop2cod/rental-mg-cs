@@ -22,19 +22,6 @@ const OrderTable = ({
     const router = useRouter();
 
     const columns: ColumnDef<any>[] = useMemo(() => [
-        {
-            id: "user",
-            header: "Customer",
-            accessorKey: "user_id.name",
-            sortable: true,
-            searchable: true,
-            cell: (item) => (
-                <div>
-                    <div className="font-medium">{item.user_id.name}</div>
-                    <div className="text-sm text-gray-500">{item.user_id.mobile}</div>
-                </div>
-            ),
-        },
        {
              id: "from_date",
              header: "From Date",
@@ -67,6 +54,19 @@ const OrderTable = ({
              sortable: true,
              searchable: false,
            },
+              {
+            id: "user",
+            header: "Customer",
+            accessorKey: "user.name",
+            sortable: true,
+            searchable: true,
+            cell: (item) => (
+                <div>
+                    <div className="font-medium">{item.user.name}</div>
+                    <div className="text-sm text-gray-500">{item.user.mobile}</div>
+                </div>
+            ),
+        },
         {
             id: "items",
             header: "Items",

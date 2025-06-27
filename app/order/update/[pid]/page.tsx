@@ -72,7 +72,7 @@ const Page = () => {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/">
+                  <BreadcrumbLink href="/momenz-dashboard">
                     Dashboard
                   </BreadcrumbLink>
                 </BreadcrumbItem>
