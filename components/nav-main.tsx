@@ -1,7 +1,7 @@
 "use client"
 
 import { ChevronRight, type LucideIcon } from "lucide-react"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   Collapsible,
   CollapsibleContent,
@@ -35,7 +35,7 @@ export function NavMain({
   }[]
 }) {
   const pathname = usePathname() // Get the current pathname
-
+  const router = useRouter()
   return (
     <SidebarGroup>
     <SidebarMenu>
@@ -92,9 +92,11 @@ export function NavMain({
                               : "text-muted-foreground hover:bg-accent"
                           )}
                         >
-                          <a href={subItem.url}>
+                          <div onClick={() => {
+                            router.push(subItem.url)
+                          }}>
                             <span>{subItem.title}</span>
-                          </a>
+                          </div>
                         </SidebarMenuSubButton>
                         )
                         }

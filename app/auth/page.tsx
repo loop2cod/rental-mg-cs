@@ -90,7 +90,7 @@ const Page = () => {
 
       if (response.success) {
         console.log('done')
-        const redirectTo = redirect ? decodeURIComponent(redirect) : '/';
+        const redirectTo = redirect ? decodeURIComponent(redirect) : '/momenz-dashboard';
         router.push(redirectTo);
       } else {
         toast({

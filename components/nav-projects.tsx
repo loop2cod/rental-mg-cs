@@ -8,7 +8,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"; // Import sidebar components
-import { usePathname } from "next/navigation"; // Import usePathname hook
+import { usePathname, useRouter } from "next/navigation"; // Import usePathname hook
 import { cn } from "@/lib/utils";
 
 export function NavProjects({
@@ -22,6 +22,7 @@ export function NavProjects({
 }) {
   const { isMobile } = useSidebar();
   const pathname = usePathname();
+  const router = useRouter()
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -40,10 +41,14 @@ export function NavProjects({
                     : "text-foreground hover:bg-accent" // Inactive state styles
                 )}
               >
-                <a href={item.url} className="flex items-center w-full">
+                <div 
+                  onClick={() => {
+                    router.push(item.url)
+                  }}
+                 className="flex items-center w-full">
                   <item.icon className="mr-2 size-4" /> {/* Use shadcn/ui icon sizing */}
                   <span>{item.name}</span>
-                </a>
+                </div>
               </SidebarMenuButton>
             </SidebarMenuItem>
           );

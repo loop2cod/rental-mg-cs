@@ -588,3 +588,75 @@ input[type=number]::-webkit-outer-spin-button {
     @apply bg-background text-foreground;
   }
 }
+
+/* Filter Primary - Default/Zinc Theme */
+.filter-primary {
+  filter: brightness(0) saturate(100%) invert(27%) sepia(8%) saturate(735%) hue-rotate(202deg) brightness(93%) contrast(88%);
+}
+
+.dark .filter-primary {
+  filter: brightness(0) saturate(100%) invert(89%) sepia(3%) saturate(336%) hue-rotate(202deg) brightness(92%) contrast(88%);
+}
+
+/* Red Theme */
+[data-color-theme="red"] .filter-primary {
+  filter: brightness(0) saturate(100%) invert(17%) sepia(95%) saturate(7495%) hue-rotate(4deg) brightness(91%) contrast(86%);
+}
+
+.dark[data-color-theme="red"] .filter-primary {
+  filter: brightness(0) saturate(100%) invert(17%) sepia(95%) saturate(7495%) hue-rotate(4deg) brightness(91%) contrast(86%);
+}
+
+/* Rose Theme */
+[data-color-theme="rose"] .filter-primary {
+  filter: brightness(0) saturate(100%) invert(13%) sepia(95%) saturate(4823%) hue-rotate(340deg) brightness(93%) contrast(90%);
+}
+
+.dark[data-color-theme="rose"] .filter-primary {
+  filter: brightness(0) saturate(100%) invert(13%) sepia(95%) saturate(4823%) hue-rotate(340deg) brightness(93%) contrast(90%);
+}
+
+/* Orange Theme */
+[data-color-theme="orange"] .filter-primary {
+  filter: brightness(0) saturate(100%) invert(48%) sepia(99%) saturate(1448%) hue-rotate(353deg) brightness(101%) contrast(101%);
+}
+
+.dark[data-color-theme="orange"] .filter-primary {
+  filter: brightness(0) saturate(100%) invert(39%) sepia(94%) saturate(1945%) hue-rotate(4deg) brightness(105%) contrast(94%);
+}
+
+/* Green Theme */
+[data-color-theme="green"] .filter-primary {
+  filter: brightness(0) saturate(100%) invert(40%) sepia(98%) saturate(371%) hue-rotate(61deg) brightness(118%) contrast(87%);
+}
+
+.dark[data-color-theme="green"] .filter-primary {
+  filter: brightness(0) saturate(100%) invert(65%) sepia(25%) saturate(2840%) hue-rotate(79deg) brightness(110%) contrast(77%);
+}
+
+/* Blue Theme */
+[data-color-theme="blue"] .filter-primary {
+  filter: brightness(0) saturate(100%) invert(42%) sepia(93%) saturate(1352%) hue-rotate(204deg) brightness(119%) contrast(101%);
+}
+
+.dark[data-color-theme="blue"] .filter-primary {
+  filter: brightness(0) saturate(100%) invert(42%) sepia(93%) saturate(1352%) hue-rotate(204deg) brightness(119%) contrast(101%);
+}
+
+/* Yellow Theme */
+[data-color-theme="yellow"] .filter-primary {
+  filter: brightness(0) saturate(100%) invert(74%) sepia(89%) saturate(2018%) hue-rotate(5deg) brightness(93%) contrast(89%);
+}
+
+.dark[data-color-theme="yellow"] .filter-primary {
+  filter: brightness(0) saturate(100%) invert(74%) sepia(89%) saturate(2018%) hue-rotate(5deg) brightness(93%) contrast(89%);
+}
+
+/* Violet Theme */
+[data-color-theme="violet"] .filter-primary {
+  filter: brightness(0) saturate(100%) invert(27%) sepia(98%) saturate(4174%) hue-rotate(257deg) brightness(96%) contrast(97%);
+}
+
+.dark[data-color-theme="violet"] .filter-primary {
+  filter: brightness(0) saturate(100%) invert(27%) sepia(98%) saturate(4174%) hue-rotate(257deg) brightness(96%) contrast(97%);
+}
