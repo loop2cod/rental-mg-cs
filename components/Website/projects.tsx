@@ -70,7 +70,7 @@ export default function Categories() {
       <div className="mb-12">
         <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4 text-start">
           Our Rental
-          <span className="text-green-600 dark:text-green-400"> Categories</span>
+          <span className="text-[#627421] dark:text-[#8ba62f]"> Categories</span>
         </h2>
         <p className="text-sm md:tex-base text-gray-700 dark:text-gray-300 max-w-3xl">
           Discover our extensive collection of rental items, carefully curated to make your events special. 
@@ -92,12 +92,12 @@ export default function Categories() {
                 className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-              <div className="absolute top-4 right-4 bg-green-600 text-white p-2 rounded-full">
+              <div className="absolute top-4 right-4 bg-[#627421] text-white p-2 rounded-full">
                 <category.icon className="w-5 h-5" />
               </div>
             </div>
             <div className="p-3 md:p-6">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-green-600 transition-colors">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-[#627421] transition-colors">
                 {category.title}
               </h3>
               <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
@@ -107,7 +107,7 @@ export default function Categories() {
                 {category.items.slice(0, 3).map((item, index) => (
                   <span
                     key={index}
-                    className="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs rounded-full"
+                    className="px-3 py-1 bg-[#627421]/10 dark:bg-[#627421]/20 text-[#627421] dark:text-[#8ba62f] text-xs rounded-full"
                   >
                     {item}
                   </span>
@@ -142,7 +142,7 @@ export default function Categories() {
             </div>
             <div className="p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="bg-green-600 text-white p-3 rounded-full">
+                <div className="bg-[#627421] text-white p-3 rounded-full">
                   <selectedCategory.icon className="w-6 h-6" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -158,13 +158,13 @@ export default function Categories() {
               <div className="grid grid-cols-2 gap-2 mb-6">
                 {selectedCategory.items.map((item: string, index: number) => (
                   <div key={index} className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                    <div className="w-2 h-2 bg-[#627421] rounded-full"></div>
                     <span className="text-gray-700 dark:text-gray-300">{item}</span>
                   </div>
                 ))}
               </div>
               <div className="flex gap-4">
-                <button className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition-colors">
+                <button className="flex-1 bg-[#627421] hover:bg-[#4d5c1a] text-white py-3 rounded-lg font-semibold transition-colors">
                   Get Quote
                 </button>
                 <button 

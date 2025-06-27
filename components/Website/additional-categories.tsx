@@ -35,7 +35,7 @@ export default function AdditionalCategories() {
       <div className="mb-12">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
           Explore More
-          <span className="text-green-600 dark:text-green-400"> Specialty Items</span>
+          <span className="text-[#627421] dark:text-[#8ba62f]"> Specialty Items</span>
         </h2>
         <p className="text-lg text-gray-700 dark:text-gray-300 max-w-2xl">
           Discover our specialized collection of unique items to add that perfect finishing touch to your events.
@@ -56,7 +56,7 @@ export default function AdditionalCategories() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
               <div className="absolute bottom-4 left-4">
-                <div className="bg-green-600 text-white p-2 rounded-full mb-2 w-fit">
+                <div className="bg-[#627421] text-white p-2 rounded-full mb-2 w-fit">
                   <category.icon className="w-5 h-5" />
                 </div>
                 <h3 className="text-white font-bold text-lg">{category.title}</h3>
@@ -69,12 +69,12 @@ export default function AdditionalCategories() {
               <div className="space-y-2">
                 {category.items.map((item, index) => (
                   <div key={index} className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-green-600 rounded-full"></div>
+                    <div className="w-1.5 h-1.5 bg-[#627421] rounded-full"></div>
                     <span className="text-sm text-gray-700 dark:text-gray-300">{item}</span>
                   </div>
                 ))}
               </div>
-              <button className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition-colors">
+              <button className="mt-4 w-full bg-[#627421] hover:bg-[#4d5c1a] text-white py-2 rounded-lg transition-colors">
                 View Items
               </button>
             </div>
@@ -83,18 +83,18 @@ export default function AdditionalCategories() {
       </div>
 
       {/* Special feature section */}
-      <div className="mt-10 bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-4 md:p-8 text-white text-center">
+      <div className="mt-10 bg-gradient-to-r from-[#627421] to-[#4d5c1a] rounded-2xl p-4 md:p-8 text-white text-center">
         <h3 className="text-xl md:text-2xl font-bold mb-4 text-center">
           Custom Event Packages Available
         </h3>
-        <p className="text-green-100 mb-6 text-xs md:text-sm max-w-4xl mx-auto">
+        <p className="text-white/80 mb-6 text-xs md:text-sm max-w-4xl mx-auto">
           Looking for a complete event setup? We offer custom packages that combine multiple categories 
           to create the perfect atmosphere for your special occasion.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a 
             href="#contact" 
-            className="bg-white text-green-600 hover:bg-green-50 px-3 py-2 rounded-lg font-semibold transition-colors"
+            className="bg-white text-[#627421] hover:bg-gray-50 px-3 py-2 rounded-lg font-semibold transition-colors"
           >
             Request Custom Package
           </a>

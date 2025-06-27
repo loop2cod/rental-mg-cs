@@ -34,6 +34,7 @@ interface UpdatePaymentDialogProps {
     user_id: string
   }
   onSuccess: () => void
+  stage: string
 }
 
 export function UpdatePaymentDialog({
@@ -41,6 +42,7 @@ export function UpdatePaymentDialog({
   onOpenChange,
   booking,
   onSuccess,
+  stage,
 }: UpdatePaymentDialogProps) {
   const [amount, setAmount] = useState("")
   const [paymentMethod, setPaymentMethod] = useState("cash")
@@ -67,7 +69,7 @@ export function UpdatePaymentDialog({
           total_amount: booking.total_amount,
           payment_method: paymentMethod,
           user_id: booking.user_id,
-          stage: "booking"
+          stage: stage,
         },
         { withCredentials: true }
       )

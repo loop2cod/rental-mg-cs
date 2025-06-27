@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { Plus, Trash2, Edit2, Check, X } from "lucide-react"
+import { Plus, Trash2, Edit2, Check, X, ChevronDown } from "lucide-react"
 import { useToast } from "../ui/use-toast"
 import { get, post } from "@/utilities/AxiosInterceptor"
 import { API_ENDPOINTS } from "@/lib/apiEndpoints"
@@ -81,6 +81,7 @@ export const OutsourcedProductsSection = ({
   })
   const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null)
   const [editingQuantity, setEditingQuantity] = useState(1)
+  const [isExpanded, setIsExpanded] = useState(false)
 
   useEffect(() => {
     fetchSuppliers()
@@ -356,6 +357,13 @@ export const OutsourcedProductsSection = ({
     }
   }, [formData?.no_of_days])
 
+  // Auto-expand when items are added
+  useEffect(() => {
+    if (outsourcedItems.length > 0 && !isExpanded) {
+      setIsExpanded(true)
+    }
+  }, [outsourcedItems.length])
+
   const removeOutsourcedItem = (index: number) => {
     const removedItem = outsourcedItems[index]
     const updatedItems = outsourcedItems.filter((_, i) => i !== index)
@@ -419,10 +427,19 @@ export const OutsourcedProductsSection = ({
   return (
     <div className="mt-6 space-y-6">
       <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Outsourced Products</CardTitle>
+        <CardHeader 
+          className="cursor-pointer hover:bg-gray-50 transition-colors"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <CardTitle className="text-lg flex items-center justify-between">
+            <span>Outsourced Products</span>
+            <ChevronDown 
+              className={`h-5 w-5 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+            />
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+        {isExpanded && (
+          <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 mb-4">
             <div className="space-y-2">
               <Label>Supplier</Label>
@@ -630,7 +647,8 @@ export const OutsourcedProductsSection = ({
               </div>
             </div>
           )}
-        </CardContent>
+          </CardContent>
+        )}
       </Card>
 
       {outsourcedItems.length > 0 && (

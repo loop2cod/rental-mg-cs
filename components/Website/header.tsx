@@ -46,7 +46,7 @@ export default function Header() {
     <>
       <header
         className={`sticky top-0 z-40 w-full transition-all duration-200 ${
-          isScrolled ? "bg-white/95 dark:bg-green-900/95 backdrop-blur-sm shadow-sm border-b border-green-100 dark:border-green-800" : "bg-transparent"
+          isScrolled ? "bg-white/95 dark:bg-[#627421]/95 backdrop-blur-sm shadow-sm border-b border-[#627421]/20 dark:border-[#627421]/50" : "bg-transparent"
         }`}
       >
         <div className="container py-4 mx-auto  p-3">
@@ -55,14 +55,14 @@ export default function Header() {
                 <img
                   src={'/logo.svg'}
                   alt="Event Rentals Logo"
-                  className="h-7 md:h-12 w-auto filter drop-shadow-sm"
+                  className="h-7 md:h-12 w-auto filter drop-shadow-sm logo-filter"
                 />
             </div>
 
             <div className="flex items-center space-x-6">
               {/* Desktop Navigation */}
               <nav className="hidden md:flex items-center space-x-6">
-                <Link href="#contact" className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
+                <Link href="#contact" className="bg-[#627421] hover:bg-[#4d5c1a] text-white px-4 py-2 rounded-lg transition-colors">
                   Contact Us
                 </Link>
               </nav>

@@ -2,19 +2,27 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CreditCard } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
 import { formatCurrency } from "@/lib/commonFunctions"
+import { Button } from "../ui/button"
+import { useState } from "react"
+import { UpdatePaymentDialog } from "../PreBooking/UpdatePaymentDialog"
 
 interface PaymentSummaryCardProps {
   booking: {
+    booking_id: string
     total_amount: number
     amount_paid: number
     discount: number
+    user_id: string
   }
+    onPaymentUpdate?: () => void
 }
 
-export function OrderPaymentSummaryCard({ booking }: PaymentSummaryCardProps) {
+export function OrderPaymentSummaryCard({ booking,onPaymentUpdate = () => {} }: PaymentSummaryCardProps) {
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
   const percentagePaid = (booking.amount_paid / booking.total_amount) * 100
 
   return (
+    <>
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center gap-2">
@@ -58,8 +66,28 @@ export function OrderPaymentSummaryCard({ booking }: PaymentSummaryCardProps) {
               </span>
             </div>
           </div>
+                 <div className="pt-2">
+                        <Button onClick={() => setIsDialogOpen(true)}>
+                          Update Payment
+                        </Button>
+                      </div>
         </div>
       </CardContent>
     </Card>
+         <UpdatePaymentDialog
+            isOpen={isDialogOpen}
+            onOpenChange={setIsDialogOpen}
+            booking={
+              {
+                _id: booking?.booking_id,
+                total_amount: booking.total_amount,
+                amount_paid: booking.amount_paid,
+                user_id: booking.user_id,
+              }
+            }
+             stage="order"
+            onSuccess={onPaymentUpdate}
+          />
+          </>
   )
 }

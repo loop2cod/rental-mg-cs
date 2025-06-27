@@ -1,51 +1,95 @@
 'use client'
 import * as React from "react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { ClockPicker } from "./ClockPicker";
 
 interface TimePickerProps {
   value?: string;
   onChange: (value: string) => void;
+  placeholder?: string;
+  className?: string;
 }
 
-export function TimePicker({ value, onChange }: TimePickerProps) {
-  const [open, setOpen] = React.useState(false);
+export function TimePicker({ value, onChange, placeholder = "HH:MM", className = "" }: TimePickerProps) {
+  const [inputValue, setInputValue] = React.useState(value || "");
 
-  const formatTime = (time: string) => {
-    if (!time) return "Select Time";
+  React.useEffect(() => {
+    setInputValue(value || "");
+  }, [value]);
+
+  const formatTimeInput = (input: string) => {
+    // Remove all non-digit characters
+    const digits = input.replace(/\D/g, "");
     
-    // Handle 24-hour format input
-    if (time.includes(":")) {
-      const [hours, minutes] = time.split(":");
-      const hour = parseInt(hours);
-      const minute = parseInt(minutes);
-      
-      // Convert to 12-hour format
-      const period = hour >= 12 ? "PM" : "AM";
-      const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-      
-      return `${displayHour}:${minute.toString().padStart(2, "0")} ${period}`;
+    if (digits.length === 0) return "";
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 4) {
+      // Auto-add colon after 2 digits
+      return `${digits.slice(0, 2)}:${digits.slice(2)}`;
     }
     
-    return time;
+    // Limit to 4 digits (HHMM)
+    return `${digits.slice(0, 2)}:${digits.slice(2, 4)}`;
+  };
+
+  const validateTime = (time: string) => {
+    if (!time.includes(":")) return false;
+    
+    const [hours, minutes] = time.split(":");
+    const h = parseInt(hours);
+    const m = parseInt(minutes);
+    
+    return h >= 0 && h <= 23 && m >= 0 && m <= 59;
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value;
+    const formattedValue = formatTimeInput(rawValue);
+    
+    setInputValue(formattedValue);
+    
+    // Only call onChange if we have a valid complete time (HH:MM)
+    if (formattedValue.length === 5 && validateTime(formattedValue)) {
+      onChange(formattedValue);
+    } else if (formattedValue === "") {
+      onChange("");
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Allow backspace, delete, tab, escape, enter
+    if ([8, 9, 27, 13, 46].indexOf(e.keyCode) !== -1 ||
+        // Allow Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+        (e.keyCode === 65 && e.ctrlKey === true) ||
+        (e.keyCode === 67 && e.ctrlKey === true) ||
+        (e.keyCode === 86 && e.ctrlKey === true) ||
+        (e.keyCode === 88 && e.ctrlKey === true)) {
+      return;
+    }
+    
+    // Ensure that it is a number and stop the keypress
+    if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+      e.preventDefault();
+    }
+  };
+
+  const handleBlur = () => {
+    // Validate on blur and clear if invalid
+    if (inputValue && !validateTime(inputValue)) {
+      setInputValue("");
+      onChange("");
+    }
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button variant="outline" className="w-full justify-start">
-          {formatTime(value || "")}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <ClockPicker
-          value={value || "12:00 AM"}
-          onChange={onChange}
-          onClose={() => setOpen(false)}
-        />
-      </PopoverContent>
-    </Popover>
+    <input
+      type="text"
+      value={inputValue}
+      onChange={handleInputChange}
+      onKeyDown={handleKeyDown}
+      onBlur={handleBlur}
+      placeholder={placeholder}
+      maxLength={5}
+      className={`w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`}
+    />
   );
 }
 

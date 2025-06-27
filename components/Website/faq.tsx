@@ -63,11 +63,11 @@ export default function Faq() {
 
   return (
     <section id="faq">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl p-3 md:p-8  shadow-xl border border-green-100 dark:border-green-800">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl p-3 md:p-8  shadow-xl border border-[#627421]/20 dark:border-[#627421]/50">
         <div className="mb-5">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
             Frequently Asked
-            <span className="text-green-600 dark:text-green-400"> Questions</span>
+            <span className="text-[#627421] dark:text-[#8ba62f]"> Questions</span>
           </h2>
           <p className="text-xs md:text-sm text-gray-700 dark:text-gray-300 max-w-3xl">
             Have questions about our rental services? Find answers to the most common questions 
@@ -80,14 +80,14 @@ export default function Faq() {
             <div key={faq.id} className="bg-gray-50 dark:bg-gray-700 rounded-xl overflow-hidden">
               <button
                 onClick={() => toggleItem(faq.id)}
-                className="flex justify-between items-center w-full text-left p-3 md:p-6 font-medium text-gray-900 dark:text-white hover:text-green-600 dark:hover:text-green-400 transition-colors"
+                className="flex justify-between items-center w-full text-left p-3 md:p-6 font-medium text-gray-900 dark:text-white hover:text-[#627421] dark:hover:text-[#8ba62f] transition-colors"
                 aria-expanded={openItem === faq.id}
                 aria-controls={`faq-answer-${faq.id}`}
               >
                 <span className="font-semibold text-sm md:text-base pr-4">{faq.question}</span>
                 <ChevronDown
                   className={`w-6 h-6 flex-shrink-0 transition-transform ${
-                    openItem === faq.id ? "rotate-180 text-green-600" : "text-gray-400"
+                    openItem === faq.id ? "rotate-180 text-[#627421]" : "text-gray-400"
                   }`}
                 />
               </button>

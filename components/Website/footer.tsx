@@ -23,7 +23,7 @@ export default function Footer() {
                 <img
                   src="/logo.svg"
                   alt="Event Rentals Logo"
-                  className="h-full w-auto"
+                  className="h-full w-auto logo-filter"
                 />
               ) : (
                 <div className="h-full w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
@@ -40,22 +40,22 @@ export default function Footer() {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Contact Info</h3>
             <div className="space-y-3 text-sm">
               <div className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 text-green-600 dark:text-green-500 mt-0.5 flex-shrink-0" />
+                <MapPin className="w-4 h-4 text-[#627421] dark:text-[#8ba62f] mt-0.5 flex-shrink-0" />
                 <span className="text-gray-600 dark:text-gray-400">
                   123 Event Street, Your City, 12345
                 </span>
               </div>
               <div className="flex items-center gap-3">
-                <Phone className="w-4 h-4 text-green-600 dark:text-green-500 flex-shrink-0" />
+                <Phone className="w-4 h-4 text-[#627421] dark:text-[#8ba62f] flex-shrink-0" />
                 <a 
                   href="tel:+911234567890" 
-                  className="text-gray-600 hover:text-green-600 dark:text-gray-400 dark:hover:text-green-400 transition-colors"
+                  className="text-gray-600 hover:text-[#627421] dark:text-gray-400 dark:hover:text-[#8ba62f] transition-colors"
                 >
                   +91 12345 67890
                 </a>
               </div>
               <div className="flex items-center gap-3">
-                <Clock className="w-4 h-4 text-green-600 dark:text-green-500 flex-shrink-0" />
+                <Clock className="w-4 h-4 text-[#627421] dark:text-[#8ba62f] flex-shrink-0" />
                 <span className="text-gray-600 dark:text-gray-400">
                   Mon-Sun: 9AM-9PM
                 </span>

@@ -1,11 +1,11 @@
 
 export default function Hero() {
   return (
-    <section id="hero" className="relative overflow-hidden bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 my-8 rounded-2xl shadow-xl">
+    <section id="hero" className="relative overflow-hidden bg-gradient-to-br from-[#627421]/10 to-[#627421]/20 dark:from-[#627421]/20 dark:to-[#627421]/30 my-8 rounded-2xl shadow-xl">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-green-400 rounded-full -translate-y-32 translate-x-32"></div>
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-green-300 rounded-full translate-y-24 -translate-x-24"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#8ba62f] rounded-full -translate-y-32 translate-x-32"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#9bc53d] rounded-full translate-y-24 -translate-x-24"></div>
       </div>
       
       <div className="relative p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row items-center min-h-[500px]">
@@ -13,16 +13,16 @@ export default function Hero() {
         <div className="w-full lg:w-1/2 z-10 text-center lg:text-left">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
             Make Your Events
-            <span className="block text-green-600 dark:text-green-400">Unforgettable</span>
+            <span className="block text-[#627421] dark:text-[#8ba62f]">Unforgettable</span>
           </h1>
           <p className="text-base md:text-lg text-gray-700 dark:text-gray-200 mb-8 max-w-lg">
             From baby shoots to grand celebrations, we provide premium rental items that transform your special moments into lasting memories.
           </p>
           <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
-            <a href="#categories" className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors text-lg shadow-lg">
+            <a href="#categories" className="bg-[#627421] hover:bg-[#4d5c1a] text-white px-3 py-2 rounded-lg font-semibold transition-colors text-lg shadow-lg">
               Browse Categories
             </a>
-            <a href="#contact" className="border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white px-3 py-2 rounded-lg font-semibold transition-colors text-lg">
+            <a href="#contact" className="border-2 border-[#627421] text-[#627421] hover:bg-[#627421] hover:text-white px-3 py-2 rounded-lg font-semibold transition-colors text-lg">
               Get Quote
             </a>
           </div>

@@ -661,6 +661,6 @@ input[type=number]::-webkit-outer-spin-button {
   filter: brightness(0) saturate(100%) invert(27%) sepia(98%) saturate(4174%) hue-rotate(257deg) brightness(96%) contrast(97%);
 }
 
-.hero-filter{
-    filter: brightness(0.9) saturate(100%) invert(40%) sepia(98%) saturate(371%) hue-rotate(61deg) brightness(118%) contrast(87%);
+.logo-filter {
+    filter: brightness(0.8) saturate(100%) invert(25%) sepia(98%) saturate(500%) hue-rotate(30deg) brightness(70%) contrast(90%);
 }

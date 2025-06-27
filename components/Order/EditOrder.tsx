@@ -116,11 +116,11 @@ const EditOrder = ({
           const total_amount = sub_total - (Number(booking.discount) || 0)
   
           setFormData({
-            user_name: booking.user_id.name,
-            user_phone: booking.user_id.mobile,
-            user_secondary_mobile: booking.user_id.secondary_mobile,
-            user_proof_type: booking.user_id.proof_type,
-            user_proof_id: booking.user_id.proof_id,
+            user_name: booking.user.name,
+            user_phone: booking.user.mobile,
+            user_secondary_mobile: booking.user.secondary_mobile,
+            user_proof_type: booking.user.proof_type,
+            user_proof_id: booking.user.proof_id,
             from_date: booking.from_date.split('T')[0],
             to_date: booking.to_date.split('T')[0],
             from_time: booking.from_time,
@@ -212,7 +212,7 @@ const EditOrder = ({
   const handleNoOfDaysChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const days = Number(e.target.value)
     setFormData((prev: any) => {
-      const updatedItems = prev.booking_items.map((item: any) => ({
+      const updatedItems = prev.booking_items?.map((item: any) => ({
         ...item,
         no_of_days: days,
         total_price: item.price * item.quantity * days
@@ -222,7 +222,7 @@ const EditOrder = ({
         ...prev,
         no_of_days: days,
         booking_items: updatedItems,
-        total_amount: updatedItems.reduce((sum: any, item: any) => sum + Number(item.total_price), 0),
+        total_amount: updatedItems?.reduce((sum: any, item: any) => sum + Number(item.total_price), 0),
       }
     })
   }

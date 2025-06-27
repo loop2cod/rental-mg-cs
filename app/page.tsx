@@ -11,8 +11,8 @@ import AdditionalCategories from '@/components/Website/additional-categories';
 function Home() {
 
   return (
-   <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
- <Header />
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <Header />
       <div className="container pt-4 mx-auto px-2">
         <Hero />
         <Categories />
@@ -21,7 +21,7 @@ function Home() {
         <Faq />
         <CallToAction />
       </div>
-    <Footer />
+      <Footer />
     </main>
   );
 }

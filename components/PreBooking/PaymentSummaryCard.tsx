@@ -76,6 +76,7 @@ export function PaymentSummaryCard({ booking, onPaymentUpdate = () => {} }: Paym
       </Card>
 
       <UpdatePaymentDialog
+      stage="booking"
         isOpen={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         booking={booking}
