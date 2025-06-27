@@ -12,10 +12,7 @@ export default function Header() {
   const [mounted, setMounted] = useState(false)
   const router = useRouter()
 
-  // Ensure component is mounted before rendering theme-dependent elements
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -55,16 +52,11 @@ export default function Header() {
         <div className="container py-4 mx-auto  p-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center" onClick={handleLogoClick}>
-              {/* Use a div with the same dimensions during SSR to prevent layout shift */}
-              {mounted ? (
                 <img
                   src={'/logo.svg'}
                   alt="Event Rentals Logo"
                   className="h-7 md:h-12 w-auto filter drop-shadow-sm"
                 />
-              ) : (
-                <div className="h-12 w-[200px]" />
-              )}
             </div>
 
             <div className="flex items-center space-x-6">
