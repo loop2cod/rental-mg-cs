@@ -1,0 +1,183 @@
+"use client"
+
+import { useState } from "react"
+import { ShoppingBag, Gift, Baby, Flower, Sparkles, Coffee } from "lucide-react"
+
+const categories = [
+  {
+    id: 1,
+    title: "Baby Shoot Props",
+    description: "Adorable props and accessories for memorable baby photoshoots",
+    icon: Baby,
+    image: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=400&h=300&fit=crop&crop=center",
+    items: ["Props Sets", "Blankets", "Baskets", "Headbands", "Costumes"]
+  },
+  {
+    id: 2,
+    title: "Gift Hampers",
+    description: "Beautifully curated gift hampers for every occasion",
+    icon: Gift,
+    image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=300&fit=crop&crop=center",
+    items: ["Birthday Hampers", "Festival Gifts", "Corporate Gifts", "Wedding Favors"]
+  },
+  {
+    id: 3,
+    title: "Party Accessories",
+    description: "Complete party setups to make your celebrations spectacular",
+    icon: Sparkles,
+    image: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=300&fit=crop&crop=center",
+    items: ["Balloons", "Banners", "Table Decor", "Lighting", "Photo Booth Props"]
+  },
+  {
+    id: 4,
+    title: "Artificial Flowers",
+    description: "Premium artificial flowers that look stunning and last forever",
+    icon: Flower,
+    image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop&crop=center",
+    items: ["Bouquets", "Arrangements", "Wall Decor", "Table Centerpieces"]
+  },
+  {
+    id: 5,
+    title: "Premium Dry Fruits",
+    description: "High-quality dry fruits and nuts for gifts and occasions",
+    icon: Coffee,
+    image: "https://images.unsplash.com/photo-1578849278619-e73505e9610f?w=400&h=300&fit=crop&crop=center",
+    items: ["Mixed Nuts", "Dates", "Dried Fruits", "Gift Boxes"]
+  },
+  {
+    id: 6,
+    title: "Imported Chocolates",
+    description: "Exquisite imported chocolates for luxury gifting",
+    icon: ShoppingBag,
+    image: "https://images.unsplash.com/photo-1511381548611-e9aacbbb90de?w=400&h=300&fit=crop&crop=center",
+    items: ["Luxury Boxes", "Truffles", "Artisan Chocolates", "Seasonal Collections"]
+  }
+]
+
+export default function Categories() {
+  const [selectedCategory, setSelectedCategory] = useState<any | null>(null)
+
+  const openCategoryModal = (category: any) => {
+    setSelectedCategory(category)
+  }
+
+  const closeCategoryModal = () => {
+    setSelectedCategory(null)
+  }
+
+  return (
+    <section id="categories" className="my-20">
+      <div className="mb-12">
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4 text-start">
+          Our Rental
+          <span className="text-green-600 dark:text-green-400"> Categories</span>
+        </h2>
+        <p className="text-sm md:tex-base text-gray-700 dark:text-gray-300 max-w-3xl">
+          Discover our extensive collection of rental items, carefully curated to make your events special. 
+          From intimate baby shoots to grand celebrations, we have everything you need.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {categories.map((category) => (
+          <div
+            key={category.id}
+            className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer transform hover:-translate-y-2"
+            onClick={() => openCategoryModal(category)}
+          >
+            <div className="relative overflow-hidden">
+              <img
+                src={category.image}
+                alt={category.title}
+                className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+              <div className="absolute top-4 right-4 bg-green-600 text-white p-2 rounded-full">
+                <category.icon className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="p-3 md:p-6">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-green-600 transition-colors">
+                {category.title}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
+                {category.description}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {category.items.slice(0, 3).map((item, index) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs rounded-full"
+                  >
+                    {item}
+                  </span>
+                ))}
+                {category.items.length > 3 && (
+                  <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs rounded-full">
+                    +{category.items.length - 3} more
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Category Modal */}
+      {selectedCategory && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="relative">
+              <img
+                src={selectedCategory.image}
+                alt={selectedCategory.title}
+                className="w-full h-64 object-cover"
+              />
+              <button
+                onClick={closeCategoryModal}
+                className="absolute top-4 right-4 bg-white/90 hover:bg-white text-gray-800 p-2 rounded-full"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-green-600 text-white p-3 rounded-full">
+                  <selectedCategory.icon className="w-6 h-6" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {selectedCategory.title}
+                </h3>
+              </div>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
+                {selectedCategory.description}
+              </p>
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                Available Items:
+              </h4>
+              <div className="grid grid-cols-2 gap-2 mb-6">
+                {selectedCategory.items.map((item: string, index: number) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                    <span className="text-gray-700 dark:text-gray-300">{item}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-4">
+                <button className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition-colors">
+                  Get Quote
+                </button>
+                <button 
+                  onClick={closeCategoryModal}
+                  className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  )
+}
