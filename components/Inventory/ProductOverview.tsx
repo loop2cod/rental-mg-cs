@@ -340,6 +340,11 @@ const ProductOverview = ({ pid }: any) => {
             <div className="md:w-2/3">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-4">
                 <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Badge variant="secondary" className="font-mono text-xs">
+                      #{product.code || "N/A"}
+                    </Badge>
+                  </div>
                   <h2 className="text-xl md:text-2xl font-bold">{product.name}</h2>
                 </div>
                 <Badge variant="outline" className="w-fit flex items-center gap-1 px-3 py-1 text-base">

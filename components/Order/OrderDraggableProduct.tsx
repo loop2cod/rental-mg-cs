@@ -35,7 +35,12 @@ const OrderDraggableProduct = ({ product, onAddToBooking }: any) => {
         </div>
         <div className="flex flex-col">
           <h3 className="text-sm font-medium">{product?.name}</h3>
-          <p className="text-xs text-muted-foreground">{product?.category_name || "Table"}</p>
+          <div className="flex items-center gap-2">
+            {product?.code && (
+              <span className="text-xs font-mono bg-secondary px-1 py-0.5 rounded">#{product.code}</span>
+            )}
+            <p className="text-xs text-muted-foreground">{product?.category_name || "Table"}</p>
+          </div>
           <p className="text-xs text-muted-foreground">Availablity: {product?.available_quantity}</p>
         </div>
       </div>

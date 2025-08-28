@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation"
 interface Product {
   _id: string
   name: string
+  code?: string
   image: string
   unit_cost: number
   quantity: number
@@ -33,7 +34,8 @@ export const ProductList = ({ products, loading, onAddToBooking }: ProductListPr
       setFilteredProducts(products)
     } else {
       const filtered = products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (product.code && product.code.toLowerCase().includes(searchTerm.toLowerCase()))
       )
       setFilteredProducts(filtered)
     }

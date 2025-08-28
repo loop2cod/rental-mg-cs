@@ -10,6 +10,7 @@ import OrderDraggableProduct from "./OrderDraggableProduct"
 interface Product {
   _id: string
   name: string
+  code?: string
   image: string
   unit_cost: number
   quantity: number
@@ -30,7 +31,8 @@ export const OrderProductList = ({ products, loading, onAddToBooking }: ProductL
       setFilteredProducts(products)
     } else {
       const filtered = products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (product.code && product.code.toLowerCase().includes(searchTerm.toLowerCase()))
       )
       setFilteredProducts(filtered)
     }

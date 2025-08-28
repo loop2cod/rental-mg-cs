@@ -66,6 +66,18 @@ export function InventoryTable({
       searchable: false,
     },
     {
+      id: "code",
+      header: "Code",
+      accessorKey: "code",
+      sortable: true,
+      searchable: true,
+      cell: (item: any) => (
+        <Badge variant="secondary" className="font-mono">
+          {item?.code || "N/A"}
+        </Badge>
+      ),
+    },
+    {
       id: "name",
       header: "Product",
       accessorKey: "name",
