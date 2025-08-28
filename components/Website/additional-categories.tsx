@@ -8,7 +8,7 @@ const additionalCategories = [
     title: "Craft Materials",
     description: "Complete craft supplies for DIY projects and creative activities",
     icon: Palette,
-    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop&crop=center",
+    image: "https://pub-1095c2d8125541debb599ae3d7654951.r2.dev/uploads/1751113034652-ChatGPT Image Jun 28, 2025, 05_46_43 PM.png",
     items: ["Art Supplies", "Craft Kits", "Decorating Materials", "Creative Accessories"]
   },
   {
@@ -16,7 +16,7 @@ const additionalCategories = [
     title: "Artificial Bokka",
     description: "Beautiful artificial bokka arrangements for traditional and modern decor",
     icon: TreePine,
-    image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop&crop=center",
+    image: "https://pub-1095c2d8125541debb599ae3d7654951.r2.dev/uploads/1751113620485-insung-yoon-4PhVHAtkCxQ-unsplash.jpg",
     items: ["Traditional Bokka", "Modern Arrangements", "Colored Variants", "Festival Specials"]
   },
   {
@@ -24,7 +24,7 @@ const additionalCategories = [
     title: "Aesthetics Items",
     description: "Curated aesthetic pieces to enhance your event's visual appeal",
     icon: Package,
-    image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&crop=center",
+    image: "https://pub-1095c2d8125541debb599ae3d7654951.r2.dev/uploads/1751113985905-ChatGPT Image Jun 28, 2025, 06_02_52 PM.png",
     items: ["Decorative Pieces", "Ambient Lighting", "Background Props", "Aesthetic Arrangements"]
   }
 ]

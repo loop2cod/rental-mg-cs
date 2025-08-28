@@ -7,6 +7,7 @@ import Hero from '@/components/Website/hero';
 import Categories from '@/components/Website/projects';
 import Services from '@/components/Website/services';
 import AdditionalCategories from '@/components/Website/additional-categories';
+import EventRentals from '@/components/Website/event-rentals';
 
 function Home() {
 
@@ -17,6 +18,7 @@ function Home() {
         <Hero />
         <Categories />
         <AdditionalCategories />
+        <EventRentals />
         <Services />
         <Faq />
         <CallToAction />

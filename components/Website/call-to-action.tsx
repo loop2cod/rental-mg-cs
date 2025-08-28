@@ -5,7 +5,7 @@ export default function CallToAction() {
   return (
     <section id="contact" className="my-5">
       {/* Main CTA Section */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-[#627421] to-[#4d5c1a] rounded-2xl shadow-xl mb-12">
+      <div className="relative overflow-hidden bg-gradient-to-br from-[#627421] to-[#4d5c1a]/80 rounded-2xl shadow-xl mb-12 z-10">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full -translate-y-48 translate-x-48"></div>
@@ -42,16 +42,16 @@ export default function CallToAction() {
           </div>
 
           {/* Images */}
-          <div className="w-full lg:w-1/3 mt-12 lg:mt-0 z-10">
+          {/* <div className="w-full lg:w-1/3 mt-12 lg:mt-0 z-10">
             <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
               <div className="space-y-4">
                 <img
-                  src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=150&h=150&fit=crop&crop=center"
+                  src="https://pub-1095c2d8125541debb599ae3d7654951.r2.dev/uploads/1751114327120-ChatGPT Image Jun 28, 2025, 06_08_21 PM.png"
                   alt="Event Setup"
                   className="w-full h-20 object-cover rounded-lg shadow-lg"
                 />
                 <img
-                  src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=150&h=150&fit=crop&crop=center"
+                  src="https://pub-1095c2d8125541debb599ae3d7654951.r2.dev/uploads/1751114589019-ChatGPT Image Jun 28, 2025, 06_12_51 PM.png"
                   alt="Party Decorations"
                   className="w-full h-20 object-cover rounded-lg shadow-lg"
                 />
@@ -69,7 +69,7 @@ export default function CallToAction() {
                 />
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

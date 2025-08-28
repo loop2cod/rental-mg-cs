@@ -34,7 +34,7 @@ export default function Hero() {
             <div className="space-y-4">
               <div className="bg-white dark:bg-gray-800  p-2 rounded-lg shadow-lg transform hover:scale-105 transition-transform">
                 <img
-                  src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=200&h=200&fit=crop&crop=center"
+                  src="https://pub-1095c2d8125541debb599ae3d7654951.r2.dev/uploads/1751110700385-ChatGPT Image Jun 28, 2025, 05_08_11 PM.png"
                   alt="Baby Props"
                   className="w-full h-24 object-cover rounded-lg"
                 />
@@ -42,7 +42,7 @@ export default function Hero() {
               </div>
               <div className="bg-white dark:bg-gray-800 p-2 rounded-lg shadow-lg transform hover:scale-105 transition-transform">
                 <img
-                  src="https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=200&h=200&fit=crop&crop=center"
+                  src="https://pub-1095c2d8125541debb599ae3d7654951.r2.dev/uploads/1751110621621-ChatGPT Image Jun 28, 2025, 05_05_46 PM.png"
                   alt="Party Accessories"
                   className="w-full h-24 object-cover rounded-lg"
                 />
@@ -52,7 +52,7 @@ export default function Hero() {
             <div className="space-y-4 pt-8">
               <div className="bg-white dark:bg-gray-800 p-2 rounded-lg shadow-lg transform hover:scale-105 transition-transform">
                 <img
-                  src="https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200&h=200&fit=crop&crop=center"
+                  src="https://pub-1095c2d8125541debb599ae3d7654951.r2.dev/uploads/1751110890004-ChatGPT Image Jun 28, 2025, 05_11_18 PM.png"
                   alt="Gift Hampers"
                   className="w-full h-24 object-cover rounded-lg"
                 />
@@ -60,7 +60,7 @@ export default function Hero() {
               </div>
               <div className="bg-white dark:bg-gray-800 p-2 rounded-lg shadow-lg transform hover:scale-105 transition-transform">
                 <img
-                  src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=200&h=200&fit=crop&crop=center"
+                  src="https://pub-1095c2d8125541debb599ae3d7654951.r2.dev/uploads/1751111079578-ChatGPT Image Jun 28, 2025, 05_14_30 PM.png"
                   alt="Artificial Flowers"
                   className="w-full h-24 object-cover rounded-lg"
                 />

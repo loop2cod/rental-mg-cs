@@ -9,7 +9,7 @@ const categories = [
     title: "Baby Shoot Props",
     description: "Adorable props and accessories for memorable baby photoshoots",
     icon: Baby,
-    image: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=400&h=300&fit=crop&crop=center",
+    image: "https://pub-1095c2d8125541debb599ae3d7654951.r2.dev/uploads/1751114841561-ChatGPT Image Jun 28, 2025, 06_16_52 PM.png",
     items: ["Props Sets", "Blankets", "Baskets", "Headbands", "Costumes"]
   },
   {
@@ -17,7 +17,7 @@ const categories = [
     title: "Gift Hampers",
     description: "Beautifully curated gift hampers for every occasion",
     icon: Gift,
-    image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=300&fit=crop&crop=center",
+    image: "https://pub-1095c2d8125541debb599ae3d7654951.r2.dev/uploads/1751111924397-ChatGPT Image Jun 28, 2025, 05_28_32 PM.png",
     items: ["Birthday Hampers", "Festival Gifts", "Corporate Gifts", "Wedding Favors"]
   },
   {
@@ -25,7 +25,7 @@ const categories = [
     title: "Party Accessories",
     description: "Complete party setups to make your celebrations spectacular",
     icon: Sparkles,
-    image: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=300&fit=crop&crop=center",
+    image: "https://pub-1095c2d8125541debb599ae3d7654951.r2.dev/uploads/1751111591326-ChatGPT Image Jun 28, 2025, 05_22_56 PM.png",
     items: ["Balloons", "Banners", "Table Decor", "Lighting", "Photo Booth Props"]
   },
   {
@@ -33,7 +33,7 @@ const categories = [
     title: "Artificial Flowers",
     description: "Premium artificial flowers that look stunning and last forever",
     icon: Flower,
-    image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop&crop=center",
+    image: "https://pub-1095c2d8125541debb599ae3d7654951.r2.dev/uploads/1751112244069-ChatGPT Image Jun 28, 2025 at 05_33_49 PM.png",
     items: ["Bouquets", "Arrangements", "Wall Decor", "Table Centerpieces"]
   },
   {
@@ -41,7 +41,7 @@ const categories = [
     title: "Premium Dry Fruits",
     description: "High-quality dry fruits and nuts for gifts and occasions",
     icon: Coffee,
-    image: "https://images.unsplash.com/photo-1578849278619-e73505e9610f?w=400&h=300&fit=crop&crop=center",
+    image: "https://pub-1095c2d8125541debb599ae3d7654951.r2.dev/uploads/1751112413078-ChatGPT Image Jun 28, 2025 at 05_36_34 PM.png",
     items: ["Mixed Nuts", "Dates", "Dried Fruits", "Gift Boxes"]
   },
   {
@@ -49,7 +49,7 @@ const categories = [
     title: "Imported Chocolates",
     description: "Exquisite imported chocolates for luxury gifting",
     icon: ShoppingBag,
-    image: "https://images.unsplash.com/photo-1511381548611-e9aacbbb90de?w=400&h=300&fit=crop&crop=center",
+    image: "https://pub-1095c2d8125541debb599ae3d7654951.r2.dev/uploads/1751112619515-ChatGPT Image Jun 28, 2025 at 05_39_56 PM.png",
     items: ["Luxury Boxes", "Truffles", "Artisan Chocolates", "Seasonal Collections"]
   }
 ]

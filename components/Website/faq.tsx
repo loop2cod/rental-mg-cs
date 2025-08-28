@@ -8,7 +8,7 @@ const faqs = [
     id: 1,
     question: "How do I book rental items?",
     answer:
-      "Simply browse our categories, select the items you need, and contact us through our booking form or phone. We'll confirm availability and provide you with a detailed quote including delivery arrangements.",
+      "Simply browse our categories, and contact us through our whatsapp or phone. We'll confirm availability and provide you with a detailed quote including delivery arrangements.",
   },
   {
     id: 2,
