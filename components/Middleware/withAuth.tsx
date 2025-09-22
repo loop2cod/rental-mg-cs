@@ -7,8 +7,8 @@ import { API_ENDPOINTS } from '../../lib/apiEndpoints';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
-const apiUrl ='https://server.momenz.in'
-// const apiUrl ='http://localhost:5000'
+// const apiUrl ='https://server.momenz.in'
+const apiUrl ='http://localhost:5000'
 
 // Define the expected response type
 interface AuthResponse {
