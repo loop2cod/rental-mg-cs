@@ -19,6 +19,7 @@ import {
   Settings2,
   SquareTerminal,
   Truck,
+  Users,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -32,13 +33,10 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import AddSupplier from "./AddSupplier"
+import { useUser } from "@/context/UserContext"
 
-
-const data = {
-  user: {
-    name: "Admin",
-    avatar: "https://github.com/shadcn.png",
-  },
+// Staff navigation data
+const staffData = {
   navMain: [
     {
       title: "Inventory",
@@ -105,8 +103,55 @@ const data = {
   ],
 };
 
-export default data;
+// Admin navigation data
+const adminData = {
+  navMain: [
+    {
+      title: "Settings",
+      url: "#",
+      icon: Settings2,
+      items: [
+        {
+          title: "User Management",
+          url: "/admin/settings",
+          icon: Users,
+        },
+      ],
+    },
+  ],
+  projects: [
+    {
+      name: "Dashboard",
+      url: "/momenz-dashboard",
+      icon: LayoutDashboard,
+    },
+  ],
+};
+
+export default staffData;
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user, loading } = useUser();
+
+  // Use appropriate navigation data based on user role
+  const navigationData = React.useMemo(() => {
+    if (loading || !user) return staffData; // Default to staff navigation
+    
+    switch (user.role) {
+      case 'admin':
+        return adminData;
+      case 'staff':
+        return staffData;
+      default:
+        return staffData;
+    }
+  }, [user, loading]);
+
+  const userData = {
+    name: user?.name || "User",
+    avatar: "https://github.com/shadcn.png",
+  };
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -117,11 +162,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <NavProjects projects={data.projects} />
-        <NavMain items={data.navMain} />
+        <NavProjects projects={navigationData.projects} />
+        <NavMain items={navigationData.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={userData} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

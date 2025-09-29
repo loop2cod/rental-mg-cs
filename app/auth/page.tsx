@@ -12,6 +12,7 @@ import { API_ENDPOINTS } from '@/lib/apiEndpoints';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { post } from '@/utilities/AxiosInterceptor';
 import Spinner from '@/components/Spinner';
+import { useUser } from '@/context/UserContext';
 import axios from 'axios';
 
 interface AuthResponse {
@@ -24,6 +25,7 @@ interface AuthResponse {
 const Page = () => {
   const apiUrl ="http://localhost:5000"
   const { toast } = useToast();
+  const { fetchUser } = useUser();
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect');
@@ -89,16 +91,22 @@ const Page = () => {
       );
 
       if (response.success) {
-        console.log('done')
+        console.log('Login successful:', response);
+        
+        // Update UserContext with fresh user data
+        await fetchUser();
+        
         // Check user role and redirect accordingly
         const userRole = response.user?.role;
+        console.log('User role:', userRole);
         let defaultRedirect = '/momenz-dashboard';
         
         if (userRole === 'admin') {
-          defaultRedirect = '/admin-settings';
+          defaultRedirect = '/momenz-dashboard'; // Admin also goes to dashboard, which will show admin view
         }
         
         const redirectTo = redirect ? decodeURIComponent(redirect) : defaultRedirect;
+        console.log('Redirecting to:', redirectTo);
         router.push(redirectTo);
       } else {
         toast({

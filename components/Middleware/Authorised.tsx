@@ -27,8 +27,8 @@ const Authorised = () => {
           <Button variant="outline" onClick={() => window.history.back()}>
             Go Back
           </Button>
-          <Button onClick={() => window.location.href = "/"}>
-            Home
+          <Button onClick={() => window.location.href = "/momenz-dashboard"}>
+            Dashboard
           </Button>
         </CardFooter>
       </Card>

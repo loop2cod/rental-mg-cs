@@ -5,6 +5,7 @@ export const API_ENDPOINTS = {
     LOGOUT: `/api/v1/auth/logout`,
     REFRESH: `/api/v1/auth/refresh`,
     VERIFY: `/api/v1/auth/check-auth`,
+    GET_USER: `/api/v1/auth/get-user`,
   },
   INVENTORY: {
     GET_ALL: `/api/v1/inventory/all-products`,
@@ -66,6 +67,12 @@ export const API_ENDPOINTS = {
   },
   PAYMENT:{
     UPDATE: `/api/v1/payment/update`
+  },
+  ADMIN: {
+    GET_STAFF_USERS: `/api/v1/admin/staff-users`,
+    CREATE_STAFF: `/api/v1/admin/create-staff`,
+    DELETE_STAFF: `/api/v1/admin/delete-staff`,
+    RESET_PASSWORD: `/api/v1/admin/reset-password`,
   }
 } as const;
 

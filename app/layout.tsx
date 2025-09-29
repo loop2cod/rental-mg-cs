@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ThemeContextProvider, { ColorTheme, Theme } from "@/context/ThemeContext";
+import ClientProviders from "@/components/Providers/ClientProviders";
 import { cookies } from "next/headers";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -40,8 +41,10 @@ export default async function RootLayout({
         data-color-theme={initialColorTheme}
       >
         <ThemeContextProvider initialTheme={initialTheme} initialColorTheme={initialColorTheme}>
-        <Toaster />
-          {children}
+          <ClientProviders>
+            <Toaster />
+            {children}
+          </ClientProviders>
         </ThemeContextProvider>
       </body>
     </html>
