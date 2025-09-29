@@ -20,6 +20,7 @@ interface AuthResponse {
   data?: any;
   message?: string;
   sessionOut?: boolean;
+  user?:any
 }
 
 const Page = () => {

@@ -6,6 +6,7 @@ import Spinner from '../Spinner';
 import { API_ENDPOINTS } from '../../lib/apiEndpoints';
 import Cookies from 'js-cookie';
 import axios from 'axios';
+import { useUser } from '../../context/UserContext';
 
 // const apiUrl ='https://server.momenz.in'
 const apiUrl ='http://localhost:5000'
@@ -25,6 +26,7 @@ export function withAuth<T extends object>(Component: React.ComponentType<T>) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+    const { triggerFetchUser } = useUser();
 
     // Memoize the authentication check function
     const checkAuth = useCallback(async () => {
@@ -33,6 +35,7 @@ export function withAuth<T extends object>(Component: React.ComponentType<T>) {
 
         if (response?.data?.success) {
           setIsAuthenticated(true);
+          triggerFetchUser();
         } else if (!response?.data?.success && response?.data?.sessionOut) {
           Cookies.set(
             'toastMessage',
@@ -50,7 +53,7 @@ export function withAuth<T extends object>(Component: React.ComponentType<T>) {
         console.error('Error during token verification:', error);
         setIsAuthenticated(false);
       }
-    }, []);
+    }, [triggerFetchUser]);
 
     // Run the authentication check on mount
     useLayoutEffect(() => {

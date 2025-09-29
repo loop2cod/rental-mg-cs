@@ -37,7 +37,7 @@ const RoleBasedDashboard: React.FC = () => {
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <h2 className="text-xl font-semibold mb-2">Access Denied</h2>
-            <p className="text-muted-foreground">You don't have permission to access this page.</p>
+            <p className="text-muted-foreground">You do not have permission to access this page.</p>
           </div>
         </div>
       );

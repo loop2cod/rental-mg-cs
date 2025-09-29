@@ -1,6 +1,5 @@
 'use client'
 import React, { useMemo } from 'react';
-import { Edit, Trash2, View } from 'lucide-react';
 import { ColumnDef, DataTable } from '../ui/data-table';
 import { Button } from '../ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';

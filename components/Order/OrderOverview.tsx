@@ -55,7 +55,7 @@ const OrderOverview = ({ data, loading,fetchOrder }: any) => {
     return `
       <div class="bill-container">
         <div class="header">
-          <img src="/logo.svg" alt="Company Logo" class="logo" />
+          <img src="/logo.png" alt="Company Logo" class="logo" />
           <div class="company-info">
             <div>Payyanur, Kerala, India</div>
             <div>Phone: +91 9847400022</div>
@@ -158,11 +158,12 @@ const OrderOverview = ({ data, loading,fetchOrder }: any) => {
       
       body {
         font-family: 'Courier New', monospace;
-        font-size: 12px;
+        font-size: 14px;
         line-height: 1.2;
         margin: 0;
         padding: 10px;
         width: 80mm;
+        font-weight: bold;
         color: #000;
       }
       
@@ -177,7 +178,7 @@ const OrderOverview = ({ data, loading,fetchOrder }: any) => {
       }
       
       .logo {
-        width: 80px;
+        width: 70%;
         height: auto;
         margin: 0 auto;
         display: block;
@@ -185,19 +186,19 @@ const OrderOverview = ({ data, loading,fetchOrder }: any) => {
       
       .header h1 {
         font-size: 16px;
-        font-weight: bold;
+        font-weight: extra-bold;
         margin: 0 0 5px 0;
       }
       
       .company-info {
-        font-size: 10px;
+        font-size: 16px;
         line-height: 1.3;
       }
       
       .separator {
         text-align: center;
         margin: 8px 0;
-        font-weight: bold;
+        font-weight: extra-bold;
       }
       
       .order-info, .customer-info, .totals {
@@ -225,14 +226,14 @@ const OrderOverview = ({ data, loading,fetchOrder }: any) => {
       }
       
       .item-name {
-        font-weight: bold;
+        font-weight: extra-bold;
         margin-bottom: 2px;
       }
       
       .item-details {
         display: flex;
         justify-content: space-between;
-        font-size: 10px;
+        font-size: 14px;
       }
       
       .total-row, .balance-row {
@@ -244,7 +245,7 @@ const OrderOverview = ({ data, loading,fetchOrder }: any) => {
       .footer {
         text-align: center;
         margin-top: 10px;
-        font-size: 10px;
+        font-size: 14px;
       }
       
       .footer div {

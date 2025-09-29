@@ -8,6 +8,12 @@ import {
   ShoppingCart,
   Plus,
   List,
+  FileText,
+  TrendingUp,
+  DollarSign,
+  Package,
+  Building2,
+  BarChart3,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -48,6 +54,33 @@ const data = {
           title: "Purchase History",
           url: "/admin/purchase/history",
           icon: List,
+        },
+      ],
+    },
+    {
+      title: "Reports & Analytics",
+      url: "#",
+      icon: BarChart3,
+      items: [
+        {
+          title: "All Reports",
+          url: "/admin/reports",
+          icon: FileText,
+        },
+        {
+          title: "Purchase Reports",
+          url: "/admin/reports/purchases",
+          icon: ShoppingCart,
+        },
+        {
+          title: "Inventory Reports",
+          url: "/admin/reports/inventory",
+          icon: Package,
+        },
+        {
+          title: "Supplier Reports",
+          url: "/admin/reports/suppliers",
+          icon: Building2,
         },
       ],
     },

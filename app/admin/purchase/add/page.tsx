@@ -73,7 +73,7 @@ const AddPurchasePage = () => {
     }));
   };
 
-  const handleItemChange = (index: number, field: keyof PurchaseItem, value: string | number) => {
+  const handleItemChange = (index: number, field: any, value: string | number) => {
     setItems(prev => {
       const newItems = [...prev];
       

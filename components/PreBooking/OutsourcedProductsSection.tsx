@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -83,17 +83,7 @@ export const OutsourcedProductsSection = ({
   const [editingQuantity, setEditingQuantity] = useState(1)
   const [isExpanded, setIsExpanded] = useState(false)
 
-  useEffect(() => {
-    fetchSuppliers()
-  }, [])
-
-  useEffect(() => {
-    if (selectedSupplier) {
-      fetchProductsBySupplier()
-    }
-  }, [selectedSupplier])
-
-  const fetchSuppliers = async () => {
+  const fetchSuppliers = useCallback(async () => {
     setLoading(prev => ({ ...prev, suppliers: true }))
     try {
       const response = await get<ResponseType>(API_ENDPOINTS.SUPPLIERS.GET_ALL, {
@@ -117,9 +107,9 @@ export const OutsourcedProductsSection = ({
     } finally {
       setLoading(prev => ({ ...prev, suppliers: false }))
     }
-  }
+  }, [])
 
-  const fetchProductsBySupplier = async () => {
+  const fetchProductsBySupplier = useCallback(async () => {
     if (!selectedSupplier) return
     setLoading(prev => ({ ...prev, products: true }))
     try {
@@ -145,7 +135,17 @@ export const OutsourcedProductsSection = ({
     } finally {
       setLoading(prev => ({ ...prev, products: false }))
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    fetchSuppliers()
+  }, [fetchSuppliers])
+
+  useEffect(() => {
+    if (selectedSupplier) {
+      fetchProductsBySupplier()
+    }
+  }, [])
 
   const handleAddSupplier = async () => {
     if (!newSupplier.name || !newSupplier.contact) {
@@ -248,6 +248,37 @@ export const OutsourcedProductsSection = ({
     }
   }
 
+  const updateFormDataWithOutsourcedItems = useCallback((items: OutsourcedItem[]) => {
+    setFormData((prev: any) => {
+      const orderItemsQuantity = (prev.order_items || []).reduce(
+        (sum: number, item: any) => sum + Number(item.quantity || 0),
+        0
+      )
+      const outsourcedItemsQuantity = items.reduce(
+        (sum, item) => sum + Number(item.quantity || 0),
+        0
+      )
+      const totalQuantity = orderItemsQuantity + outsourcedItemsQuantity
+
+      const orderItemsTotal = (prev.order_items || []).reduce(
+        (sum: number, item: any) => sum + Number(item.total_price || 0),
+        0
+      )
+      const outsourcedItemsTotal = items.reduce(
+        (sum, item) => sum + Number(item.total_price || 0),
+        0
+      )
+      const totalAmount = orderItemsTotal + outsourcedItemsTotal - Number(prev.discount || 0)
+
+      return {
+        ...prev,
+        outsourced_items: items,
+        total_quantity: totalQuantity,
+        total_amount: totalAmount
+      }
+    })
+  }, [])
+
   const addOutsourcedItem = () => {
     if (!selectedProduct || quantity <= 0) {
       toast({
@@ -305,64 +336,46 @@ export const OutsourcedProductsSection = ({
         description: `${product.product_name} added to outsourced items`,
       })
     }
-  
+
     setSelectedProduct("")
     setQuantity(1)
   }
-  
-  // Helper function to update form data
-  const updateFormDataWithOutsourcedItems = (items: OutsourcedItem[]) => {
-    setFormData((prev: any) => {
-      // Calculate total quantity
-      const orderItemsQuantity = (prev.order_items || []).reduce(
-        (sum: number, item: any) => sum + Number(item.quantity || 0), 
-        0
-      )
-      const outsourcedItemsQuantity = items.reduce(
-        (sum, item) => sum + Number(item.quantity || 0), 
-        0
-      )
-      const totalQuantity = orderItemsQuantity + outsourcedItemsQuantity
 
-      // Calculate total amount
-      const orderItemsTotal = (prev.order_items || []).reduce(
-        (sum: number, item: any) => sum + Number(item.total_price || 0), 
-        0
-      )
-      const outsourcedItemsTotal = items.reduce(
-        (sum, item) => sum + Number(item.total_price || 0), 
-        0
-      )
-      const totalAmount = orderItemsTotal + outsourcedItemsTotal - Number(prev.discount || 0)
+  const updateItemsForNewDays = useCallback(() => {
+    if (outsourcedItems.length === 0) {
+      return
+    }
 
-      return {
-        ...prev,
-        outsourced_items: items,
-        total_quantity: totalQuantity,
-        total_amount: totalAmount
-      }
+    const days = formData?.no_of_days || 1
+    const updatedItems = outsourcedItems.map(item => ({
+      ...item,
+      no_of_days: days,
+      total_price: item.price * item.quantity * days,
+    }))
+
+    const hasChanges = outsourcedItems.some(item => {
+      const expectedTotal = item.price * item.quantity * days
+      return item.no_of_days !== days || item.total_price !== expectedTotal
     })
-  }
+
+    if (!hasChanges) {
+      return
+    }
+
+    setOutsourcedItems(updatedItems)
+    updateFormDataWithOutsourcedItems(updatedItems)
+  }, [formData?.no_of_days, outsourcedItems, setOutsourcedItems, updateFormDataWithOutsourcedItems])
 
   useEffect(() => {
-    if (outsourcedItems.length > 0) {
-      const updatedItems = outsourcedItems.map(item => ({
-        ...item,
-        no_of_days: formData.no_of_days || 1,
-        total_price: item.price * item.quantity * (formData.no_of_days || 1)
-      }))
-      
-      setOutsourcedItems(updatedItems)
-      updateFormDataWithOutsourcedItems(updatedItems)
-    }
-  }, [formData?.no_of_days])
+    updateItemsForNewDays()
+  }, [updateItemsForNewDays])
 
   // Auto-expand when items are added
   useEffect(() => {
     if (outsourcedItems.length > 0 && !isExpanded) {
       setIsExpanded(true)
     }
-  }, [outsourcedItems.length])
+  }, [outsourcedItems, isExpanded])
 
   const removeOutsourcedItem = (index: number) => {
     const removedItem = outsourcedItems[index]

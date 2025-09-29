@@ -78,6 +78,8 @@ export const API_ENDPOINTS = {
     ADD: `/api/v1/purchase/add`,
     BULK_UPLOAD: `/api/v1/purchase/bulk-upload`,
     LIST: `/api/v1/purchase/list`,
+    REPORTS: `/api/v1/purchase/reports`,
+    SUMMARY: `/api/v1/purchase/summary`,
     GET_BY_ID: `/api/v1/purchase`,
     UPDATE_STATUS: `/api/v1/purchase`,
     DELETE: `/api/v1/purchase`,

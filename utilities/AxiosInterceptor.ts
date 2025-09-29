@@ -1,6 +1,7 @@
 import { API_ENDPOINTS } from "@/lib/apiEndpoints";
 import axios, { AxiosRequestConfig } from "axios";
 import Cookies from "js-cookie";
+import { clearAuthAndRedirect, isAuthPage, getCurrentPathname } from "./authUtils";
 
 // const API_URL = "https://server.momenz.in";
 const API_URL = "http://localhost:5000";
@@ -27,7 +28,9 @@ const refreshTokenApi = async () => {
         { expires: 1 }
       );
 
-      window.location.href = '/auth'
+      if (typeof window !== 'undefined') {
+        window.location.href = '/auth';
+      }
       throw new Error("Session expired, logging out.");
     }
 
@@ -36,7 +39,11 @@ const refreshTokenApi = async () => {
     } else {
       throw new Error("Token refresh failed");
     }
-  } catch (error) {
+  } catch (error: any) {
+    // If it's a 401 error (no tokens), handle it gracefully
+    if (error.response?.status === 401) {
+      clearAuthAndRedirect("Session expired", "Please log in again.");
+    }
     throw error;
   }
 };
@@ -47,11 +54,20 @@ axiosApi.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // Don't try to refresh if this IS the refresh endpoint
+    const isRefreshEndpoint = originalRequest.url?.includes('/auth/refresh');
+    
+    // Don't try to refresh if we're already on the auth page
+    const currentPath = getCurrentPathname();
+    const onAuthPage = isAuthPage(currentPath);
+
     if (
       error.response &&
       error.response.status === 401 &&
       !originalRequest._retry &&
-      !error.response.sessionOut
+      !error.response.sessionOut &&
+      !isRefreshEndpoint &&
+      !onAuthPage
     ) {
       originalRequest._retry = true;
 
@@ -64,8 +80,15 @@ axiosApi.interceptors.response.use(
         }
       } catch (refreshError) {
         console.error("Refresh Token Error:", refreshError);
+        // If refresh fails, redirect to login
+        clearAuthAndRedirect("Session expired", "Please log in again.");
         throw refreshError;
       }
+    }
+
+    // If this is the refresh endpoint failing, redirect to login immediately
+    if (isRefreshEndpoint && error.response?.status === 401) {
+      clearAuthAndRedirect("Session expired", "Please log in again.");
     }
 
     return Promise.reject(error);
