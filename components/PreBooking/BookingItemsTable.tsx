@@ -65,8 +65,8 @@ export const BookingItemsTable = ({
                 </TableCell>
                 <TableCell className="font-medium">₹{(item.total_price || 0).toFixed(2)}</TableCell>
                 <TableCell>
-                  <Button variant="ghost" size="icon" onClick={() => removeItem(index)}>
-                    <Trash2 className="h-4 w-4" />
+                  <Button variant="ghost" size="sm" onClick={() => removeItem(index)}>
+                    Remove
                   </Button>
                 </TableCell>
               </TableRow>

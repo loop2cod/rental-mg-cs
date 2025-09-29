@@ -88,7 +88,7 @@ export function TimePicker({ value, onChange, placeholder = "HH:MM", className =
       onBlur={handleBlur}
       placeholder={placeholder}
       maxLength={5}
-      className={`w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`}
+      className={`w-full px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${className}`}
     />
   );
 }

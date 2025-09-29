@@ -146,14 +146,13 @@ export function InventoryTable({
               <TooltipTrigger asChild>
              <Button
             variant="ghost"
-            size="lg"
+            size="sm"
             onClick={(e) => {
               e.stopPropagation()
               router.push(`/list-inventory/overview/${item._id}`)
             }}
           >
-            <EyeIcon className="h-4 w-4" />
-            <span className="sr-only">View</span>
+            View
           </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -168,14 +167,13 @@ export function InventoryTable({
             <TooltipTrigger asChild>
           <Button
             variant="ghost"
-            size="lg"
+            size="sm"
             onClick={(e) => {
               e.stopPropagation()
               onEdit(item)
             }}
           >
-            <Edit className="h-4 w-4" />
-            <span className="sr-only">Edit</span>
+            Edit
           </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -190,7 +188,7 @@ export function InventoryTable({
           <TooltipTrigger asChild>
           <Button
             variant="ghost"
-            size="lg"
+            size="sm"
             onClick={(e) => {
               e.stopPropagation()
               handleDelete(item._id)
@@ -200,9 +198,8 @@ export function InventoryTable({
             {deletingId === item._id ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <Trash2 className="h-4 w-4" />
+              "Delete"
             )}
-            <span className="sr-only">Delete</span>
             </Button>
           </TooltipTrigger>
           <TooltipContent>

@@ -151,7 +151,7 @@ export function OrderOutsourcedItemsDetailsTable({
                 getAvailableForDispatchQuantity(item.out_product_id) <= 0
               )}
             >
-              <Truck className="mr-1 h-4 w-4" /> Dispatch All
+              Dispatch All
             </Button>
             <Button
               variant="outline"
@@ -162,7 +162,7 @@ export function OrderOutsourcedItemsDetailsTable({
                 getAvailableForReturnQuantity(item.out_product_id) <= 0
               )}
             >
-              <Undo className="mr-1 h-4 w-4" /> Return All
+              Return All
             </Button>
             <Badge variant="outline" className="ml-auto">
               {items.length} {items.length === 1 ? "item" : "items"}
@@ -251,7 +251,7 @@ export function OrderOutsourcedItemsDetailsTable({
                           className='text-xs'
                           disabled={availableForDispatch <= 0}
                         >
-                          <Truck className="mr-1 h-4 w-4" /> Dispatch
+                          Dispatch
                         </Button>
                         <Button
                           variant="ghost"
@@ -263,7 +263,7 @@ export function OrderOutsourcedItemsDetailsTable({
                           className='text-xs'
                           disabled={availableForReturn <= 0}
                         >
-                          <Undo className="mr-1 h-4 w-4" /> Return
+                          Return
                         </Button>
                       </TableCell>
                     </TableRow>

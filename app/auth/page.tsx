@@ -22,7 +22,7 @@ interface AuthResponse {
 }
 
 const Page = () => {
-  const apiUrl ="https://server.momenz.in"
+  const apiUrl ="http://localhost:5000"
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -90,7 +90,15 @@ const Page = () => {
 
       if (response.success) {
         console.log('done')
-        const redirectTo = redirect ? decodeURIComponent(redirect) : '/momenz-dashboard';
+        // Check user role and redirect accordingly
+        const userRole = response.user?.role;
+        let defaultRedirect = '/momenz-dashboard';
+        
+        if (userRole === 'admin') {
+          defaultRedirect = '/admin-settings';
+        }
+        
+        const redirectTo = redirect ? decodeURIComponent(redirect) : defaultRedirect;
         router.push(redirectTo);
       } else {
         toast({

@@ -153,7 +153,7 @@ export function OrderItemsDetailsTable({
                 getAvailableForDispatchQuantity(item.product_id) <= 0
               )}
             >
-              <Truck className="mr-1 h-4 w-4" /> Dispatch All
+              Dispatch All
             </Button>
             <Button
               variant="outline"
@@ -164,7 +164,7 @@ export function OrderItemsDetailsTable({
                 getAvailableForReturnQuantity(item.product_id) <= 0
               )}
             >
-              <Undo className="mr-1 h-4 w-4" /> Return All
+              Return All
             </Button>
             <Badge variant="outline" className="ml-auto">
               {items.length} {items.length === 1 ? "item" : "items"}
@@ -253,7 +253,7 @@ export function OrderItemsDetailsTable({
                           className='text-xs'
                           disabled={availableForDispatch <= 0}
                         >
-                          <Truck className="mr-1 h-4 w-4" /> Dispatch
+                          Dispatch
                         </Button>
                         <Button
                           variant="ghost"
@@ -265,7 +265,7 @@ export function OrderItemsDetailsTable({
                           className='text-xs'
                           disabled={availableForReturn <= 0}
                         >
-                          <Undo className="mr-1 h-4 w-4" /> Return
+                          Return
                         </Button>
                       </TableCell>
                     </TableRow>

@@ -65,15 +65,14 @@ const SupplierTable = ({
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 hover:bg-gray-100"
+                  size="sm"
+                  className="h-8 hover:bg-gray-100"
                   onClick={(e) => {
                     e.stopPropagation();
                     router.push(`/list-suppliers/${item?._id}`)
                   }}
                 >
-                  <View className="h-4 w-4 " />
-                  <span className="sr-only">View</span>
+                  View
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -87,15 +86,14 @@ const SupplierTable = ({
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 hover:bg-gray-100"
+                  size="sm"
+                  className="h-8 hover:bg-gray-100"
                   onClick={(e) => {
                     e.stopPropagation();
                     onEdit(item);
                   }}
                 >
-                  <Edit className="h-4 w-4" />
-                  <span className="sr-only">Edit</span>
+                  Edit
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
