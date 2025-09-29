@@ -5,6 +5,9 @@ import {
   LayoutDashboard,
   Settings2,
   Users,
+  ShoppingCart,
+  Plus,
+  List,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -31,6 +34,23 @@ const data = {
     },
   ],
   navMain: [
+    {
+      title: "Purchases",
+      url: "#",
+      icon: ShoppingCart,
+      items: [
+        {
+          title: "Add Purchase",
+          url: "/admin/purchase/add",
+          icon: Plus,
+        },
+        {
+          title: "Purchase History",
+          url: "/admin/purchase/history",
+          icon: List,
+        },
+      ],
+    },
     {
       title: "Settings",
       url: "#",

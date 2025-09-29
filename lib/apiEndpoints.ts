@@ -73,6 +73,14 @@ export const API_ENDPOINTS = {
     CREATE_STAFF: `/api/v1/admin/create-staff`,
     DELETE_STAFF: `/api/v1/admin/delete-staff`,
     RESET_PASSWORD: `/api/v1/admin/reset-password`,
+  },
+  PURCHASE: {
+    ADD: `/api/v1/purchase/add`,
+    BULK_UPLOAD: `/api/v1/purchase/bulk-upload`,
+    LIST: `/api/v1/purchase/list`,
+    GET_BY_ID: `/api/v1/purchase`,
+    UPDATE_STATUS: `/api/v1/purchase`,
+    DELETE: `/api/v1/purchase`,
   }
 } as const;
 
