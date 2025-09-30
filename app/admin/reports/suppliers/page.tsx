@@ -82,9 +82,9 @@ const SuppliersReportsPage = () => {
 
   const calculateSummaryStats = useCallback((supplierData: Supplier[]) => {
     const totalSuppliers = supplierData.length;
-    const totalPurchases = supplierData.reduce((sum, s) => sum + (s.totalPurchases || 0), 0);
-    const totalAmount = supplierData.reduce((sum, s) => sum + (s.totalAmount || 0), 0);
-    const suppliersWithContact = supplierData.filter(s => s.phone || s.supplierContact).length;
+    const totalPurchases = supplierData.reduce((sum, s:any) => sum + (s.totalPurchases || 0), 0);
+    const totalAmount = supplierData.reduce((sum, s:any) => sum + (s.totalAmount || 0), 0);
+    const suppliersWithContact = supplierData.filter((s:any) => s.phone || s.supplierContact).length;
 
     setSummaryStats({
       totalSuppliers,
@@ -97,7 +97,7 @@ const SuppliersReportsPage = () => {
   const fetchSuppliersData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await get<ResponseType>(`http://localhost:5000/api/v1/reports/supplier`, {
+      const response = await get<ResponseType>(`/api/v1/reports/supplier`, {
         withCredentials: true,
       });
 
@@ -169,7 +169,7 @@ const SuppliersReportsPage = () => {
   }, [calculateSummaryStats]);
 
   const getFilteredSuppliers = () => {
-    return suppliers.filter(supplier => {
+    return suppliers.filter((supplier:any) => {
       const name = supplier.name || supplier.supplierName || '';
       const contactPerson = supplier.contact_person || '';
       const email = supplier.email || supplier.supplierContact || '';
@@ -191,7 +191,7 @@ const SuppliersReportsPage = () => {
       const filteredSuppliers = getFilteredSuppliers();
       
       // Prepare data for Excel
-      const excelData = filteredSuppliers.map((supplier, index) => ({
+      const excelData = filteredSuppliers.map((supplier:any, index) => ({
         'S.No.': index + 1,
         'Supplier Name': supplier.name,
         'Contact': supplier.phone || supplier.supplierContact || 'N/A',
@@ -210,10 +210,10 @@ const SuppliersReportsPage = () => {
 
       // Top suppliers breakdown
       const topSuppliers = suppliers
-        .filter(s => s.totalAmount > 0)
-        .sort((a, b) => (b.totalAmount || 0) - (a.totalAmount || 0))
+        .filter((s:any) => s.totalAmount > 0)
+        .sort((a:any, b:any) => (b.totalAmount || 0) - (a.totalAmount || 0))
         .slice(0, 10)
-        .map(supplier => ({
+        .map((supplier:any) => ({
           'Supplier Name': supplier.name,
           'Total Purchases': supplier.totalPurchases || 0,
           'Total Amount': supplier.totalAmount || 0,
@@ -312,7 +312,7 @@ const SuppliersReportsPage = () => {
       pdf.text('SUPPLIER DETAILS', margin, finalY);
 
       const filteredSuppliers = getFilteredSuppliers();
-      const supplierTableData = filteredSuppliers.map((supplier, index) => [
+      const supplierTableData = filteredSuppliers.map((supplier:any, index) => [
         (index + 1).toString(),
         supplier.name || 'N/A',
         supplier.phone || supplier.supplierContact || 'N/A',
@@ -559,7 +559,7 @@ const SuppliersReportsPage = () => {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredSuppliers.map((supplier) => (
+                    filteredSuppliers.map((supplier:any) => (
                       <TableRow key={supplier._id}>
                         <TableCell className="font-medium">{supplier.name}</TableCell>
                         <TableCell>

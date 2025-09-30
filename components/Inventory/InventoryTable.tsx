@@ -1,14 +1,12 @@
 "use client"
 
-import Image from "next/image"
-import { Edit, Trash2, Loader2, Eye, EyeIcon } from "lucide-react"
+import { Edit, Trash2, Loader2, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { DataTable, type ColumnDef } from "@/components/ui/data-table"
 import { Badge } from "../ui/badge"
-import { useMemo, useState } from "react"
+import { Card } from "@/components/ui/card"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { formatCurrency } from "@/lib/commonFunctions"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface InventoryTableProps {
   onSearch?: (term: string) => void
@@ -38,203 +36,136 @@ export function InventoryTable({
   const router = useRouter()
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
-  // Handle delete with loading state
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     setDeletingId(id)
-    try {
-      await onDelete(id)
-    } finally {
-      setDeletingId(null)
-    }
+    onDelete(id)
+    setDeletingId(null)
   }
 
-  // Define columns for the data table using useMemo
-  const columns: ColumnDef<any>[] = useMemo(() => [
-    {
-      id: "image",
-      header: "Image",
-      cell: (item: any) => (
-        <div className="h-12 w-12 relative rounded-md overflow-hidden">
-          <img
-            src={item?.images?.[0] || "/placeHolder.jpg"}
-            alt={item?.name}
-            className="object-cover"
-          />
-        </div>
-      ),
-      sortable: false,
-      searchable: false,
-    },
-    {
-      id: "code",
-      header: "Code",
-      accessorKey: "code",
-      sortable: true,
-      searchable: true,
-      cell: (item: any) => (
-        <Badge variant="secondary" className="font-mono">
-          {item?.code || "N/A"}
-        </Badge>
-      ),
-    },
-    {
-      id: "name",
-      header: "Product",
-      accessorKey: "name",
-      sortable: true,
-      searchable: true,
-      cell: (item: any) => (
-        <span
-         className="decoration-secondary-foreground decoration-2 underline-offset-4">
-          {item?.name}
-        </span>
-      ),
-    },
-    {
-      id: "categoryName",
-      header: "Category",
-      accessorKey: "categoryName",
-      sortable: true,
-      searchable: true,
-    },
-    {
-      id: "features",
-      header: "Features",
-      accessorKey: "features",
-      cell: (item) => (
-        <div className="flex flex-wrap gap-1">
-          {item?.features &&
-            Object.entries(item?.features).map(([key, value]: any) => (
-              <Badge key={key} variant="outline" className="capitalize">
-                {key}: {value}
-              </Badge>
-            ))}
-        </div>
-      ),
-      sortable: false,
-      searchable: false,
-    },
-    {
-      id: "price",
-      header: "Price",
-      accessorKey: "unit_cost",
-      cell: (item: any) => `${formatCurrency(item?.unit_cost||0)}`,
-      sortable: true,
-      searchable: false,
-    },
-    {
-      id: "quantity",
-      header: "Quantity",
-      accessorKey: "inventoryQuantity",
-      sortable: true,
-      searchable: false,
-    },
-    {
-      id: "available",
-      header: "Available",
-      accessorKey: "available_quantity",
-      sortable: true,
-      searchable: false,
-    },
-    {
-      id: "actions",
-      header: "Actions",
-      cell: (item) => (
-        <div className="flex justify-start gap-2">
-             <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-             <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation()
-              router.push(`/list-inventory/overview/${item._id}`)
-            }}
-          >
-            View
-          </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>
-              View Product
-            </p>
-          </TooltipContent>
-          </Tooltip>
-          </TooltipProvider>
-          <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation()
-              onEdit(item)
-            }}
-          >
-            Edit
-          </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>
-              Edit Product
-            </p>
-          </TooltipContent>
-          </Tooltip>
-          </TooltipProvider>
-          <TooltipProvider>
-          <Tooltip>
-          <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation()
-              handleDelete(item._id)
-            }}
-            disabled={deletingId === item._id}
-          >
-            {deletingId === item._id ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              "Delete"
-            )}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>
-              Delete Product
-            </p>
-          </TooltipContent>
-          </Tooltip>
-          </TooltipProvider>
-        </div>
-      ),
-      sortable: false,
-      searchable: false,
-    },
-  ], [onEdit, handleDelete, deletingId])
+  const getStockColor = (available: number, total: number) => {
+    const ratio = available / total
+    if (ratio === 0) return "bg-red-100 text-red-700"
+    if (ratio < 0.2) return "bg-orange-100 text-orange-700"
+    return "bg-green-100 text-green-700"
+  }
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 p-2">
+        {[...Array(10)].map((_, i) => (
+          <Card key={i} className="p-2 animate-pulse">
+            <div className="w-full aspect-[5/7] bg-gray-200 rounded mb-1"></div>
+            <div className="h-3 bg-gray-200 rounded mb-1 w-3/4"></div>
+            <div className="h-2 bg-gray-200 rounded w-1/2"></div>
+          </Card>
+        ))}
+      </div>
+    )
+  }
 
   return (
-    <div className="px-2 md:px-2 lg:px-4">
-      <DataTable
-        itemsPerPageOptions={[5, 10, 20, 50, 100]}
-        isLoading={isLoading}
-        data={inventory}
-        columns={columns}
-        serialNumber={true}
-        showSearchBar={true}
-        showPdfExport={true}
-        showExcelExport={true}
-        showPagination={true}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        totalCount={totalCount}
-        onPageChange={onPageChange}
-        onPageSizeChange={onPageSizeChange}
-        onSearch={onSearch}
-      />
+    <div className="p-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+        {inventory?.map((item: any) => (
+          <Card key={item._id} className="p-2 hover:shadow-md transition-shadow">
+            {/* Image */}
+            <div className="relative w-full mb-1 rounded overflow-hidden bg-gray-50 aspect-[5/7]">
+              <img
+                src={item?.images?.[0] || "/placeHolder.jpg"}
+                alt={item?.name}
+                className="w-full h-full object-cover"
+              />
+              <Badge 
+                variant="secondary" 
+                className="absolute top-0.5 left-0.5 text-[10px] font-mono px-1 py-0"
+              >
+                {item?.code || "N/A"}
+              </Badge>
+            </div>
+
+            {/* Content */}
+            <div className="space-y-1">
+              <h3 className="font-medium text-xs leading-tight truncate" title={item?.name}>
+                {item?.name}
+              </h3>
+              
+              <p className="text-[10px] text-gray-500 truncate">
+                {item?.categoryName || "Uncategorized"}
+              </p>
+
+              {/* Price & Stock */}
+              <div className="flex justify-between items-center text-[10px]">
+                <span className="font-semibold">{formatCurrency(item?.unit_cost || 0)}</span>
+                <Badge 
+                  className={`px-1 py-0 text-[9px] ${getStockColor(item?.available_quantity || 0, item?.inventoryQuantity || 0)}`}
+                  variant="outline"
+                >
+                  {item?.available_quantity || 0}/{item?.inventoryQuantity || 0}
+                </Badge>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-0.5 pt-0.5">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 h-6 text-[10px] px-1"
+                  onClick={() => router.push(`/list-inventory/overview/${item._id}`)}
+                >
+                  <Eye className="h-2.5 w-2.5 mr-0.5" />
+                  View
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-6 px-1"
+                  onClick={() => onEdit(item)}
+                >
+                  <Edit className="h-2.5 w-2.5" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-6 px-1 text-red-600 hover:text-red-700"
+                  onClick={() => handleDelete(item._id)}
+                  disabled={deletingId === item._id}
+                >
+                  {deletingId === item._id ? (
+                    <Loader2 className="h-2.5 w-2.5 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-2.5 w-2.5" />
+                  )}
+                </Button>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      {/* Simple Pagination */}
+      {totalPages && totalPages > 1 && (
+        <div className="flex justify-center items-center gap-2 mt-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onPageChange?.(currentPage! - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </Button>
+          <span className="text-xs px-2">
+            {currentPage} / {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onPageChange?.(currentPage! + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

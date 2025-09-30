@@ -138,7 +138,7 @@ const PurchaseReportsPage = () => {
       if (dateTo) params.append('endDate', dateTo);
       if (selectedStatus && selectedStatus !== 'all') params.append('status', selectedStatus);
 
-      const response = await get<ResponseType>(`http://localhost:5000/api/v1/reports/purchase?${params.toString()}`, {
+      const response = await get<ResponseType>(`/api/v1/reports/purchase?${params.toString()}`, {
         withCredentials: true,
       });
 

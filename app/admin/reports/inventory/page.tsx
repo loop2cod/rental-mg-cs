@@ -129,7 +129,7 @@ const InventoryReportsPage = () => {
       const params = new URLSearchParams();
       if (selectedCategory !== 'all') params.append('categoryId', selectedCategory);
 
-      const response = await get<ResponseType>(`http://localhost:5000/api/v1/reports/inventory?${params}`, {
+      const response = await get<ResponseType>(`/api/v1/reports/inventory?${params}`, {
         withCredentials: true,
       });
 

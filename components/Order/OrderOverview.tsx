@@ -55,7 +55,7 @@ const OrderOverview = ({ data, loading,fetchOrder }: any) => {
     return `
       <div class="bill-container">
         <div class="header">
-          <img src="/logo.png" alt="Company Logo" class="logo" />
+          <img src="/logo.svg" alt="Company Logo" class="logo" />
           <div class="company-info">
             <div>Payyanur, Kerala, India</div>
             <div>Phone: +91 9847400022</div>
@@ -182,6 +182,7 @@ const OrderOverview = ({ data, loading,fetchOrder }: any) => {
         height: auto;
         margin: 0 auto;
         display: block;
+        filter: brightness(0);
       }
       
       .header h1 {
