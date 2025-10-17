@@ -11,7 +11,9 @@ interface PaymentSummaryCardProps {
     booking_id: string
     total_amount: number
     amount_paid: number
+    total_amount_paid: number
     discount: number
+    sub_total: number
     user_id: string
   }
     onPaymentUpdate?: () => void
@@ -19,7 +21,9 @@ interface PaymentSummaryCardProps {
 
 export function OrderPaymentSummaryCard({ booking,onPaymentUpdate = () => {} }: PaymentSummaryCardProps) {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const percentagePaid = (booking.amount_paid / booking.total_amount) * 100
+  const amountPaid = booking.total_amount_paid || booking.amount_paid || 0
+  const percentagePaid = booking.total_amount > 0 ? (amountPaid / booking.total_amount) * 100 : 0
+  const remainingBalance = booking.total_amount - amountPaid
 
   return (
     <>
@@ -33,20 +37,20 @@ export function OrderPaymentSummaryCard({ booking,onPaymentUpdate = () => {} }: 
       <CardContent>
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">Total Amount</span>
-            <span className="font-medium">{formatCurrency(booking.total_amount)}</span>
+            <span className="text-sm text-muted-foreground">Sub Total</span>
+            <span className="font-medium">{formatCurrency(booking.sub_total || 0)}</span>
           </div>
 
           <div className="flex justify-between items-center">
             <span className="text-sm text-muted-foreground">Discount</span>
-            <span className="font-medium text-destructive">-{formatCurrency(booking.discount)}</span>
+            <span className="font-medium text-destructive">-{formatCurrency(booking.discount || 0)}</span>
           </div>
 
           <div className="border-t pt-2">
             <div className="flex justify-between items-center">
-              <span className="text-base font-medium">Net Amount</span>
+              <span className="text-base font-medium">Total Amount</span>
               <span className="text-lg font-bold">
-                {formatCurrency(booking.total_amount - booking.discount)}
+                {formatCurrency(booking.total_amount)}
               </span>
             </div>
           </div>
@@ -54,15 +58,15 @@ export function OrderPaymentSummaryCard({ booking,onPaymentUpdate = () => {} }: 
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <span className="text-sm text-muted-foreground">Amount Paid</span>
-              <span className="font-medium">{formatCurrency(booking.amount_paid)}</span>
+              <span className="font-medium text-green-600">{formatCurrency(amountPaid)}</span>
             </div>
 
             <Progress value={percentagePaid} className="h-2" />
 
             <div className="flex justify-between items-center text-sm">
               <span className="text-muted-foreground">{percentagePaid.toFixed(0)}% Paid</span>
-              <span className="font-medium text-primary">
-                Balance: {formatCurrency(booking.total_amount - booking.amount_paid)}
+              <span className={`font-medium ${remainingBalance > 0 ? 'text-orange-600' : 'text-green-600'}`}>
+                Balance: {formatCurrency(remainingBalance)}
               </span>
             </div>
           </div>
@@ -81,7 +85,7 @@ export function OrderPaymentSummaryCard({ booking,onPaymentUpdate = () => {} }: 
               {
                 _id: booking?.booking_id,
                 total_amount: booking.total_amount,
-                amount_paid: booking.amount_paid,
+                amount_paid: amountPaid,
                 user_id: booking.user_id,
               }
             }

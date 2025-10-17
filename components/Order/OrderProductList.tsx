@@ -55,21 +55,17 @@ export const OrderProductList = ({ products, loading, onAddToBooking }: ProductL
       </CardHeader>
       <CardContent className="py-2">
         <ScrollArea className="h-[calc(100vh-250px)] rounded-lg shadow-sm overflow-y-auto">
-          <div className="space-y-2 p-2">
+          <div className="p-2">
             {loading ? (
-              Array.from({ length: 8 }).map((_, index) => (
-                <div key={index} className="flex items-center justify-between p-2 rounded-lg">
-                  <div className="flex items-center gap-4">
-                    <Skeleton className="h-14 w-14 rounded-md" />
-                    <div className="flex flex-col space-y-1">
-                      <Skeleton className="h-4 w-24" />
-                      <Skeleton className="h-3 w-16" />
-                      <Skeleton className="h-3 w-20" />
-                    </div>
+              <div className="grid grid-cols-2 gap-2">
+                {Array.from({ length: 12 }).map((_, index) => (
+                  <div key={index} className="p-2 border rounded-lg">
+                    <Skeleton className="w-full aspect-[5/7] rounded mb-1" />
+                    <Skeleton className="h-3 w-3/4 mb-1" />
+                    <Skeleton className="h-2 w-1/2" />
                   </div>
-                  <Skeleton className="h-5 w-12" />
-                </div>
-              ))
+                ))}
+              </div>
             ) : (
               <>
                 {filteredProducts.length === 0 ? (
@@ -77,13 +73,15 @@ export const OrderProductList = ({ products, loading, onAddToBooking }: ProductL
                     {searchTerm ? "No products found" : "No products available"}
                   </div>
                 ) : (
-                  filteredProducts.map((product) => (
-                    <OrderDraggableProduct
-                      key={product._id} 
-                      product={product} 
-                      onAddToBooking={onAddToBooking} 
-                    />
-                  ))
+                  <div className="grid grid-cols-2 gap-2">
+                    {filteredProducts.map((product) => (
+                      <OrderDraggableProduct
+                        key={product._id} 
+                        product={product} 
+                        onAddToBooking={onAddToBooking} 
+                      />
+                    ))}
+                  </div>
                 )}
               </>
             )}

@@ -2,10 +2,8 @@
 import React, { useMemo, useState } from "react";
 import { ColumnDef, DataTable } from "../ui/data-table";
 import { Button } from "../ui/button";
-import { BookUp2Icon, Edit, View, X } from "lucide-react";
 import { format } from "date-fns";
 import { formatCurrency } from "@/lib/commonFunctions";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { useRouter } from "next/navigation";
 import { patch} from "@/utilities/AxiosInterceptor";
 import { API_ENDPOINTS } from "@/lib/apiEndpoints";
@@ -154,92 +152,47 @@ const ListPreBookings = ({
         header: "Actions",
         cell: (item) => (
           <div className="flex justify-start gap-2">
-              <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
-                  size="icon"
+                  size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
                     router.push(`/pre-booking/${item._id}`);
                   }}
                 >
-                  <View className="h-4 w-4" />
-                  <span className="sr-only">View</span>
+                  View
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>
-                  View Booking
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
-                  size="icon"
+                  size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
                     router.push(`/order/${item._id}`);
                   }}
                 >
-                  <BookUp2Icon className="h-4 w-4" />
-                  <span className="sr-only">Make Order</span>
+                  Make Order
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>
-                Make Order
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
-                  size="icon"
+                  size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
                     router.push(`/list-pre-bookings/${item._id}`);
                   }}
                 >
-                  <Edit className="h-4 w-4" />
-                  <span className="sr-only">Edit</span>
+                  Edit
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Edit Booking</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-    
-          <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedBookingId(item._id);
-                      setIsDialogOpen(true);
-                    }}
-                  >
-                    <X className="h-4 w-4" />
-                    <span className="sr-only">Cancel</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Cancel Booking</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedBookingId(item._id);
+                    setIsDialogOpen(true);
+                  }}
+                >
+                  Cancel
+                </Button>
         </div>
         ),
         sortable: false,

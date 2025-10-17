@@ -53,12 +53,12 @@ export function withAuth<T extends object>(Component: React.ComponentType<T>) {
         console.error('Error during token verification:', error);
         setIsAuthenticated(false);
       }
-    }, [triggerFetchUser]);
+    }, []);
 
     // Run the authentication check on mount
     useLayoutEffect(() => {
       checkAuth();
-    }, [checkAuth]);
+    }, []);
 
     // Handle redirects when authentication status changes
     useLayoutEffect(() => {

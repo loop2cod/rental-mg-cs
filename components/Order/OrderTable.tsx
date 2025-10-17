@@ -102,12 +102,45 @@ const OrderTable = ({
             cell: (item) => {
                 const status = item?.status;
                 let variant: "default" | "destructive" | "outline" | "secondary" = "outline";
+                let className = "";
                 
-                if (status === "Pending") variant = "outline";
-                else if (status === "inreturn") variant = "secondary";
-                // Add more status variants as needed
+                switch (status?.toLowerCase()) {
+                    case "pending":
+                        variant = "outline";
+                        className = "bg-yellow-100 text-yellow-800 border-yellow-300";
+                        break;
+                    case "confirmed":
+                    case "active":
+                        variant = "default";
+                        className = "bg-blue-100 text-blue-800 border-blue-300";
+                        break;
+                    case "completed":
+                    case "delivered":
+                    case "success":
+                        variant = "secondary";
+                        className = "bg-green-100 text-green-800 border-green-300";
+                        break;
+                    case "cancelled":
+                    case "failed":
+                        variant = "destructive";
+                        className = "bg-red-100 text-red-800 border-red-300";
+                        break;
+                    case "inreturn":
+                    case "returned":
+                        variant = "secondary";
+                        className = "bg-purple-100 text-purple-800 border-purple-300";
+                        break;
+                    case "processing":
+                    case "in_progress":
+                        variant = "default";
+                        className = "bg-orange-100 text-orange-800 border-orange-300";
+                        break;
+                    default:
+                        variant = "outline";
+                        className = "bg-gray-100 text-gray-800 border-gray-300";
+                }
                 
-                return <Badge variant={variant}>{status}</Badge>;
+                return <Badge variant={variant} className={className}>{status}</Badge>;
             },
             sortable: true,
         },

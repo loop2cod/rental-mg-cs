@@ -3,6 +3,8 @@
 import { useDrag } from "react-dnd"
 import { GripHorizontal, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 
 const OrderDraggableProduct = ({ product, onAddToBooking }: any) => {
   const [{ isDragging }, drag] = useDrag(() => ({
@@ -20,37 +22,65 @@ const OrderDraggableProduct = ({ product, onAddToBooking }: any) => {
   }))
 
   return (
-    <div
+    <Card
       ref={drag as any}
-      className={`flex items-center justify-between p-2 hover:bg-muted transition-all rounded-lg cursor-move ${
+      className={`p-2 hover:shadow-md transition-all cursor-move ${
         isDragging ? "opacity-50" : "opacity-100"
       }`}
     >
-      <div className="flex items-center gap-2">
-        <div className="h-14 w-14 relative rounded-md overflow-hidden">
-          <img src={product?.images[0] || "/placeHolder.jpg"} alt={product.name} className="object-cover" />
-          <div className="absolute top-0 right-0">
-            <GripHorizontal className="h-4 w-4 text-white bg-black/50 rounded-bl" />
-          </div>
+      {/* Image */}
+      <div className="relative w-full mb-1 rounded overflow-hidden bg-gray-50 aspect-[5/7]">
+        <img
+          src={product?.images[0] || "/placeHolder.jpg"}
+          alt={product.name}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute top-0.5 right-0.5">
+          <GripHorizontal className="h-3 w-3 text-white bg-black/50 rounded-bl p-0.5" />
         </div>
-        <div className="flex flex-col">
-          <h3 className="text-sm font-medium">{product?.name}</h3>
-          <div className="flex items-center gap-2">
-            {product?.code && (
-              <span className="text-xs font-mono bg-secondary px-1 py-0.5 rounded">#{product.code}</span>
-            )}
-            <p className="text-xs text-muted-foreground">{product?.category_name || "Table"}</p>
-          </div>
-          <p className="text-xs text-muted-foreground">Availablity: {product?.available_quantity}</p>
-        </div>
+        {product?.code && (
+          <Badge 
+            variant="secondary" 
+            className="absolute top-0.5 left-0.5 text-[10px] font-mono px-1 py-0"
+          >
+            {product.code}
+          </Badge>
+        )}
       </div>
-      <div className="flex flex-col items-end gap-1">
-        <p className="text-sm font-semibold">₹{product?.unit_cost} <span className="text-muted-foreground text-xs">/ day</span></p>
-        <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => onAddToBooking(product)}>
-          <Plus className="h-3 w-3 mr-1" /> Add
+
+      {/* Content */}
+      <div className="space-y-1">
+        <h3 className="font-medium text-xs leading-tight truncate" title={product?.name}>
+          {product?.name}
+        </h3>
+        
+        <p className="text-[10px] text-gray-500 truncate">
+          {product?.category_name || "Uncategorized"}
+        </p>
+
+        {/* Availability */}
+        <p className="text-[10px] text-gray-500">
+          Available: {product?.available_quantity || 0}
+        </p>
+
+        {/* Price */}
+        <div className="flex justify-between items-center text-[10px]">
+          <span className="font-semibold">₹{product?.unit_cost}</span>
+          <span className="text-gray-500">/day</span>
+        </div>
+
+        {/* Add Button */}
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full h-6 text-[10px] px-1"
+          onClick={() => onAddToBooking(product)}
+        >
+          <Plus className="h-2.5 w-2.5 mr-0.5" />
+          Add
         </Button>
       </div>
-    </div>
+    </Card>
   )
 }
 
