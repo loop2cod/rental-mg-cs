@@ -1,10 +1,11 @@
 "use client"
 
-import { Edit, Trash2, Loader2, Eye } from "lucide-react"
+import { Edit, Trash2, Loader2, Eye, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "../ui/badge"
 import { Card } from "@/components/ui/card"
-import { useState } from "react"
+import { Input } from "@/components/ui/input"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { formatCurrency } from "@/lib/commonFunctions"
 
@@ -35,11 +36,52 @@ export function InventoryTable({
 }: InventoryTableProps) {
   const router = useRouter()
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("")
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  const wasSearchingRef = useRef(false)
+
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm)
+    }, 500) // 500ms debounce
+
+    return () => clearTimeout(timer)
+  }, [searchTerm])
+
+  // Call onSearch when debounced term changes
+  useEffect(() => {
+    if (debouncedSearchTerm !== undefined) {
+      wasSearchingRef.current = true
+      onSearch?.(debouncedSearchTerm)
+    }
+  }, [debouncedSearchTerm, onSearch])
+
+  // Restore focus after re-render when searching
+  useEffect(() => {
+    if (wasSearchingRef.current && searchInputRef.current && !isLoading) {
+      const input = searchInputRef.current
+      const cursorPosition = searchTerm.length
+      
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        input.focus()
+        input.setSelectionRange(cursorPosition, cursorPosition)
+        wasSearchingRef.current = false
+      }, 0)
+    }
+  }, [inventory, isLoading, searchTerm])
 
   const handleDelete = (id: string) => {
     setDeletingId(id)
     onDelete(id)
     setDeletingId(null)
+  }
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setSearchTerm(value)
   }
 
   const getStockColor = (available: number, total: number) => {
@@ -65,6 +107,21 @@ export function InventoryTable({
 
   return (
     <div className="p-2">
+      {/* Search Bar */}
+      <div className="mb-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Input
+            ref={searchInputRef}
+            type="text"
+            placeholder="Search inventory..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="pl-10"
+          />
+        </div>
+      </div>
+
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
         {inventory?.map((item: any) => (
           <Card key={item._id} className="p-2 hover:shadow-md transition-shadow">
