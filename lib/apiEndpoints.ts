@@ -36,6 +36,7 @@ export const API_ENDPOINTS = {
     CREATE: `/api/v1/order/create`,
     GET_BY_ID: `/api/v1/order/details`,
     UPDATE: `/api/v1/order/update`,
+    DELETE: `/api/v1/order/delete`,
     DISPATCH: `/api/v1/order/order-dispatch`,
     RETURN: `/api/v1/order/order-return`,
   },

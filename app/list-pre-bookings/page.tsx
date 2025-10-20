@@ -43,10 +43,21 @@ const Page = () => {
         setIsLoading(true);
         try {
             const response = await get<ResponseType>(API_ENDPOINTS.BOOKING.GET_ALL, {
-                params: { page, limit, search },
+                params: { page, limit, search, status: "Pending" },
                 withCredentials: true,
             });
             if (response.success) {
+                console.log('Pre-bookings API response:', response.data);
+                console.log('Bookings received:', response.data.bookings);
+                response.data.bookings?.forEach((booking: any, index: number) => {
+                    console.log(`Booking ${index + 1}:`, {
+                        id: booking._id,
+                        booking_id: booking.booking_id,
+                        status: booking.status,
+                        isDeleted: booking.isDeleted,
+                        user_name: booking.user_id?.name
+                    });
+                });
                 setPreBookings(response.data.bookings);
                 setTotalPages(response.data?.pagination?.totalPages);
                 setTotalCount(response.data?.pagination?.totalItems);

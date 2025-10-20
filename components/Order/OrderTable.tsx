@@ -4,10 +4,21 @@ import { ColumnDef, DataTable } from '../ui/data-table';
 import { useRouter } from 'next/navigation';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { Button } from '../ui/button';
-import { Edit, View } from 'lucide-react';
+import { Edit, View, Trash2 } from 'lucide-react';
 import { formatCurrency } from '@/lib/commonFunctions'
 import { Badge } from '../ui/badge';
 import { format } from 'date-fns';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '../ui/alert-dialog';
 
 const OrderTable = ({
     onSearch,
@@ -18,6 +29,7 @@ const OrderTable = ({
     totalCount,
     onPageChange,
     onPageSizeChange,
+    onDelete,
 }: any) => {
     const router = useRouter();
 
@@ -197,12 +209,55 @@ const OrderTable = ({
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
+
+                    {/* Delete Button - Only show for orders that can be deleted */}
+                    {(item.status === "initiated" || item.status === "in-dispatch") && (
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 hover:bg-red-50 text-red-600 hover:text-red-700"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    Delete
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Delete Order</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        Are you sure you want to delete this order? This action will:
+                                        <ul className="list-disc list-inside mt-2 space-y-1">
+                                            <li>Permanently delete the order</li>
+                                            <li>Restore inventory quantities</li>
+                                            <li>Revert the booking status to "Pending"</li>
+                                        </ul>
+                                        This action cannot be undone.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                        className="bg-red-600 hover:bg-red-700"
+                                        onClick={() => {
+                                            if (onDelete) {
+                                                onDelete(item._id);
+                                            }
+                                        }}
+                                    >
+                                        Delete Order
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    )}
                 </div>
             ),
             sortable: false,
             searchable: false,
         },
-    ], [router]);
+    ], [router, onDelete]);
 
     return (
         <div className="px-2 md:px-4 lg:px-6">

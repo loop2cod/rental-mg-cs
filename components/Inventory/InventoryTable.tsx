@@ -8,6 +8,17 @@ import { Input } from "@/components/ui/input"
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { formatCurrency } from "@/lib/commonFunctions"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "../ui/alert-dialog"
 
 interface InventoryTableProps {
   onSearch?: (term: string) => void
@@ -180,19 +191,44 @@ export function InventoryTable({
                 >
                   <Edit className="h-2.5 w-2.5" />
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-6 px-1 text-red-600 hover:text-red-700"
-                  onClick={() => handleDelete(item._id)}
-                  disabled={deletingId === item._id}
-                >
-                  {deletingId === item._id ? (
-                    <Loader2 className="h-2.5 w-2.5 animate-spin" />
-                  ) : (
-                    <Trash2 className="h-2.5 w-2.5" />
-                  )}
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-6 px-1 text-red-600 hover:text-red-700"
+                      disabled={deletingId === item._id}
+                    >
+                      {deletingId === item._id ? (
+                        <Loader2 className="h-2.5 w-2.5 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-2.5 w-2.5" />
+                      )}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete Product</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to delete "{item?.name}"? This action will:
+                        <ul className="list-disc list-inside mt-2 space-y-1">
+                          <li>Permanently remove the product from inventory</li>
+                          <li>Remove all associated data</li>
+                          <li>This cannot be undone</li>
+                        </ul>
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-red-600 hover:bg-red-700"
+                        onClick={() => handleDelete(item._id)}
+                      >
+                        Delete Product
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
           </Card>

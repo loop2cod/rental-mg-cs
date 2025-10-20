@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/sidebar"
 import { toast } from "@/components/ui/use-toast"
 import { API_ENDPOINTS } from "@/lib/apiEndpoints"
-import { get } from "@/utilities/AxiosInterceptor"
+import { del, get } from "@/utilities/AxiosInterceptor"
 import { useEffect, useState } from "react"
 
 
@@ -63,6 +63,35 @@ const Page = () => {
         });
       } finally {
         setIsLoading(false);
+      }
+    };
+
+    const handleDeleteOrder = async (orderId: string) => {
+      try {
+        const response = await del<ResponseType>(`${API_ENDPOINTS.ORDER.DELETE}/${orderId}`, {
+          withCredentials: true,
+        });
+        
+        if (response.success) {
+          toast({
+            title: "Success",
+            description: response.message || "Order deleted successfully and inventory restored",
+          });
+          // Refresh the orders list
+          fetchOrders(currentPage, itemsPerPage, searchTerm);
+        } else {
+          toast({
+            title: "Error",
+            description: response.message || "Failed to delete order",
+            variant: "destructive",
+          });
+        }
+      } catch (error: any) {
+        toast({
+          title: "Error",
+          description: error.response?.data?.message || error.message || "Failed to delete order",
+          variant: "destructive",
+        });
       }
     };
   
@@ -119,6 +148,7 @@ const Page = () => {
             totalCount={totalCount}
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
+            onDelete={handleDeleteOrder}
           />
     </div>
       </SidebarInset>
