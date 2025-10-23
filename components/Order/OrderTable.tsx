@@ -209,9 +209,6 @@ const OrderTable = ({
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
-
-                    {/* Delete Button - Only show for orders that can be deleted */}
-                    {(item.status === "initiated" || item.status === "in-dispatch") && (
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
                                 <Button
@@ -231,7 +228,6 @@ const OrderTable = ({
                                         <ul className="list-disc list-inside mt-2 space-y-1">
                                             <li>Permanently delete the order</li>
                                             <li>Restore inventory quantities</li>
-                                            <li>Revert the booking status to "Pending"</li>
                                         </ul>
                                         This action cannot be undone.
                                     </AlertDialogDescription>
@@ -251,7 +247,6 @@ const OrderTable = ({
                                 </AlertDialogFooter>
                             </AlertDialogContent>
                         </AlertDialog>
-                    )}
                 </div>
             ),
             sortable: false,

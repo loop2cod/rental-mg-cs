@@ -210,7 +210,7 @@ export function InventoryTable({
                     <AlertDialogHeader>
                       <AlertDialogTitle>Delete Product</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Are you sure you want to delete "{item?.name}"? This action will:
+                        Are you sure you want to delete &quot;{item?.name}&quot;? This action will:
                         <ul className="list-disc list-inside mt-2 space-y-1">
                           <li>Permanently remove the product from inventory</li>
                           <li>Remove all associated data</li>
