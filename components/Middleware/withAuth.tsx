@@ -8,8 +8,8 @@ import Cookies from 'js-cookie';
 import axios from 'axios';
 import { useUser } from '../../context/UserContext';
 
-// const apiUrl ='https://server.momenz.in'
-const apiUrl ='http://localhost:5000'
+const apiUrl ='https://server.momenz.in'
+// const apiUrl ='http://localhost:5000'
 
 // Define the expected response type
 interface AuthResponse {

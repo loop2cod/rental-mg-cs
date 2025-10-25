@@ -24,7 +24,8 @@ interface AuthResponse {
 }
 
 const Page = () => {
-  const apiUrl ="http://localhost:5000"
+  // const apiUrl ="http://localhost:5000"
+  const apiUrl ='https://server.momenz.in'
   const { toast } = useToast();
   const { fetchUser } = useUser();
   const router = useRouter();

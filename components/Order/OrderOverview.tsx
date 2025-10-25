@@ -157,7 +157,6 @@ const OrderOverview = ({ data, loading,fetchOrder }: any) => {
       }
       
       body {
-        font-family: 'Courier New', monospace;
         font-size: 14px;
         line-height: 1.2;
         margin: 0;

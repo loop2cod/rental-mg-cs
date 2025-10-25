@@ -51,6 +51,7 @@ export function InventoryTable({
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("")
   const searchInputRef = useRef<HTMLInputElement>(null)
   const wasSearchingRef = useRef(false)
+  const previousDebouncedTermRef = useRef("")
 
   // Debounce search term
   useEffect(() => {
@@ -61,15 +62,16 @@ export function InventoryTable({
     return () => clearTimeout(timer)
   }, [searchTerm])
 
-  // Call onSearch when debounced term changes
+  // Trigger search when debounced term changes
   useEffect(() => {
-    if (debouncedSearchTerm !== undefined) {
-      wasSearchingRef.current = true
-      onSearch?.(debouncedSearchTerm)
+    if (onSearch && debouncedSearchTerm !== previousDebouncedTermRef.current) {
+      onSearch(debouncedSearchTerm)
+      previousDebouncedTermRef.current = debouncedSearchTerm
     }
   }, [debouncedSearchTerm, onSearch])
 
-  // Restore focus after re-render when searching
+
+  // Restore focus after re-render when searching (only when actually searching, not pagination)
   useEffect(() => {
     if (wasSearchingRef.current && searchInputRef.current && !isLoading) {
       const input = searchInputRef.current
@@ -82,7 +84,7 @@ export function InventoryTable({
         wasSearchingRef.current = false
       }, 0)
     }
-  }, [inventory, isLoading, searchTerm])
+  }, [searchTerm, isLoading]) // Removed inventory dependency to prevent pagination triggers
 
   const handleDelete = (id: string) => {
     setDeletingId(id)
@@ -93,6 +95,7 @@ export function InventoryTable({
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setSearchTerm(value)
+    wasSearchingRef.current = true // Set flag when user types
   }
 
   const getStockColor = (available: number, total: number) => {

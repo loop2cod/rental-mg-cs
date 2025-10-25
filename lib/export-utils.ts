@@ -184,7 +184,7 @@ import { formatCurrency } from "./commonFunctions"
                     // Order/Booking table columns
                     case 'customer_name':
                     case 'user':
-                      return `<td>${cellFormatters.contactInfo(item.user_id?.name, item.user_id?.mobile)}</td>`
+                      return `<td>${cellFormatters.contactInfo(item.user?.name || item.user_id?.name, item.user?.mobile || item.user_id?.mobile)}</td>`
                     case 'from_date':
                       return `<td class="nowrap">${cellFormatters.dateWithTime(item.from_date, item.from_time)}</td>`
                     case 'to_date':
@@ -193,7 +193,7 @@ import { formatCurrency } from "./commonFunctions"
                     case 'order_date':
                       return `<td class="nowrap">${formatDate(item[col.id])}</td>`
                     case 'items':
-                      const products = item.booking_items?.reduce((sum: number, i: any) => sum + i.quantity, 0) || 0
+                      const products = (item.order_items || item.booking_items)?.reduce((sum: number, i: any) => sum + i.quantity, 0) || 0
                       const outsourced = item.outsourced_items?.reduce((sum: number, i: any) => sum + i.quantity, 0) || 0
                       return `<td>Products: ${products}<br>Outsourced: ${outsourced}</td>`
                     case 'total_amount':
@@ -257,32 +257,36 @@ import { formatCurrency } from "./commonFunctions"
           case 'features':
             return `"${cellFormatters.features(item.features).replace(/"/g, '""')}"`
           case 'price':
-            return formatCurrency(item.unit_cost || 0)
+            return `"${formatCurrency(item.unit_cost || 0)}"`
           case 'unit_cost':
-            return formatCurrency(item.unit_cost || 0)
+            return `"${formatCurrency(item.unit_cost || 0)}"`
           case 'quantity':
-            return item.inventoryQuantity || 0
+            return `"${item.inventoryQuantity || 0}"`
           case 'inventoryQuantity':
-            return item.inventoryQuantity || 0
+            return `"${item.inventoryQuantity || 0}"`
             
           // Order/Booking table columns
           case 'customer_name':
           case 'user':
-            return `"${cellFormatters.contactInfo(item.user_id?.name, item.user_id?.mobile).replace(/"/g, '""')}"`
+            const customerName = item.user?.name || item.user_id?.name || '-'
+            const customerMobile = item.user?.mobile || item.user_id?.mobile || '-'
+            return `"${customerName} - ${customerMobile}"`
           case 'from_date':
-            return `"${cellFormatters.dateWithTime(item.from_date, item.from_time).replace(/"/g, '""')}"`
+            return `"${formatDate(item.from_date)} ${formatTime(item.from_time)}"`
           case 'to_date':
-            return `"${cellFormatters.dateWithTime(item.to_date, item.to_time).replace(/"/g, '""')}"`
+            return `"${formatDate(item.to_date)} ${formatTime(item.to_time)}"`
           case 'booking_date':
           case 'order_date':
-            return `"${formatDate(item[col.id]).replace(/"/g, '""')}"`
+            return `"${formatDate(item[col.id])}"`
           case 'items':
-            const products = item.booking_items?.reduce((sum: number, i: any) => sum + i.quantity, 0) || 0
+            const products = (item.order_items || item.booking_items)?.reduce((sum: number, i: any) => sum + i.quantity, 0) || 0
             const outsourced = item.outsourced_items?.reduce((sum: number, i: any) => sum + i.quantity, 0) || 0
-            return `"Products: ${products}, Outsourced: ${outsourced}"`
+            return `"Products: ${products} | Outsourced: ${outsourced}"`
           case 'total_amount':
           case 'amount_paid':
-            return formatCurrency(item[col.id] || 0)
+            return `"${formatCurrency(item[col.id] || 0)}"`
+          case 'amount':
+            return `"${formatCurrency(item.total_amount || 0)}"`
           case 'status':
             return `"${(item.status || '-').replace(/"/g, '""')}"`
             
@@ -296,9 +300,12 @@ import { formatCurrency } from "./commonFunctions"
           default:
             if (col.accessorKey) {
               const value = getNestedValue(item, col.accessorKey)
-              return typeof value === 'string' ? `"${value.replace(/"/g, '""')}"` : value
+              if (value === null || value === undefined) {
+                return '"-"'
+              }
+              return typeof value === 'string' ? `"${value.replace(/"/g, '""')}"` : `"${value}"`
             }
-            return '""'
+            return '"-"'
         }
       }).join(',')
     }).join('\n')

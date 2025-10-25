@@ -3,8 +3,8 @@ import axios, { AxiosRequestConfig } from "axios";
 import Cookies from "js-cookie";
 import { clearAuthAndRedirect, isAuthPage, getCurrentPathname } from "./authUtils";
 
-// const API_URL = "https://server.momenz.in";
-const API_URL = "http://localhost:5000";
+const API_URL = "https://server.momenz.in";
+// const API_URL = "http://localhost:5000";
 
 const axiosApi = axios.create({
   baseURL: API_URL,

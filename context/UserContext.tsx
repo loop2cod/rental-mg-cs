@@ -5,8 +5,8 @@ import axios from 'axios';
 import { API_ENDPOINTS } from '@/lib/apiEndpoints';
 import { get } from '@/utilities/AxiosInterceptor';
 
-// const apiUrl = 'https://server.momenz.in';
-const apiUrl = 'http://localhost:5000';
+const apiUrl = 'https://server.momenz.in';
+// const apiUrl = 'http://localhost:5000';
 
 interface User {
   id: string;
